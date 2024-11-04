@@ -1,0 +1,6 @@
+@CommuniQueue.Api_HostAddress = http://localhost:5125
+
+GET {{CommuniQueue.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

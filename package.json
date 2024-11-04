@@ -1,0 +1,30 @@
+{
+  "name": "battletenant",
+  "version": "1.0.0",
+  "description": "Manages tenant configuration for all battleline productions applications",
+  "main": "index.js",
+  "scripts": {
+    "domain:dev": "serverless create_domain --stage dev",
+    "domain:prod": "serverless create_domain --stage prod",
+    "deploy:dev": "serverless deploy --stage dev",
+    "deploy:prod": "serverless deploy --stage prod"
+  },
+  "keywords": [
+    "Tenant",
+    "configuration"
+  ],
+  "author": "Battle Line Productions",
+  "license": "Battleline Productions",
+  "devDependencies": {
+    "serverless": "^4.0.35",
+    "serverless-domain-manager": "^7.3.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Battle-Line-Productions/BattleTenant.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Battle-Line-Productions/BattleTenant/issues"
+  },
+  "homepage": "https://github.com/Battle-Line-Productions/BattleTenant#readme"
+}

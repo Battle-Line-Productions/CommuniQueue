@@ -1,0 +1,124 @@
+org: battleline
+app: tenant
+service: BattleTenant
+
+provider:
+  name: aws
+  memorySize: 1024
+  logRetentionInDays: 3
+  runtime: dotnet8
+  region: us-east-2
+  architecture: x86_64
+  stage: ${opt:stage, 'dev'}
+  environment:
+    EnvironmentName: ${self:provider.stage}
+    AuthIssuer: ${param:issuerUrl}
+    AuthAudience: ${param:allowedAudiences}
+    ServiceName: ${self:service}
+    DynamoDbTenantTableName: ${self:custom.tenantTableName}
+  deploymentBucket:
+    name: battleline-serverless-deployments
+  timeout: 29
+  logs:
+    httpApi: true
+  httpApi:
+    cors: true
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:Scan
+            - dynamodb:Query
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt:
+                - Table
+                - Arn
+        - Sid: AllowStartQueries
+          Effect: Allow
+          Action:
+            - logs:DescribeLogGroups
+            - logs:StartQuery
+          Resource: "*"
+        - Sid: AllowGetQueryResults
+          Effect: Allow
+          Action:
+            - logs:GetQueryResults
+          Resource: "*"
+
+package:
+  individually: true
+
+plugins:
+  - serverless-domain-manager
+
+custom:
+  tenantTableName: Tenants
+  customDomain:
+    autoDomain: true
+    domainName: ${param:domain}
+    basePath: ""
+    stage: ${self:provider.stage}
+    createRoute53Record: false
+    endpointType: "regional"
+    securityPolicy: tls_1_2
+    certificateName: ${param:cert}
+    apiType: http
+
+params:
+  prod:
+    domain: tenant.battlelineproductions.com
+    cert: tenant.battlelineproductions.com
+    issuerUrl: 'https://auth.battlelineproductions.com/oidc'
+    allowedAudiences: https://tenant.battlelineproductions.com
+  dev:
+    domain: dev-tenant.battlelineproductions.com
+    cert: dev-tenant.battlelineproductions.com
+    issuerUrl: https://auth-dev.battlelineproductions.com/oidc
+    allowedAudiences: https://dev-tenant.battlelineproductions.com
+
+functions:
+  apiFunction:
+    handler: bootstrap
+    package:
+      artifact: deploy_package.zip
+    events:
+      - httpApi:
+          path: "*"
+          method: "*"
+
+resources:
+  Resources:
+    Table:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-${self:provider.stage}-${self:custom.tenantTableName}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: createdBy
+            AttributeType: S
+          - AttributeName: organization
+            AttributeType: S
+        BillingMode: PAY_PER_REQUEST
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: CreatedBy-Index
+            KeySchema:
+              - AttributeName: createdBy
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: Organization-Index
+            KeySchema:
+              - AttributeName: organization
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
