@@ -72,5 +72,8 @@ app.UseRequestResponseLogging();
 app.MigrateDatabase();
 
 app.MapProjectEndpoints();
+app.MapContainerEndpoints();
+app.MapTemplateEndpoints();
+app.MapApiKeyEndpoints();
 
 app.Run();

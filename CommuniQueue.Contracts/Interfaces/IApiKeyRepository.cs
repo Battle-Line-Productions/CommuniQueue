@@ -7,11 +7,11 @@
 // 
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
-// Date: 10/14/2024
+// Date: 11/05/2024
 // Solution Name: CommuniQueue
 // Project Name: CommuniQueue.Contracts
-// File: IProjectRepository.cs
-// File Path: C:\git\battleline\CommuniQueue\CommuniQueue.Contracts\Interfaces\IProjectRepository.cs
+// File: IApiKeyRepository.cs
+// File Path: C:\git\battleline\CommuniQueue\CommuniQueue.Contracts\Interfaces\IApiKeyRepository.cs
 // ---------------------------------------------------------------------------
 #endregion
 
@@ -19,12 +19,13 @@ using CommuniQueue.Contracts.Models;
 
 namespace CommuniQueue.Contracts.Interfaces;
 
-public interface IProjectRepository
+public interface IApiKeyRepository
 {
-    Task<Project> CreateAsync(Project project);
-    Task<Project?> GetByIdAsync(Guid projectId);
-    Task<IEnumerable<Project?>> GetByUserIdAsync(Guid userId);
-    Task<Project> UpdateAsync(Project project);
-    Task DeleteAsync(Guid projectId);
-    Task<bool> ExistsAsync(Guid projectId);
+    Task<ApiKey> CreateAsync(ApiKey apiKey);
+    Task<ApiKey?> GetByIdAsync(Guid apiKeyId);
+    Task<ApiKey?> GetByHashAsync(string keyHash);
+    Task<IEnumerable<ApiKey>> GetByProjectIdAsync(Guid projectId);
+    Task<ApiKey> UpdateAsync(ApiKey apiKey);
+    Task DeleteAsync(Guid apiKeyId);
+    Task<bool> ExistsAsync(Guid apiKeyId);
 }

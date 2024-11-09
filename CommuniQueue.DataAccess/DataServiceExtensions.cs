@@ -33,6 +33,7 @@ public static class DataServiceExtensions
         services.AddScoped<ITemplateVersionRepository, TemplateVersionRepository>();
         services.AddScoped<ITemplateStageAssignmentRepository, TemplateStageAssignmentRepository>();
         services.AddScoped<IContainerRepository, ContainerRepository>();
+        services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
 
         return services;
     }

@@ -19,6 +19,7 @@
 
 #region Usings
 
+using System.Text.Json;
 using BattlelineExtras.Contracts.Interfaces;
 using CommuniQueue.Contracts.Models;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +43,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Stage> Stages { get; set; }
     public DbSet<TemplateVersion> TemplateVersions { get; set; }
     public DbSet<TemplateStageAssignment> TemplateStageAssignments { get; set; }
+    public DbSet<ApiKey> ApiKeys { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -149,6 +151,23 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .WithOne()
                 .HasForeignKey<Project>(p => p.RootContainerId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<ApiKey>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.KeyHash).IsRequired();
+
+            entity.HasOne(e => e.Project)
+                .WithMany()
+                .HasForeignKey(e => e.ProjectId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.Property(e => e.Scopes)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                    v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null));
         });
     }
 
