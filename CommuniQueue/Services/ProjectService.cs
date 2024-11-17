@@ -21,6 +21,7 @@
 
 using BattlelineExtras.Contracts.Extensions;
 using BattlelineExtras.Contracts.Models;
+using CommuniQueue.Contracts.Models;
 
 #endregion
 
@@ -30,7 +31,8 @@ public class ProjectService(
     IProjectRepository projectRepository,
     IPermissionRepository permissionRepository,
     IStageRepository stageRepository,
-    IContainerRepository containerRepository)
+    IContainerRepository containerRepository,
+    ITemplateRepository templateRepository)
     : IProjectService
 {
     private const string SubCode = "ProjectService";
@@ -39,37 +41,40 @@ public class ProjectService(
     {
         try
         {
-            var project = new Project
+            return await projectRepository.ExecuteInTransactionAsync(async () =>
             {
-                Name = name,
-                Description = description
-            };
+                // First, create the Project without the RootContainerId
+                var project = new Project
+                {
+                    Name = name,
+                    Description = description
+                };
 
-            project = await projectRepository.CreateAsync(project);
+                project = await projectRepository.CreateAsync(project);
 
-            var rootContainer = new Container
-            {
-                Name = "Root",
-                ProjectId = project.Id,
-                IsRoot = true
-            };
+                // Now create the Container with the ProjectId
+                var rootContainer = new Container
+                {
+                    Name = "Root",
+                    IsRoot = true,
+                    ProjectId = project.Id
+                };
 
-            rootContainer = await containerRepository.CreateAsync(rootContainer);
+                await containerRepository.CreateAsync(rootContainer);
 
-            project.RootContainer = rootContainer;
-            await projectRepository.UpdateAsync(project);
+                // Create the Permission
+                var permission = new Permission
+                {
+                    UserId = ownerId,
+                    EntityId = project.Id,
+                    EntityType = EntityType.Project,
+                    PermissionLevel = PermissionLevel.SuperAdmin
+                };
 
-            var permission = new Permission
-            {
-                UserId = ownerId,
-                EntityId = project.Id,
-                EntityType = EntityType.Project,
-                PermissionLevel = PermissionLevel.SuperAdmin
-            };
+                await permissionRepository.CreateAsync(permission);
 
-            await permissionRepository.CreateAsync(permission);
-
-            return project.BuildResponseDetail(ResultStatus.Created201, "Create Project", SubCode);
+                return project.BuildResponseDetail(ResultStatus.Created201, "Create Project", SubCode);
+            });
         }
         catch (Exception ex)
         {
@@ -77,6 +82,7 @@ public class ProjectService(
                 .AddErrorDetail("CreateProject", ex.Message);
         }
     }
+
 
     public async Task<ResponseDetail<Project>> GetProjectByIdAsync(Guid projectId)
     {
@@ -139,6 +145,49 @@ public class ProjectService(
     {
         try
         {
+            var project = await projectRepository.GetByIdAsync(projectId);
+
+            if (project == null)
+            {
+                return false.BuildResponseDetail(ResultStatus.NotFound404, "Delete Project", SubCode)
+                    .AddErrorDetail("DeleteProject", $"Project with ID {projectId} not found");
+            }
+
+            var containers = await containerRepository.GetByProjectIdAsync(projectId);
+
+            foreach (var container in containers)
+            {
+                var templates = await templateRepository.GetByContainerIdAsync(container.Id);
+
+                foreach (var template in templates)
+                {
+                    var templatePermissions = await permissionRepository.ListEntityTypeById(template.Id, EntityType.Template);
+
+                    foreach (var templatePermission in templatePermissions)
+                    {
+                        await permissionRepository.DeleteAsync(templatePermission);
+                    }
+
+                    await templateRepository.DeleteAsync(template);
+                }
+
+                var containerPermissions = await permissionRepository.ListEntityTypeById(container.Id, EntityType.Container);
+
+                foreach (var containerPermission in containerPermissions)
+                {
+                    await permissionRepository.DeleteAsync(containerPermission);
+                }
+
+                await containerRepository.DeleteAsync(container);
+            }
+
+            var projectPermissions = await permissionRepository.ListEntityTypeById(project.Id, EntityType.Project);
+
+            foreach (var permission in projectPermissions)
+            {
+                await permissionRepository.DeleteAsync(permission);
+            }
+
             await projectRepository.DeleteAsync(projectId);
             return true.BuildResponseDetail(ResultStatus.Ok200, "Delete Project", SubCode);
         }

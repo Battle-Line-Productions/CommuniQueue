@@ -26,4 +26,5 @@ public interface ITemplateRepository
     Task<Template> CreateAsync(Template template);
     Task<Template?> GetByIdAsync(Guid templateId);
     Task DeleteAsync(Guid templateId);
+    Task DeleteAsync(Template template);
 }

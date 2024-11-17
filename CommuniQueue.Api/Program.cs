@@ -19,12 +19,14 @@
 
 #region Usings
 
+using System.Text.Json.Serialization;
 using Asp.Versioning;
 using BattlelineExtras.Http.Extensions;
 using CommuniQueue;
 using CommuniQueue.Api.Extensions;
 using CommuniQueue.Api.Handlers;
 using CommuniQueue.DataAccess;
+using CommuniQueue.ServiceDefaults;
 using Microsoft.EntityFrameworkCore;
 using ServiceExtensions = BattlelineExtras.Services.Extensions.ServiceExtensions;
 
@@ -35,6 +37,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCustomLogger(builder.Configuration);
 
 builder.AddServiceDefaults();
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -51,6 +58,14 @@ builder.Services.AddApiVersioning(options =>
         options.SubstituteApiVersionInUrl = true;
     });
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policyBuilder =>
+    {
+        policyBuilder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+    });
+});
+
 builder.AddNpgsqlDbContext<AppDbContext>("communiqueuedb", null,
     options => { options.UseSnakeCaseNamingConvention(); });
 
@@ -63,6 +78,8 @@ builder.Services.AddAppServices();
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
+
+app.UseCors();
 
 app.UseHttpsRedirection();
 

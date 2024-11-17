@@ -58,4 +58,10 @@ public class TemplateRepository(AppDbContext context) : ITemplateRepository
             await context.SaveChangesAsync();
         }
     }
+
+    public async Task DeleteAsync(Template template)
+    {
+        context.Templates.Remove(template);
+        await context.SaveChangesAsync();
+    }
 }

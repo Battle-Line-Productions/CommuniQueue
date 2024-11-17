@@ -86,6 +86,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.HasOne(c => c.Project)
                 .WithMany(p => p.Containers)
                 .HasForeignKey(c => c.ProjectId)
+                .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
@@ -146,11 +147,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<Project>(entity =>
         {
             entity.HasKey(e => e.Id);
-
-            entity.HasOne(p => p.RootContainer)
-                .WithOne()
-                .HasForeignKey<Project>(p => p.RootContainerId)
-                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<ApiKey>(entity =>

@@ -32,6 +32,7 @@ public interface IContainerRepository
     Task<IEnumerable<Container>> GetByProjectIdAsync(Guid projectId);
     Task<Container> UpdateAsync(Container container);
     Task DeleteAsync(Guid containerId);
+    Task DeleteAsync(Container container);
     Task<IEnumerable<Container>> GetChildrenAsync(Guid parentContainerId);
     Task<Container> GetRootContainerForProjectAsync(Guid projectId);
     Task<bool> ExistsAsync(Guid containerId);

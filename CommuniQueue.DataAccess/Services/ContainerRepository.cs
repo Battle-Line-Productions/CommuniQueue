@@ -65,6 +65,12 @@ public class ContainerRepository(AppDbContext context) : IContainerRepository
         }
     }
 
+    public async Task DeleteAsync(Container container)
+    {
+        context.Containers.Remove(container);
+        await context.SaveChangesAsync();
+    }
+
     public async Task<IEnumerable<Container>> GetChildrenAsync(Guid parentContainerId)
     {
         return await context.Containers

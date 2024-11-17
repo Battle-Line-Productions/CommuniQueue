@@ -30,8 +30,6 @@ public class Project : IEntity
     public required string Name { get; set; }
     public string? Description { get; set; }
     public string? CustomerId { get; set; }
-    public Guid RootContainerId { get; set; }
-    public Container RootContainer { get; set; }
     public ICollection<Stage> Stages { get; set; } = [];
     public ICollection<Container> Containers { get; set; } = [];
     public ICollection<Template> Templates { get; set; } = [];

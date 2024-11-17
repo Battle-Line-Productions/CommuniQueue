@@ -21,6 +21,7 @@ namespace CommuniQueue.Contracts.Interfaces;
 
 public interface IProjectRepository
 {
+    Task<TResult> ExecuteInTransactionAsync<TResult>(Func<Task<TResult>> operation);
     Task<Project> CreateAsync(Project project);
     Task<Project?> GetByIdAsync(Guid projectId);
     Task<IEnumerable<Project?>> GetByUserIdAsync(Guid userId);

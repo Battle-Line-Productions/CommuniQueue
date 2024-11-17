@@ -36,6 +36,12 @@ public class PermissionRepository(AppDbContext context) : IPermissionRepository
             .FirstOrDefaultAsync(p => p.UserId == userId && p.EntityId == entityId && p.EntityType == entityType);
     }
 
+    public async Task<List<Permission>> ListEntityTypeById(Guid entityId, EntityType entityType)
+    {
+        return await context.Permissions
+            .Where(p => p.EntityId == entityId && p.EntityType == entityType).ToListAsync();
+    }
+
     public async Task<Permission> UpdateAsync(Permission permission)
     {
         context.Permissions.Update(permission);
@@ -51,6 +57,12 @@ public class PermissionRepository(AppDbContext context) : IPermissionRepository
             context.Permissions.Remove(permission);
             await context.SaveChangesAsync();
         }
+    }
+
+    public async Task DeleteAsync(Permission permission)
+    {
+        context.Permissions.Remove(permission);
+        await context.SaveChangesAsync();
     }
 
     public async Task<bool> ExistsAsync(Guid userId, Guid entityId, EntityType entityType)

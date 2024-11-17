@@ -23,7 +23,9 @@ public interface IPermissionRepository
 {
     Task<Permission> CreateAsync(Permission permission);
     Task<Permission?> GetAsync(Guid userId, Guid entityId, EntityType entityType);
+    Task<List<Permission>> ListEntityTypeById(Guid entityId, EntityType entityType);
     Task<Permission> UpdateAsync(Permission permission);
     Task DeleteAsync(Guid userId, Guid entityId, EntityType entityType);
+    Task DeleteAsync(Permission permission);
     Task<bool> ExistsAsync(Guid userId, Guid entityId, EntityType entityType);
 }

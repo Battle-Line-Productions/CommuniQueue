@@ -23,6 +23,26 @@ namespace CommuniQueue.DataAccess.Services;
 
 public class ProjectRepository(AppDbContext context) : IProjectRepository
 {
+    public async Task<TResult> ExecuteInTransactionAsync<TResult>(Func<Task<TResult>> operation)
+    {
+        var strategy = context.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(async () =>
+        {
+            await using var transaction = await context.Database.BeginTransactionAsync();
+            try
+            {
+                var result = await operation();
+                await transaction.CommitAsync();
+                return result;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        });
+    }
+
     public async Task<Project> CreateAsync(Project project)
     {
         context.Projects.Add(project);
