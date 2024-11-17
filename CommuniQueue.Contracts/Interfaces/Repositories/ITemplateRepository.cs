@@ -7,25 +7,20 @@
 // 
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
-// Date: 11/05/2024
+// Date: 11/03/2024
 // Solution Name: CommuniQueue
 // Project Name: CommuniQueue.Contracts
-// File: IApiKeyRepository.cs
-// File Path: C:\git\battleline\CommuniQueue\CommuniQueue.Contracts\Interfaces\IApiKeyRepository.cs
+// File: ITemplateRepository.cs
+// File Path: C:\git\battleline\CommuniQueue\CommuniQueue.Contracts\Interfaces\ITemplateRepository.cs
 // ---------------------------------------------------------------------------
 #endregion
 
 using CommuniQueue.Contracts.Models;
 
-namespace CommuniQueue.Contracts.Interfaces;
+namespace CommuniQueue.Contracts.Interfaces.Repositories;
 
-public interface IApiKeyRepository
+public interface ITemplateRepository : IBaseRepository<Template>
 {
-    Task<ApiKey> CreateAsync(ApiKey apiKey);
-    Task<ApiKey?> GetByIdAsync(Guid apiKeyId);
-    Task<ApiKey?> GetByHashAsync(string keyHash);
-    Task<IEnumerable<ApiKey>> GetByProjectIdAsync(Guid projectId);
-    Task<ApiKey> UpdateAsync(ApiKey apiKey);
-    Task DeleteAsync(Guid apiKeyId);
-    Task<bool> ExistsAsync(Guid apiKeyId);
+    Task<IEnumerable<Template>> GetByProjectIdAsync(Guid projectId);
+    Task<IEnumerable<Template>> GetByContainerIdAsync(Guid containerId);
 }

@@ -15,21 +15,14 @@
 // ---------------------------------------------------------------------------
 #endregion
 
-using CommuniQueue.Contracts.Interfaces;
+using CommuniQueue.Contracts.Interfaces.Repositories;
 using CommuniQueue.Contracts.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CommuniQueue.DataAccess.Services;
 
-public class PermissionRepository(AppDbContext context) : IPermissionRepository
+public class PermissionRepository(AppDbContext context) : BaseRepository<Permission>(context), IPermissionRepository
 {
-    public async Task<Permission> CreateAsync(Permission permission)
-    {
-        context.Permissions.Add(permission);
-        await context.SaveChangesAsync();
-        return permission;
-    }
-
     public async Task<Permission?> GetAsync(Guid userId, Guid entityId, EntityType entityType)
     {
         return await context.Permissions
@@ -42,13 +35,6 @@ public class PermissionRepository(AppDbContext context) : IPermissionRepository
             .Where(p => p.EntityId == entityId && p.EntityType == entityType).ToListAsync();
     }
 
-    public async Task<Permission> UpdateAsync(Permission permission)
-    {
-        context.Permissions.Update(permission);
-        await context.SaveChangesAsync();
-        return permission;
-    }
-
     public async Task DeleteAsync(Guid userId, Guid entityId, EntityType entityType)
     {
         var permission = await GetAsync(userId, entityId, entityType);
@@ -57,12 +43,6 @@ public class PermissionRepository(AppDbContext context) : IPermissionRepository
             context.Permissions.Remove(permission);
             await context.SaveChangesAsync();
         }
-    }
-
-    public async Task DeleteAsync(Permission permission)
-    {
-        context.Permissions.Remove(permission);
-        await context.SaveChangesAsync();
     }
 
     public async Task<bool> ExistsAsync(Guid userId, Guid entityId, EntityType entityType)

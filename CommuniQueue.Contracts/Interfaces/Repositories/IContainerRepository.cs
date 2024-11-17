@@ -23,17 +23,11 @@ using CommuniQueue.Contracts.Models;
 
 #endregion
 
-namespace CommuniQueue.Contracts.Interfaces;
+namespace CommuniQueue.Contracts.Interfaces.Repositories;
 
-public interface IContainerRepository
+public interface IContainerRepository : IBaseRepository<Container>
 {
-    Task<Container> CreateAsync(Container container);
-    Task<Container?> GetByIdAsync(Guid containerId);
     Task<IEnumerable<Container>> GetByProjectIdAsync(Guid projectId);
-    Task<Container> UpdateAsync(Container container);
-    Task DeleteAsync(Guid containerId);
-    Task DeleteAsync(Container container);
     Task<IEnumerable<Container>> GetChildrenAsync(Guid parentContainerId);
     Task<Container> GetRootContainerForProjectAsync(Guid projectId);
-    Task<bool> ExistsAsync(Guid containerId);
 }

@@ -10,22 +10,19 @@
 // Date: 10/14/2024
 // Solution Name: CommuniQueue
 // Project Name: CommuniQueue.Contracts
-// File: IProjectRepository.cs
-// File Path: C:\git\battleline\CommuniQueue\CommuniQueue.Contracts\Interfaces\IProjectRepository.cs
+// File: IPermissionRepository.cs
+// File Path: C:\git\battleline\CommuniQueue\CommuniQueue.Contracts\Interfaces\IPermissionRepository.cs
 // ---------------------------------------------------------------------------
 #endregion
 
 using CommuniQueue.Contracts.Models;
 
-namespace CommuniQueue.Contracts.Interfaces;
+namespace CommuniQueue.Contracts.Interfaces.Repositories;
 
-public interface IProjectRepository
+public interface IPermissionRepository : IBaseRepository<Permission>
 {
-    Task<TResult> ExecuteInTransactionAsync<TResult>(Func<Task<TResult>> operation);
-    Task<Project> CreateAsync(Project project);
-    Task<Project?> GetByIdAsync(Guid projectId);
-    Task<IEnumerable<Project?>> GetByUserIdAsync(Guid userId);
-    Task<Project> UpdateAsync(Project project);
-    Task DeleteAsync(Guid projectId);
-    Task<bool> ExistsAsync(Guid projectId);
+    Task<Permission?> GetAsync(Guid userId, Guid entityId, EntityType entityType);
+    Task<List<Permission>> ListEntityTypeById(Guid entityId, EntityType entityType);
+    Task DeleteAsync(Guid userId, Guid entityId, EntityType entityType);
+    Task<bool> ExistsAsync(Guid userId, Guid entityId, EntityType entityType);
 }

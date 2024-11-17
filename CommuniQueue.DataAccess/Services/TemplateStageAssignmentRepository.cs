@@ -15,31 +15,14 @@
 // ---------------------------------------------------------------------------
 #endregion
 
-using CommuniQueue.Contracts.Interfaces;
+using CommuniQueue.Contracts.Interfaces.Repositories;
 using CommuniQueue.Contracts.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CommuniQueue.DataAccess.Services;
 
-public class TemplateStageAssignmentRepository(AppDbContext context) : ITemplateStageAssignmentRepository
+public class TemplateStageAssignmentRepository(AppDbContext context) : BaseRepository<TemplateStageAssignment>(context), ITemplateStageAssignmentRepository
 {
-    public async Task<TemplateStageAssignment> CreateAsync(TemplateStageAssignment assignment)
-    {
-        await context.TemplateStageAssignments.AddAsync(assignment);
-        await context.SaveChangesAsync();
-        return assignment;
-    }
-
-    public async Task DeleteAsync(Guid assignmentId)
-    {
-        var assignment = await context.TemplateStageAssignments.FindAsync(assignmentId);
-        if (assignment != null)
-        {
-            context.TemplateStageAssignments.Remove(assignment);
-            await context.SaveChangesAsync();
-        }
-    }
-
     public async Task<IEnumerable<TemplateStageAssignment>> GetByStageIdAsync(Guid stageId)
     {
         return await context.TemplateStageAssignments
@@ -47,7 +30,7 @@ public class TemplateStageAssignmentRepository(AppDbContext context) : ITemplate
             .ToListAsync();
     }
 
-    public async Task<TemplateStageAssignment> GetByStageAndTemplateVersionIdAsync(Guid stageId, Guid templateVersionId)
+    public async Task<TemplateStageAssignment?> GetByStageAndTemplateVersionIdAsync(Guid stageId, Guid templateVersionId)
     {
         return await context.TemplateStageAssignments
             .FirstOrDefaultAsync(tsa => tsa.StageId == stageId && tsa.TemplateVersionId == templateVersionId);

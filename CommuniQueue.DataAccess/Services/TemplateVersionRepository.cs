@@ -15,26 +15,14 @@
 // ---------------------------------------------------------------------------
 #endregion
 
-using CommuniQueue.Contracts.Interfaces;
+using CommuniQueue.Contracts.Interfaces.Repositories;
 using CommuniQueue.Contracts.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CommuniQueue.DataAccess.Services;
 
-public class TemplateVersionRepository(AppDbContext context) : ITemplateVersionRepository
+public class TemplateVersionRepository(AppDbContext context) : BaseRepository<TemplateVersion>(context), ITemplateVersionRepository
 {
-    public async Task<TemplateVersion> CreateAsync(TemplateVersion templateVersion)
-    {
-        await context.TemplateVersions.AddAsync(templateVersion);
-        await context.SaveChangesAsync();
-        return templateVersion;
-    }
-
-    public async Task<TemplateVersion?> GetByIdAsync(Guid templateVersionId)
-    {
-        return await context.TemplateVersions.FindAsync(templateVersionId);
-    }
-
     public async Task<IEnumerable<TemplateVersion>> GetByTemplateIdAsync(Guid templateId)
     {
         return await context.TemplateVersions

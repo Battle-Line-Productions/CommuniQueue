@@ -21,6 +21,7 @@
 
 using BattlelineExtras.Contracts.Extensions;
 using BattlelineExtras.Contracts.Models;
+using CommuniQueue.Contracts.Interfaces.Repositories;
 
 #endregion
 

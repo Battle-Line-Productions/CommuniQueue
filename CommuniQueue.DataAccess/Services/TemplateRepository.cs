@@ -15,13 +15,13 @@
 // ---------------------------------------------------------------------------
 #endregion
 
-using CommuniQueue.Contracts.Interfaces;
+using CommuniQueue.Contracts.Interfaces.Repositories;
 using CommuniQueue.Contracts.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CommuniQueue.DataAccess.Services;
 
-public class TemplateRepository(AppDbContext context) : ITemplateRepository
+public class TemplateRepository(AppDbContext context) : BaseRepository<Template>(context), ITemplateRepository
 {
     public async Task<IEnumerable<Template>> GetByProjectIdAsync(Guid projectId)
     {
@@ -35,33 +35,5 @@ public class TemplateRepository(AppDbContext context) : ITemplateRepository
         return await context.Templates
             .Where(t => t.ContainerId == containerId)
             .ToListAsync();
-    }
-
-    public async Task<Template> CreateAsync(Template template)
-    {
-        await context.Templates.AddAsync(template);
-        await context.SaveChangesAsync();
-        return template;
-    }
-
-    public async Task<Template?> GetByIdAsync(Guid templateId)
-    {
-        return await context.Templates.FindAsync(templateId);
-    }
-
-    public async Task DeleteAsync(Guid templateId)
-    {
-        var template = await context.Templates.FindAsync(templateId);
-        if (template != null)
-        {
-            context.Templates.Remove(template);
-            await context.SaveChangesAsync();
-        }
-    }
-
-    public async Task DeleteAsync(Template template)
-    {
-        context.Templates.Remove(template);
-        await context.SaveChangesAsync();
     }
 }

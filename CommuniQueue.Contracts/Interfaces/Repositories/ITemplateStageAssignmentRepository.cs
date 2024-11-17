@@ -10,19 +10,18 @@
 // Date: 11/03/2024
 // Solution Name: CommuniQueue
 // Project Name: CommuniQueue.Contracts
-// File: ITemplateVersionRepository.cs
-// File Path: C:\git\battleline\CommuniQueue\CommuniQueue.Contracts\Interfaces\ITemplateVersionRepository.cs
+// File: ITemplateStageAssignmentRepository.cs
+// File Path: C:\git\battleline\CommuniQueue\CommuniQueue.Contracts\Interfaces\ITemplateStageAssignmentRepository.cs
 // ---------------------------------------------------------------------------
 #endregion
 
 using CommuniQueue.Contracts.Models;
 
-namespace CommuniQueue.Contracts.Interfaces;
+namespace CommuniQueue.Contracts.Interfaces.Repositories;
 
-public interface ITemplateVersionRepository
+public interface ITemplateStageAssignmentRepository : IBaseRepository<TemplateStageAssignment>
 {
-    Task<TemplateVersion> CreateAsync(TemplateVersion templateVersion);
-    Task<TemplateVersion?> GetByIdAsync(Guid templateVersionId);
-    Task<IEnumerable<TemplateVersion>> GetByTemplateIdAsync(Guid templateId);
-    Task<TemplateVersion> GetLatestVersionAsync(Guid templateId);
+    Task<IEnumerable<TemplateStageAssignment>> GetByStageIdAsync(Guid stageId);
+    Task<TemplateStageAssignment?> GetByStageAndTemplateVersionIdAsync(Guid stageId, Guid templateVersionId);
+    Task<bool> ExistsForStageAndTemplateVersionAsync(Guid stageId, Guid templateVersionId);
 }

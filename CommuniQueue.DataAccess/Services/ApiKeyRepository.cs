@@ -15,26 +15,14 @@
 // ---------------------------------------------------------------------------
 #endregion
 
-using CommuniQueue.Contracts.Interfaces;
+using CommuniQueue.Contracts.Interfaces.Repositories;
 using CommuniQueue.Contracts.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CommuniQueue.DataAccess.Services;
 
-public class ApiKeyRepository(AppDbContext context) : IApiKeyRepository
+public class ApiKeyRepository(AppDbContext context) : BaseRepository<ApiKey>(context), IApiKeyRepository
 {
-    public async Task<ApiKey> CreateAsync(ApiKey apiKey)
-    {
-        context.ApiKeys.Add(apiKey);
-        await context.SaveChangesAsync();
-        return apiKey;
-    }
-
-    public async Task<ApiKey?> GetByIdAsync(Guid apiKeyId)
-    {
-        return await context.ApiKeys.FindAsync(apiKeyId);
-    }
-
     public async Task<ApiKey?> GetByHashAsync(string keyHash)
     {
         return await context.ApiKeys.FirstOrDefaultAsync(ak => ak.KeyHash == keyHash);
@@ -45,27 +33,5 @@ public class ApiKeyRepository(AppDbContext context) : IApiKeyRepository
         return await context.ApiKeys
             .Where(ak => ak.ProjectId == projectId)
             .ToListAsync();
-    }
-
-    public async Task<ApiKey> UpdateAsync(ApiKey apiKey)
-    {
-        context.ApiKeys.Update(apiKey);
-        await context.SaveChangesAsync();
-        return apiKey;
-    }
-
-    public async Task DeleteAsync(Guid apiKeyId)
-    {
-        var apiKey = await context.ApiKeys.FindAsync(apiKeyId);
-        if (apiKey != null)
-        {
-            context.ApiKeys.Remove(apiKey);
-            await context.SaveChangesAsync();
-        }
-    }
-
-    public async Task<bool> ExistsAsync(Guid apiKeyId)
-    {
-        return await context.ApiKeys.AnyAsync(ak => ak.Id == apiKeyId);
     }
 }

@@ -15,7 +15,7 @@
 // ---------------------------------------------------------------------------
 #endregion
 
-using CommuniQueue.Contracts.Interfaces;
+using CommuniQueue.Contracts.Interfaces.Repositories;
 using CommuniQueue.DataAccess.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -25,6 +25,9 @@ public static class DataServiceExtensions
 {
     public static IServiceCollection AddDataServices(this IServiceCollection services)
     {
+        services.AddScoped(typeof(IKpiQueryService<,>), typeof(BaseKpiDataService<,>));
+        services.AddScoped(typeof(IBaseKpiDataServiceFactory<,>), typeof(BaseKpiDataServiceFactory<,>));
+
         services.AddScoped<IContainerRepository, ContainerRepository>();
         services.AddScoped<IProjectRepository, ProjectRepository>();
         services.AddScoped<IPermissionRepository, PermissionRepository>();

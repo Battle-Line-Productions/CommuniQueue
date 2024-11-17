@@ -7,24 +7,19 @@
 // 
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
-// Date: 11/03/2024
+// Date: 10/14/2024
 // Solution Name: CommuniQueue
 // Project Name: CommuniQueue.Contracts
-// File: IStageRepository.cs
-// File Path: C:\git\battleline\CommuniQueue\CommuniQueue.Contracts\Interfaces\IStageRepository.cs
+// File: IProjectRepository.cs
+// File Path: C:\git\battleline\CommuniQueue\CommuniQueue.Contracts\Interfaces\IProjectRepository.cs
 // ---------------------------------------------------------------------------
 #endregion
 
 using CommuniQueue.Contracts.Models;
 
-namespace CommuniQueue.Contracts.Interfaces;
+namespace CommuniQueue.Contracts.Interfaces.Repositories;
 
-public interface IStageRepository
+public interface IProjectRepository : IBaseRepository<Project>
 {
-    Task<Stage> CreateAsync(Stage stage);
-    Task<Stage?> GetByIdAsync(Guid stageId);
-    Task<IEnumerable<Stage>> GetByProjectIdAsync(Guid projectId);
-    Task<Stage> UpdateAsync(Stage stage);
-    Task DeleteAsync(Guid stageId);
-    Task<bool> ExistsAsync(Guid stageId);
+    Task<IEnumerable<Project?>> GetByUserIdAsync(Guid userId);
 }

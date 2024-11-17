@@ -19,6 +19,7 @@ using System.Security.Cryptography;
 using BattlelineExtras.Contracts.Extensions;
 using BattlelineExtras.Contracts.Models;
 using BattlelineExtras.Services.Crypto;
+using CommuniQueue.Contracts.Interfaces.Repositories;
 
 namespace CommuniQueue.Services;
 
