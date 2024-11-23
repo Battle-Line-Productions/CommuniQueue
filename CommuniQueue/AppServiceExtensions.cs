@@ -28,6 +28,7 @@ public static class AppServiceExtensions
         services.AddScoped<IStageService, StageService>();
         services.AddScoped<IContainerService, ContainerService>();
         services.AddScoped<ITemplateService, TemplateService>();
+        services.AddScoped<IPermissionService, PermissionService>();
 
         return services;
     }

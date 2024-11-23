@@ -15,79 +15,30 @@
 // ---------------------------------------------------------------------------
 #endregion
 
-using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using CommuniQueue.Contracts.Interfaces;
 using CommuniQueue.Contracts.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace CommuniQueue.DataAccess;
 
-public interface IBaseKpiDataServiceFactory<TEntity, TContext>
+public class BaseKpiDataServiceFactory<TEntity>(IDbContextFactory<AppDbContext> contextFactory)
+    : IBaseKpiDataServiceFactory<TEntity>
     where TEntity : class
-    where TContext : DbContext
 {
-    IKpiQueryService<TEntity, TContext> Create();
-}
-
-public class BaseKpiDataServiceFactory<TEntity, TContext>(IDbContextFactory<TContext> contextFactory)
-    : IBaseKpiDataServiceFactory<TEntity, TContext>
-    where TEntity : class
-    where TContext : DbContext
-{
-    public IKpiQueryService<TEntity, TContext> Create()
+    public IKpiQueryService<TEntity> Create()
     {
         var context = contextFactory.CreateDbContext();
-        return new BaseKpiDataService<TEntity, TContext>(context);
+        return new BaseKpiDataService<TEntity>(context);
     }
 }
 
-public interface IKpiQueryService<TEntity, TContext> : IDisposable
+public class BaseKpiDataService<TEntity>(AppDbContext context) : IKpiQueryService<TEntity>
     where TEntity : class
-    where TContext : DbContext
-{
-    Task<(IEnumerable<TEntity> data, int totalRecords)> GetAllAsync(
-        List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>>? includes = null,
-        Expression<Func<TEntity, bool>>? filterPredicate = null,
-        PaginationFilter? paginationFilter = null);
-
-    Task<(IEnumerable<TProjection> data, int totalRecords)> GetAllProjectedAsync<TProjection>(
-        Expression<Func<TEntity, TProjection>> projection,
-        List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>>? includes = null,
-        Expression<Func<TEntity, bool>>? filterPredicate = null,
-        PaginationFilter? paginationFilter = null) where TProjection : class;
-
-    Task<(IEnumerable<TProjection> data, int totalRecords)> GetAllGroupedProjectedAsync<TProjection, TKey>(
-        Expression<Func<IGrouping<TKey, TEntity>, TProjection>> groupProjection,
-        Expression<Func<TEntity, TKey>> groupBy,
-        List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>>? includes = null,
-        Expression<Func<TEntity, bool>>? filterPredicate = null,
-        PaginationFilter? paginationFilter = null)
-        where TProjection : class;
-
-    Task<(IEnumerable<TProjection> data, int totalRecords)> GetAllOrderedGroupedProjectedAsync<TProjection, TKey>(
-        Expression<Func<IGrouping<TKey, TEntity>, TProjection>> groupProjection,
-        Expression<Func<TEntity, TKey>> groupBy,
-        Func<IQueryable<TProjection>, IOrderedQueryable<TProjection>> applyOrdering,
-        List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>>? includes = null,
-        Expression<Func<TEntity, bool>>? filterPredicate = null,
-        PaginationFilter? paginationFilter = null)
-        where TProjection : class;
-
-    Task<IEnumerable<TProjection>> GetAllGroupedDoubleProjectedAsync<TGrouping, TIntermediate, TProjection>(
-        Expression<Func<TEntity, TGrouping>> groupBy,
-        Expression<Func<IGrouping<TGrouping, TEntity>, TIntermediate>> intermediateProjection,
-        Func<IEnumerable<TIntermediate>, IEnumerable<TProjection>> finalProjection,
-        Expression<Func<TEntity, bool>>? filterPredicate = null)
-        where TIntermediate : class
-        where TProjection : class;
-}
-
-public class BaseKpiDataService<TEntity, TContext>(TContext context) : IKpiQueryService<TEntity, TContext>
-    where TEntity : class
-    where TContext : DbContext
 {
     private readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();
-    private bool _disposed = false;
+    private bool _disposed;
 
     public async Task<(IEnumerable<TEntity> data, int totalRecords)> GetAllAsync(
         List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>>? includes = null,

@@ -19,10 +19,12 @@
 
 #region Usings
 
+using System.Linq.Expressions;
 using BattlelineExtras.Contracts.Extensions;
 using BattlelineExtras.Contracts.Models;
 using CommuniQueue.Contracts.Interfaces.Repositories;
-using CommuniQueue.Contracts.Models;
+using CommuniQueue.Contracts.Models.Filters;
+using CommuniQueue.Predicate;
 
 #endregion
 
@@ -33,10 +35,37 @@ public class ProjectService(
     IPermissionRepository permissionRepository,
     IStageRepository stageRepository,
     IContainerRepository containerRepository,
-    ITemplateRepository templateRepository)
+    ITemplateRepository templateRepository,
+    IKpiQueryService<Project> projectKpiService)
     : IProjectService
 {
     private const string SubCode = "ProjectService";
+
+    public async Task<ResponseDetail<ProjectKpis>> GetProjectMetrics(ProjectFilter? filter)
+    {
+        var filterPredicate = ProjectDataPredicateBuilder.GetFilterPredicate(filter);
+        Expression<Func<Project, object>> groupBy = entity => 1;
+        Expression<Func<IGrouping<object, Project>, ProjectKpis>> select = group => new ProjectKpis
+        {
+            TemplateCount = group.Sum(project => project.Templates.Count),
+            StageCount = group.Sum(project =>
+                project.Templates.SelectMany(t => t.Versions.Where(v => v.StageAssignments.Count > 0)).Count()),
+            ContainerCount = group.Sum(project => project.Containers.Count),
+        };
+
+        var (kpis, _) = await projectKpiService.GetAllGroupedProjectedAsync(select, groupBy, null, filterPredicate);
+
+        var result = kpis.FirstOrDefault() ?? new ProjectKpis
+        {
+            TemplateCount = 0,
+            StageCount = 0,
+            ContainerCount = 0,
+            ApiKeyCount = 0,
+            TeamMemberCount = 0
+        };
+
+        return result.BuildResponseDetail(ResultStatus.Ok200, "Project Metrics", SubCode);
+    }
 
     public async Task<ResponseDetail<Project>> CreateProjectAsync(string name, string description, Guid ownerId)
     {
@@ -83,7 +112,6 @@ public class ProjectService(
                 .AddErrorDetail("CreateProject", ex.Message);
         }
     }
-
 
     public async Task<ResponseDetail<Project>> GetProjectByIdAsync(Guid projectId)
     {

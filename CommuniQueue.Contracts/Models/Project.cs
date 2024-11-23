@@ -33,6 +33,7 @@ public class Project : IEntity
     public ICollection<Stage> Stages { get; set; } = [];
     public ICollection<Container> Containers { get; set; } = [];
     public ICollection<Template> Templates { get; set; } = [];
+    public ICollection<Permission> Permissions { get; set; } = [];
     public Guid Id { get; set; }
     public DateTime CreatedDateTime { get; set; }
     public DateTime UpdatedDateTime { get; set; }

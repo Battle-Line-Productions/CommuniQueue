@@ -22,6 +22,7 @@ using BattlelineExtras.Contracts.Models;
 using BattlelineExtras.Http.Utility;
 using CommuniQueue.Contracts.Interfaces;
 using CommuniQueue.Contracts.Models;
+using CommuniQueue.Contracts.Models.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CommuniQueue.Api.Handlers;
@@ -57,6 +58,16 @@ public static class ProjectEndpoints
             {
                 Summary = "Get a project by ID",
                 Description = "Retrieves the details of a specific project by its ID"
+            });
+
+        app.MapGet($"{BaseRoute}/kpis", GetProjectKpis)
+            .Produces<ResponseDetail<ProjectKpis>>()
+            .WithApiVersionSet(versionSet)
+            .MapToApiVersion(1.0)
+            .WithOpenApi(operation => new(operation)
+            {
+                Summary = "Gets basic project Kpi's",
+                Description = "Returns some basic details regarding project Kpi's"
             });
 
         app.MapGet($"{BaseRoute}/user/{{userId:guid}}", GetProjectsByUserId)
@@ -174,6 +185,14 @@ public static class ProjectEndpoints
         [FromBody] CreateProjectRequest request)
     {
         var result = await projectService.CreateProjectAsync(request.Name, request.Description, request.OwnerId);
+        return ApiResponse.GetActionResult(result);
+    }
+
+    private static async Task<IResult> GetProjectKpis(
+        [FromServices] IProjectService projectService,
+        [FromQuery] ProjectFilter? filter)
+    {
+        var result = await projectService.GetProjectMetrics(filter);
         return ApiResponse.GetActionResult(result);
     }
 

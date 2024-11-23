@@ -21,6 +21,7 @@
 
 using BattlelineExtras.Contracts.Models;
 using CommuniQueue.Contracts.Models;
+using CommuniQueue.Contracts.Models.Filters;
 
 #endregion
 
@@ -43,4 +44,6 @@ public interface IProjectService
     Task<ResponseDetail<Stage>> AddStageToProjectAsync(Guid projectId, string stageName, int order);
     Task<ResponseDetail<bool>> RemoveStageFromProjectAsync(Guid projectId, Guid stageId);
     Task<ResponseDetail<Stage>> UpdateProjectStageAsync(Guid projectId, Guid stageId, string name, int order);
+
+    Task<ResponseDetail<ProjectKpis>> GetProjectMetrics(ProjectFilter? filter);
 }

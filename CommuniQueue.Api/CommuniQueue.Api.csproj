@@ -12,7 +12,7 @@
     <PackageReference Include="Asp.Versioning.Http" Version="8.1.0" />
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
     <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.2.2" />
-    <PackageReference Include="BattlelineExtras.Http" Version="1.1.2" />
+    <PackageReference Include="BattlelineExtras.Http" Version="1.1.3" />
     <PackageReference Include="BattlelineExtras.Services" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">

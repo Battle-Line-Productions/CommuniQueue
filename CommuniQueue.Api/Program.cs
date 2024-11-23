@@ -41,6 +41,7 @@ builder.AddServiceDefaults();
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -92,5 +93,6 @@ app.MapProjectEndpoints();
 app.MapContainerEndpoints();
 app.MapTemplateEndpoints();
 app.MapApiKeyEndpoints();
+app.MapPermissionEndpoints();
 
 app.Run();
