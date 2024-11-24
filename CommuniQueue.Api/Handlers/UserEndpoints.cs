@@ -131,6 +131,17 @@ public static class UserEndpoints
                 Summary = "Search users",
                 Description = "Searches for users based on a partial match of first name, last name, or email"
             });
+
+        app.MapGet($"{BaseRoute}/entity/{{entityType}}/{{entityId}}/permissions", GetUsersWithEntityPermissions)
+            .Produces<ResponseDetail<List<User>>>()
+            .Produces<ResponseDetail<List<User>>>(StatusCodes.Status404NotFound)
+            .WithApiVersionSet(versionSet)
+            .MapToApiVersion(1.0)
+            .WithOpenApi(operation => new(operation)
+            {
+                Summary = "Get users with entity permissions",
+                Description = "Retrieves a list of users who have permissions for a specific entity"
+            });
     }
 
     private static async Task<IResult> CreateUser(
@@ -202,6 +213,15 @@ public static class UserEndpoints
         [FromQuery] string searchTerm)
     {
         var result = await userService.SearchUsersAsync(searchTerm);
+        return ApiResponse.GetActionResult(result);
+    }
+
+    private static async Task<IResult> GetUsersWithEntityPermissions(
+        [FromServices] IUserService userService,
+        [FromRoute] EntityType entityType,
+        [FromRoute] Guid entityId)
+    {
+        var result = await userService.GetUsersWithEntityPermissionsAsync(entityId, entityType);
         return ApiResponse.GetActionResult(result);
     }
 }
