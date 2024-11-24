@@ -46,7 +46,7 @@ public static class PermissionEndpoints
                 Description = "Creates a new permission for a user on a specific entity"
             });
 
-        app.MapGet($"{BaseRoute}/{{userId}}/{{entityId}}/{{entityType}}", GetPermission)
+        app.MapGet($"{BaseRoute}/{{userId:guid}}/{{entityId:guid}}/{{entityType}}", GetPermission)
             .Produces<ResponseDetail<Permission>>()
             .Produces<ResponseDetail<Permission>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
@@ -57,7 +57,7 @@ public static class PermissionEndpoints
                 Description = "Retrieves a specific permission"
             });
 
-        app.MapGet($"{BaseRoute}/entity/{{entityId}}/{{entityType}}", GetPermissionsByEntity)
+        app.MapGet($"{BaseRoute}/entity/{{entityId:guid}}/{{entityType}}", GetPermissionsByEntity)
             .Produces<ResponseDetail<List<Permission>>>()
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
@@ -78,7 +78,7 @@ public static class PermissionEndpoints
                 Description = "Updates an existing permission"
             });
 
-        app.MapDelete($"{BaseRoute}/{{userId}}/{{entityId}}/{{entityType}}", DeletePermission)
+        app.MapDelete($"{BaseRoute}/{{userId:guid}}/{{entityId:guid}}/{{entityType}}", DeletePermission)
             .Produces<ResponseDetail<bool>>()
             .Produces<ResponseDetail<bool>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
@@ -94,48 +94,72 @@ public static class PermissionEndpoints
         [FromServices] IPermissionService permissionService,
         [FromBody] CreatePermissionRequest request)
     {
-        var result = await permissionService.CreatePermissionAsync(request.UserId, request.EntityId, request.EntityType, request.PermissionLevel);
-        return ApiResponse.GetActionResult(result);
+        if (Enum.TryParse<EntityType>(request.EntityType, true, out var parsedEntityType))
+        {
+            var result = await permissionService.CreatePermissionAsync(request.UserId, request.EntityId, parsedEntityType, request.PermissionLevel);
+            return ApiResponse.GetActionResult(result);
+        }
+
+        return Results.BadRequest($"Invalid EntityType: {request.EntityType}");
     }
 
     private static async Task<IResult> GetPermission(
         [FromServices] IPermissionService permissionService,
         Guid userId,
         Guid entityId,
-        EntityType entityType)
+        string entityType)
     {
-        var result = await permissionService.GetPermissionAsync(userId, entityId, entityType);
-        return ApiResponse.GetActionResult(result);
+        if (Enum.TryParse<EntityType>(entityType, true, out var parsedEntityType))
+        {
+            var result = await permissionService.GetPermissionAsync(userId, entityId, parsedEntityType);
+            return ApiResponse.GetActionResult(result);
+        }
+
+        return Results.BadRequest($"Invalid EntityType: {entityType}");
     }
 
     private static async Task<IResult> GetPermissionsByEntity(
         [FromServices] IPermissionService permissionService,
         Guid entityId,
-        EntityType entityType)
+        string entityType)
     {
-        var result = await permissionService.GetPermissionsByEntityAsync(entityId, entityType);
-        return ApiResponse.GetActionResult(result);
+        if (Enum.TryParse<EntityType>(entityType, true, out var parsedEntityType))
+        {
+            var result = await permissionService.GetPermissionsByEntityAsync(entityId, parsedEntityType);
+            return ApiResponse.GetActionResult(result);
+        }
+
+        return Results.BadRequest($"Invalid EntityType: {entityType}");
     }
 
     private static async Task<IResult> UpdatePermission(
         [FromServices] IPermissionService permissionService,
         [FromBody] UpdatePermissionRequest request)
     {
-        var result = await permissionService.UpdatePermissionAsync(request.UserId, request.EntityId, request.EntityType, request.NewPermissionLevel);
-        return ApiResponse.GetActionResult(result);
+        if (Enum.TryParse<EntityType>(request.EntityType, true, out var parsedEntityType))
+        {
+            var result = await permissionService.UpdatePermissionAsync(request.UserId, request.EntityId, parsedEntityType, request.NewPermissionLevel);
+            return ApiResponse.GetActionResult(result);
+        }
+
+        return Results.BadRequest($"Invalid EntityType: {request.EntityType}");
     }
 
     private static async Task<IResult> DeletePermission(
         [FromServices] IPermissionService permissionService,
         Guid userId,
         Guid entityId,
-        EntityType entityType)
+        string entityType)
     {
-        var result = await permissionService.DeletePermissionAsync(userId, entityId, entityType);
-        return ApiResponse.GetActionResult(result);
+        if (Enum.TryParse<EntityType>(entityType, true, out var parsedEntityType))
+        {
+            var result = await permissionService.DeletePermissionAsync(userId, entityId, parsedEntityType);
+            return ApiResponse.GetActionResult(result);
+        }
+
+        return Results.BadRequest($"Invalid EntityType: {entityType}");
     }
 }
 
-public record CreatePermissionRequest(Guid UserId, Guid EntityId, EntityType EntityType, PermissionLevel PermissionLevel);
-public record UpdatePermissionRequest(Guid UserId, Guid EntityId, EntityType EntityType, PermissionLevel NewPermissionLevel);
-
+public record CreatePermissionRequest(Guid UserId, Guid EntityId, string EntityType, PermissionLevel PermissionLevel);
+public record UpdatePermissionRequest(Guid UserId, Guid EntityId, string EntityType, PermissionLevel NewPermissionLevel);
