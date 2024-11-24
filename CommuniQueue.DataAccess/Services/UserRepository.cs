@@ -42,4 +42,20 @@ public class UserRepository(AppDbContext context) : BaseRepository<User>(context
         return await _context.Users
             .AnyAsync(u => u.SsoId == ssoId);
     }
+
+    public async Task<IEnumerable<User>> SearchUsersAsync(string searchTerm)
+    {
+        return await _context.Users
+            .Where(u => u.Email.Contains(searchTerm) ||
+                        u.FirstName.Contains(searchTerm) ||
+                        u.LastName.Contains(searchTerm))
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<User>> GetUsersByIdsAsync(IEnumerable<Guid> userIds)
+    {
+        return await _context.Users
+            .Where(u => userIds.Contains(u.Id))
+            .ToListAsync();
+    }
 }

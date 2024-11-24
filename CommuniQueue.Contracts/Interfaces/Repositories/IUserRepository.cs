@@ -21,6 +21,7 @@ namespace CommuniQueue.Contracts.Interfaces.Repositories;
 
 public interface IUserRepository
 {
+    Task<List<User>> GetAllAsync();
     Task<User> CreateAsync(User user);
     Task<User?> GetByIdAsync(Guid id);
     Task<User?> GetBySsoIdAsync(string ssoId);
@@ -29,4 +30,6 @@ public interface IUserRepository
     Task DeleteAsync(Guid id);
     Task<bool> ExistsAsync(Guid id);
     Task<bool> ExistsBySsoIdAsync(string ssoId);
+    Task<IEnumerable<User>> SearchUsersAsync(string searchTerm);
+    Task<IEnumerable<User>> GetUsersByIdsAsync(IEnumerable<Guid> userIds);
 }

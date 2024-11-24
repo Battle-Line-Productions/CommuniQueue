@@ -27,6 +27,11 @@ public class BaseRepository<TEntity>(AppDbContext context) where TEntity : class
         return await context.Set<TEntity>().AnyAsync(p => p.Id == id);
     }
 
+    public async Task<List<TEntity>> GetAllAsync()
+    {
+        return await context.Set<TEntity>().ToListAsync();
+    }
+
     public async Task<TResult> ExecuteInTransactionAsync<TResult>(Func<Task<TResult>> operation)
     {
         var strategy = context.Database.CreateExecutionStrategy();

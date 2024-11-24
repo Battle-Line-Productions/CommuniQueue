@@ -27,6 +27,7 @@ namespace CommuniQueue.Contracts.Interfaces.Repositories;
 
 public interface IContainerRepository : IBaseRepository<Container>
 {
+    Task<List<Container>> GetAllAsync();
     Task<IEnumerable<Container>> GetByProjectIdAsync(Guid projectId);
     Task<IEnumerable<Container>> GetChildrenAsync(Guid parentContainerId);
     Task<Container> GetRootContainerForProjectAsync(Guid projectId);

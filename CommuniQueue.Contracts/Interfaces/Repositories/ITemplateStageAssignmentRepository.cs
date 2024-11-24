@@ -21,6 +21,7 @@ namespace CommuniQueue.Contracts.Interfaces.Repositories;
 
 public interface ITemplateStageAssignmentRepository : IBaseRepository<TemplateStageAssignment>
 {
+    Task<List<TemplateStageAssignment>> GetAllAsync();
     Task<IEnumerable<TemplateStageAssignment>> GetByStageIdAsync(Guid stageId);
     Task<TemplateStageAssignment?> GetByStageAndTemplateVersionIdAsync(Guid stageId, Guid templateVersionId);
     Task<bool> ExistsForStageAndTemplateVersionAsync(Guid stageId, Guid templateVersionId);

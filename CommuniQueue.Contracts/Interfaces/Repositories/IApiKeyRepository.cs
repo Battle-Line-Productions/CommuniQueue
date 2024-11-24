@@ -21,6 +21,7 @@ namespace CommuniQueue.Contracts.Interfaces.Repositories;
 
 public interface IApiKeyRepository : IBaseRepository<ApiKey>
 {
+    Task<List<ApiKey>> GetAllAsync();
     Task<ApiKey?> GetByHashAsync(string keyHash);
     Task<IEnumerable<ApiKey>> GetByProjectIdAsync(Guid projectId);
 }

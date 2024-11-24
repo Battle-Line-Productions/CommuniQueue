@@ -26,6 +26,8 @@ public class User : IEntity
     public DateTime UpdatedDateTime { get; set; }
     public required string Email { get; set; }
     public required string SsoId { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
 
     public ICollection<Permission>? Permissions { get; set; }
 }

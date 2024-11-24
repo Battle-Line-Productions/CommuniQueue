@@ -21,6 +21,7 @@ namespace CommuniQueue.Contracts.Interfaces.Repositories;
 
 public interface ITemplateVersionRepository : IBaseRepository<TemplateVersion>
 {
+    Task<List<TemplateVersion>> GetAllAsync();
     Task<IEnumerable<TemplateVersion>> GetByTemplateIdAsync(Guid templateId);
     Task<TemplateVersion> GetLatestVersionAsync(Guid templateId);
 }

@@ -21,6 +21,7 @@ namespace CommuniQueue.Contracts.Interfaces.Repositories;
 
 public interface ITemplateRepository : IBaseRepository<Template>
 {
+    Task<List<Template>> GetAllAsync();
     Task<IEnumerable<Template>> GetByProjectIdAsync(Guid projectId);
     Task<IEnumerable<Template>> GetByContainerIdAsync(Guid containerId);
 }

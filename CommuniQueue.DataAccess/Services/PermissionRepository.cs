@@ -23,6 +23,12 @@ namespace CommuniQueue.DataAccess.Services;
 
 public class PermissionRepository(AppDbContext context) : BaseRepository<Permission>(context), IPermissionRepository
 {
+    public async Task<List<Permission>> GetByUserId(Guid userId)
+    {
+        return await context.Permissions
+            .Where(p => p.UserId == userId).ToListAsync();
+    }
+
     public async Task<Permission?> GetAsync(Guid userId, Guid entityId, EntityType entityType)
     {
         return await context.Permissions

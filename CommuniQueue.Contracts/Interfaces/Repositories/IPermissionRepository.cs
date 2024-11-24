@@ -21,6 +21,8 @@ namespace CommuniQueue.Contracts.Interfaces.Repositories;
 
 public interface IPermissionRepository : IBaseRepository<Permission>
 {
+    Task<List<Permission>> GetAllAsync();
+    Task<List<Permission>> GetByUserId(Guid userId);
     Task<Permission?> GetAsync(Guid userId, Guid entityId, EntityType entityType);
     Task<List<Permission>> ListEntityTypeById(Guid entityId, EntityType entityType);
     Task DeleteAsync(Guid userId, Guid entityId, EntityType entityType);
