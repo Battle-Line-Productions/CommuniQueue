@@ -87,12 +87,13 @@ app.UseHttpsRedirection();
 app.UseCorrelationTokenMiddleware();
 app.UseRequestResponseLogging();
 
-app.MigrateDatabase();
+await app.MigrateDatabaseAsync();
 
 app.MapProjectEndpoints();
 app.MapContainerEndpoints();
 app.MapTemplateEndpoints();
 app.MapApiKeyEndpoints();
 app.MapPermissionEndpoints();
+app.MapUserEndpoints();
 
-app.Run();
+await app.RunAsync();
