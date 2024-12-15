@@ -111,7 +111,7 @@ public static class ContainerEndpoints
             });
     }
 
-    private static async Task<IResult> CreateContainer(
+    public static async Task<IResult> CreateContainer(
         [FromServices] IContainerService containerService,
         [FromBody] CreateContainerRequest request)
     {
@@ -119,7 +119,7 @@ public static class ContainerEndpoints
         return ApiResponse.GetActionResult(result);
     }
 
-    private static async Task<IResult> GetContainerById(
+    public static async Task<IResult> GetContainerById(
         [FromServices] IContainerService containerService,
         Guid containerId)
     {
@@ -127,7 +127,7 @@ public static class ContainerEndpoints
         return ApiResponse.GetActionResult(result);
     }
 
-    private static async Task<IResult> GetContainersByProjectId(
+    public static async Task<IResult> GetContainersByProjectId(
         [FromServices] IContainerService containerService,
         Guid projectId)
     {
@@ -135,7 +135,7 @@ public static class ContainerEndpoints
         return ApiResponse.GetListActionResult(result);
     }
 
-    private static async Task<IResult> UpdateContainer(
+    public static async Task<IResult> UpdateContainer(
         [FromServices] IContainerService containerService,
         Guid containerId,
         [FromBody] UpdateContainerRequest request)
@@ -144,7 +144,7 @@ public static class ContainerEndpoints
         return ApiResponse.GetActionResult(result);
     }
 
-    private static async Task<IResult> DeleteContainer(
+    public static async Task<IResult> DeleteContainer(
         [FromServices] IContainerService containerService,
         Guid containerId)
     {
@@ -152,7 +152,7 @@ public static class ContainerEndpoints
         return ApiResponse.GetActionResult(result);
     }
 
-    private static async Task<IResult> GetChildContainers(
+    public static async Task<IResult> GetChildContainers(
         [FromServices] IContainerService containerService,
         Guid parentContainerId)
     {
@@ -160,7 +160,7 @@ public static class ContainerEndpoints
         return ApiResponse.GetListActionResult(result);
     }
 
-    private static async Task<IResult> MoveContainer(
+    public static async Task<IResult> MoveContainer(
         [FromServices] IContainerService containerService,
         Guid containerId,
         [FromBody] MoveContainerRequest request)

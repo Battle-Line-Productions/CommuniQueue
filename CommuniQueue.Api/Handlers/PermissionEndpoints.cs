@@ -90,7 +90,7 @@ public static class PermissionEndpoints
             });
     }
 
-    private static async Task<IResult> CreatePermission(
+    public static async Task<IResult> CreatePermission(
         [FromServices] IPermissionService permissionService,
         [FromBody] CreatePermissionRequest request)
     {
@@ -103,7 +103,7 @@ public static class PermissionEndpoints
         return Results.BadRequest($"Invalid EntityType: {request.EntityType}");
     }
 
-    private static async Task<IResult> GetPermission(
+    public static async Task<IResult> GetPermission(
         [FromServices] IPermissionService permissionService,
         Guid userId,
         Guid entityId,
@@ -118,7 +118,7 @@ public static class PermissionEndpoints
         return Results.BadRequest($"Invalid EntityType: {entityType}");
     }
 
-    private static async Task<IResult> GetPermissionsByEntity(
+    public static async Task<IResult> GetPermissionsByEntity(
         [FromServices] IPermissionService permissionService,
         Guid entityId,
         string entityType)
@@ -132,7 +132,7 @@ public static class PermissionEndpoints
         return Results.BadRequest($"Invalid EntityType: {entityType}");
     }
 
-    private static async Task<IResult> UpdatePermission(
+    public static async Task<IResult> UpdatePermission(
         [FromServices] IPermissionService permissionService,
         [FromBody] UpdatePermissionRequest request)
     {
@@ -145,7 +145,7 @@ public static class PermissionEndpoints
         return Results.BadRequest($"Invalid EntityType: {request.EntityType}");
     }
 
-    private static async Task<IResult> DeletePermission(
+    public static async Task<IResult> DeletePermission(
         [FromServices] IPermissionService permissionService,
         Guid userId,
         Guid entityId,

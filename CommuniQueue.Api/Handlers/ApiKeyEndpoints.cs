@@ -101,7 +101,7 @@ public static class ApiKeyEndpoints
             });
     }
 
-    private static async Task<IResult> GenerateApiKey(
+    public static async Task<IResult> GenerateApiKey(
         [FromServices] IApiKeyService apiKeyService,
         [FromBody] GenerateApiKeyRequest request)
     {
@@ -109,7 +109,7 @@ public static class ApiKeyEndpoints
         return ApiResponse.GetActionResult(result);
     }
 
-    private static async Task<IResult> GetApiKeyById(
+    public static async Task<IResult> GetApiKeyById(
         [FromServices] IApiKeyService apiKeyService,
         Guid apiKeyId)
     {
@@ -117,7 +117,7 @@ public static class ApiKeyEndpoints
         return ApiResponse.GetActionResult(result);
     }
 
-    private static async Task<IResult> GetApiKeysByProjectId(
+    public static async Task<IResult> GetApiKeysByProjectId(
         [FromServices] IApiKeyService apiKeyService,
         Guid projectId)
     {
@@ -125,7 +125,7 @@ public static class ApiKeyEndpoints
         return ApiResponse.GetActionResult(result);
     }
 
-    private static async Task<IResult> ValidateApiKey(
+    public static async Task<IResult> ValidateApiKey(
         [FromServices] IApiKeyService apiKeyService,
         [FromBody] ValidateApiKeyRequest request)
     {
@@ -133,7 +133,7 @@ public static class ApiKeyEndpoints
         return ApiResponse.GetActionResult(result);
     }
 
-    private static async Task<IResult> ExpireApiKey(
+    public static async Task<IResult> ExpireApiKey(
         [FromServices] IApiKeyService apiKeyService,
         Guid apiKeyId)
     {
@@ -141,7 +141,7 @@ public static class ApiKeyEndpoints
         return ApiResponse.GetActionResult(result);
     }
 
-    private static async Task<IResult> HasValidApiKey(
+    public static async Task<IResult> HasValidApiKey(
         [FromServices] IApiKeyService apiKeyService,
         Guid projectId)
     {

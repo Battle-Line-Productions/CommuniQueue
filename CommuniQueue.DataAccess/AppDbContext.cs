@@ -179,7 +179,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
             if (entityEntry.State == EntityState.Added)
             {
-                ((IEntity)entityEntry.Entity).Id = Guid.NewGuid();
+                ((IEntity)entityEntry.Entity).Id = Guid.CreateVersion7();
                 ((IEntity)entityEntry.Entity).CreatedDateTime = DateTime.UtcNow;
             }
         }
@@ -199,7 +199,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
             if (entityEntry.State == EntityState.Added)
             {
-                ((IEntity)entityEntry.Entity).Id = Guid.NewGuid();
+                ((IEntity)entityEntry.Entity).Id = Guid.CreateVersion7();
                 ((IEntity)entityEntry.Entity).CreatedDateTime = DateTime.UtcNow;
             }
         }
