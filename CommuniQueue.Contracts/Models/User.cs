@@ -1,10 +1,10 @@
 #region Copyright
 // ---------------------------------------------------------------------------
 // Copyright (c) 2024 Battleline Productions LLC. All rights reserved.
-// 
+//
 // Licensed under the Battleline Productions LLC license agreement.
 // See LICENSE file in the project root for full license information.
-// 
+//
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
 // Date: 10/13/2024
@@ -26,8 +26,10 @@ public class User : IEntity
     public DateTime UpdatedDateTime { get; set; }
     public required string Email { get; set; }
     public required string SsoId { get; set; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+    public bool IsActive { get; set; }
+    public GlobalRoleType GlobalRole { get; set; } = GlobalRoleType.Contributor;
 
     public ICollection<Permission>? Permissions { get; set; }
 }

@@ -2,10 +2,10 @@
 
 // ---------------------------------------------------------------------------
 // Copyright (c) 2024 Battleline Productions LLC. All rights reserved.
-// 
+//
 // Licensed under the Battleline Productions LLC license agreement.
 // See LICENSE file in the project root for full license information.
-// 
+//
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
 // Date: 11/03/2024
@@ -30,8 +30,9 @@ namespace CommuniQueue.DataAccess;
 
 // dotnet tool update --global dotnet-ef
 // cd path/to/CommuniQueue.Api
-// dotnet ef migrations add LinkingPermissions --project ../CommuniQueue.DataAccess/CommuniQueue.DataAccess.csproj
+// dotnet ef migrations add InitialMigration --project ../CommuniQueue.DataAccess/CommuniQueue.DataAccess.csproj
 // dotnet ef database update --project ../CommuniQueue.DataAccess/CommuniQueue.DataAccess.csproj
+// dotnet ef migrations remove --project ../CommuniQueue.DataAccess/CommuniQueue.DataAccess.csproj
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {

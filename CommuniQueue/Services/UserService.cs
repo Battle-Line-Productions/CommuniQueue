@@ -1,10 +1,10 @@
 #region Copyright
 // ---------------------------------------------------------------------------
 // Copyright (c) 2024 Battleline Productions LLC. All rights reserved.
-// 
+//
 // Licensed under the Battleline Productions LLC license agreement.
 // See LICENSE file in the project root for full license information.
-// 
+//
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
 // Date: 11/24/2024
@@ -26,7 +26,7 @@ public class UserService(IUserRepository userRepository, IPermissionRepository p
 {
     private const string SubCode = "UserService";
 
-    public async Task<ResponseDetail<User>> CreateUserAsync(string email, string ssoId)
+    public async Task<ResponseDetail<User>> CreateUserAsync(string email, string ssoId, string globalRole)
     {
         try
         {
@@ -36,10 +36,20 @@ public class UserService(IUserRepository userRepository, IPermissionRepository p
                     .AddErrorDetail("CreateUser", $"User with SSO ID {ssoId} already exists");
             }
 
+            var isRoleMatched = Enum.TryParse<GlobalRoleType>(globalRole, true, out var role);
+
+            if (!isRoleMatched)
+            {
+                return ((User?)null).BuildResponseDetail(ResultStatus.Error400, "Create User", SubCode)
+                    .AddErrorDetail("CreateUser", $"Requested role of {globalRole} is not a valid role");
+            }
+
             var user = new User
             {
                 Email = email,
-                SsoId = ssoId
+                SsoId = ssoId,
+                IsActive = true,
+                GlobalRole = role
             };
 
             user = await userRepository.CreateAsync(user);
@@ -137,7 +147,8 @@ public class UserService(IUserRepository userRepository, IPermissionRepository p
         }
     }
 
-    public async Task<ResponseDetail<User>> UpdateUserAsync(Guid userId, string email)
+    public async Task<ResponseDetail<User>> UpdateUserAsync(Guid userId, string email, string requestGlobalRole,
+        bool requestIsActive)
     {
         try
         {
@@ -148,7 +159,18 @@ public class UserService(IUserRepository userRepository, IPermissionRepository p
                     .AddErrorDetail("UpdateUser", $"User with ID {userId} not found");
             }
 
+            var isRoleMatched = Enum.TryParse<GlobalRoleType>(requestGlobalRole, true, out var role);
+
+            if (!isRoleMatched)
+            {
+                return ((User?)null).BuildResponseDetail(ResultStatus.Error400, "Create User", SubCode)
+                    .AddErrorDetail("CreateUser", $"Requested role of {requestGlobalRole} is not a valid role");
+            }
+
             user.Email = email;
+            user.GlobalRole = role;
+            user.IsActive = requestIsActive;
+
             var updatedUser = await userRepository.UpdateAsync(user);
             return updatedUser.BuildResponseDetail(ResultStatus.Ok200, "Update User", SubCode);
         }

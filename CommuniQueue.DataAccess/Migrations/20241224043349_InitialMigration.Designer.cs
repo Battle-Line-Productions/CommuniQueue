@@ -12,15 +12,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CommuniQueue.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241124071611_AddingFirstAndLastToUserModel")]
-    partial class AddingFirstAndLastToUserModel
+    [Migration("20241224043349_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -384,6 +384,14 @@ namespace CommuniQueue.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("first_name");
+
+                    b.Property<int>("GlobalRole")
+                        .HasColumnType("integer")
+                        .HasColumnName("global_role");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
 
                     b.Property<string>("LastName")
                         .IsRequired()

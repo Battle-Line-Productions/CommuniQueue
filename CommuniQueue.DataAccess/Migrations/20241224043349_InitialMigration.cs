@@ -6,11 +6,27 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CommuniQueue.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "projects",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "text", nullable: false),
+                    description = table.Column<string>(type: "text", nullable: true),
+                    customer_id = table.Column<string>(type: "text", nullable: true),
+                    created_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_projects", x => x.id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "users",
                 columns: table => new
@@ -19,11 +35,40 @@ namespace CommuniQueue.DataAccess.Migrations
                     created_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     email = table.Column<string>(type: "text", nullable: false),
-                    sso_id = table.Column<string>(type: "text", nullable: false)
+                    sso_id = table.Column<string>(type: "text", nullable: false),
+                    first_name = table.Column<string>(type: "text", nullable: false),
+                    last_name = table.Column<string>(type: "text", nullable: false),
+                    is_active = table.Column<bool>(type: "boolean", nullable: false),
+                    global_role = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_users", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "api_keys",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    key_hash = table.Column<string>(type: "text", nullable: false),
+                    project_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    created_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    end_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    is_expired = table.Column<bool>(type: "boolean", nullable: false),
+                    scopes = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_api_keys", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_api_keys_projects_project_id",
+                        column: x => x.project_id,
+                        principalTable: "projects",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -48,56 +93,10 @@ namespace CommuniQueue.DataAccess.Migrations
                         principalTable: "containers",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "projects",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
-                    name = table.Column<string>(type: "text", nullable: false),
-                    description = table.Column<string>(type: "text", nullable: true),
-                    customer_id = table.Column<string>(type: "text", nullable: true),
-                    root_container_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    created_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_projects", x => x.id);
                     table.ForeignKey(
-                        name: "fk_projects_containers_root_container_id",
-                        column: x => x.root_container_id,
-                        principalTable: "containers",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "permissions",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
-                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    entity_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    entity_type = table.Column<int>(type: "integer", nullable: false),
-                    permission_level = table.Column<int>(type: "integer", nullable: false),
-                    created_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_permissions", x => x.id);
-                    table.ForeignKey(
-                        name: "fk_permissions_projects_entity_id",
-                        column: x => x.entity_id,
+                        name: "fk_containers_projects_project_id",
+                        column: x => x.project_id,
                         principalTable: "projects",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "fk_permissions_users_user_id",
-                        column: x => x.user_id,
-                        principalTable: "users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -120,6 +119,41 @@ namespace CommuniQueue.DataAccess.Migrations
                         name: "fk_stages_projects_project_id",
                         column: x => x.project_id,
                         principalTable: "projects",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "permissions",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    entity_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    entity_type = table.Column<int>(type: "integer", nullable: false),
+                    permission_level = table.Column<int>(type: "integer", nullable: false),
+                    created_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    project_id = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_permissions", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_permissions_projects_entity_id",
+                        column: x => x.entity_id,
+                        principalTable: "projects",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_permissions_projects_project_id",
+                        column: x => x.project_id,
+                        principalTable: "projects",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "fk_permissions_users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -203,6 +237,11 @@ namespace CommuniQueue.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "ix_api_keys_project_id",
+                table: "api_keys",
+                column: "project_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_containers_parent_id",
                 table: "containers",
                 column: "parent_id");
@@ -218,15 +257,14 @@ namespace CommuniQueue.DataAccess.Migrations
                 column: "entity_id");
 
             migrationBuilder.CreateIndex(
+                name: "ix_permissions_project_id",
+                table: "permissions",
+                column: "project_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_permissions_user_id_entity_id_entity_type",
                 table: "permissions",
                 columns: new[] { "user_id", "entity_id", "entity_type" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "ix_projects_root_container_id",
-                table: "projects",
-                column: "root_container_id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -272,22 +310,13 @@ namespace CommuniQueue.DataAccess.Migrations
                 table: "users",
                 column: "sso_id",
                 unique: true);
-
-            migrationBuilder.AddForeignKey(
-                name: "fk_containers_projects_project_id",
-                table: "containers",
-                column: "project_id",
-                principalTable: "projects",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "fk_containers_projects_project_id",
-                table: "containers");
+            migrationBuilder.DropTable(
+                name: "api_keys");
 
             migrationBuilder.DropTable(
                 name: "permissions");
@@ -308,10 +337,10 @@ namespace CommuniQueue.DataAccess.Migrations
                 name: "templates");
 
             migrationBuilder.DropTable(
-                name: "projects");
+                name: "containers");
 
             migrationBuilder.DropTable(
-                name: "containers");
+                name: "projects");
         }
     }
 }

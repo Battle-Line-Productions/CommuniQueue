@@ -22,12 +22,13 @@ namespace CommuniQueue.Contracts.Interfaces;
 
 public interface IUserService
 {
-    Task<ResponseDetail<User>> CreateUserAsync(string email, string ssoId);
+    Task<ResponseDetail<User>> CreateUserAsync(string email, string ssoId, string requestGlobalRole);
     Task<ResponseDetail<User>> GetUserByIdAsync(Guid userId);
     Task<ResponseDetail<User>> GetUserBySsoIdAsync(string ssoId);
     Task<ResponseDetail<User>> GetUserByEmailAsync(string email);
     Task<ResponseDetail<List<User>>> GetAllUsersAsync();
-    Task<ResponseDetail<User>> UpdateUserAsync(Guid userId, string email);
+    Task<ResponseDetail<User>> UpdateUserAsync(Guid userId, string email, string requestGlobalRole,
+        bool requestIsActive);
     Task<ResponseDetail<bool>> DeleteUserAsync(Guid userId);
     Task<ResponseDetail<List<Permission>>> GetUserPermissionsAsync(Guid userId);
     Task<ResponseDetail<List<User>>> SearchUsersAsync(string searchTerm);

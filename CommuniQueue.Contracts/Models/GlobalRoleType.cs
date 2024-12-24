@@ -7,19 +7,20 @@
 //
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
-// Date: 10/13/2024
+// Date: 12/23/2024
 // Solution Name: CommuniQueue
 // Project Name: CommuniQueue.Contracts
-// File: EntityType.cs
-// File Path: C:\git\battleline\CommuniQueue\CommuniQueue.Contracts\Models\EntityType.cs
+// File: GlobalRoleType.cs
+// File Path: C:\git\battleline\CommuniQueue\CommuniQueue.Contracts\Models\GlobalRoleType.cs
 // ---------------------------------------------------------------------------
 #endregion
 
 namespace CommuniQueue.Contracts.Models;
 
-public enum EntityType
+public enum GlobalRoleType
 {
-    Project,
-    Container,
-    Template
+    Owner = 0,
+    SuperAdmin = 1,
+    Contributor = 2,
+    ReadOnly = 3
 }
