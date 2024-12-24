@@ -144,14 +144,6 @@ public static class UserEndpoints
             });
     }
 
-    private static async Task<IResult> CreateUser(
-        [FromServices] IUserService userService,
-        [FromBody] CreateUserRequest request)
-    {
-        var result = await userService.CreateUserAsync(request.Email, request.SsoId);
-        return ApiResponse.GetActionResult(result);
-    }
-
     private static async Task<IResult> GetUserById(
         [FromServices] IUserService userService,
         Guid userId)
@@ -180,15 +172,6 @@ public static class UserEndpoints
         [FromServices] IUserService userService)
     {
         var result = await userService.GetAllUsersAsync();
-        return ApiResponse.GetActionResult(result);
-    }
-
-    private static async Task<IResult> UpdateUser(
-        [FromServices] IUserService userService,
-        Guid userId,
-        [FromBody] UpdateUserRequest request)
-    {
-        var result = await userService.UpdateUserAsync(userId, request.Email);
         return ApiResponse.GetActionResult(result);
     }
 
@@ -224,7 +207,24 @@ public static class UserEndpoints
         var result = await userService.GetUsersWithEntityPermissionsAsync(entityId, entityType);
         return ApiResponse.GetActionResult(result);
     }
+
+    private static async Task<IResult> CreateUser(
+        [FromServices] IUserService userService,
+        [FromBody] CreateUserRequest request)
+    {
+        var result = await userService.CreateUserAsync(request.Email, request.SsoId, request.GlobalRole);
+        return ApiResponse.GetActionResult(result);
+    }
+
+    private static async Task<IResult> UpdateUser(
+        [FromServices] IUserService userService,
+        Guid userId,
+        [FromBody] UpdateUserRequest request)
+    {
+        var result = await userService.UpdateUserAsync(userId, request.Email, request.GlobalRole, request.IsActive);
+        return ApiResponse.GetActionResult(result);
+    }
 }
 
-public record CreateUserRequest(string Email, string SsoId);
-public record UpdateUserRequest(string Email);
+public record CreateUserRequest(string Email, string SsoId, string GlobalRole);
+public record UpdateUserRequest(string Email, string GlobalRole, bool IsActive);
