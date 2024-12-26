@@ -2,10 +2,10 @@
 
 // ---------------------------------------------------------------------------
 // Copyright (c) 2024 Battleline Productions LLC. All rights reserved.
-// 
+//
 // Licensed under the Battleline Productions LLC license agreement.
 // See LICENSE file in the project root for full license information.
-// 
+//
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
 // Date: 11/03/2024
@@ -25,8 +25,10 @@ using BattlelineExtras.Http.Extensions;
 using CommuniQueue;
 using CommuniQueue.Api.Extensions;
 using CommuniQueue.Api.Handlers;
+using CommuniQueue.Contracts.Models;
 using CommuniQueue.DataAccess;
 using CommuniQueue.ServiceDefaults;
+using Finbuckle.MultiTenant;
 using Microsoft.EntityFrameworkCore;
 using ServiceExtensions = BattlelineExtras.Services.Extensions.ServiceExtensions;
 
@@ -43,6 +45,15 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
+
+builder.AddNpgsqlDbContext<AppDbContext>("communiqueuedb", null,
+    options => { options.UseSnakeCaseNamingConvention(); });
+
+builder.AddNpgsqlDbContext<TenantStoreDbContext>("communiqueuedb", null,
+    options => { options.UseSnakeCaseNamingConvention(); });
+
+builder.Services.AddMultiTenant<AppTenantInfo>().WithEFCoreStore<TenantStoreDbContext, AppTenantInfo>()
+    .WithRouteStrategy("tenantId");
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -67,9 +78,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.AddNpgsqlDbContext<AppDbContext>("communiqueuedb", null,
-    options => { options.UseSnakeCaseNamingConvention(); });
-
 builder.Services.AddPagedResponseBuilder();
 ServiceExtensions.AddCachingService(builder.Services);
 ServiceExtensions.AddDateTimeProvider(builder.Services);
@@ -77,6 +85,8 @@ builder.Services.AddDataServices();
 builder.Services.AddAppServices();
 
 var app = builder.Build();
+
+app.UseMultiTenant();
 
 app.MapDefaultEndpoints();
 

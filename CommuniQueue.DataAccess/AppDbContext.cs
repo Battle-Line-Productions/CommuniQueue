@@ -22,6 +22,9 @@
 using System.Text.Json;
 using BattlelineExtras.Contracts.Interfaces;
 using CommuniQueue.Contracts.Models;
+using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 #endregion
@@ -30,25 +33,54 @@ namespace CommuniQueue.DataAccess;
 
 // dotnet tool update --global dotnet-ef
 // cd path/to/CommuniQueue.Api
-// dotnet ef migrations add InitialMigration --project ../CommuniQueue.DataAccess/CommuniQueue.DataAccess.csproj
+// dotnet ef migrations add InitialMigration --project ../CommuniQueue.DataAccess/CommuniQueue.DataAccess.csproj  --context AppDbContext
 // dotnet ef database update --project ../CommuniQueue.DataAccess/CommuniQueue.DataAccess.csproj
 // dotnet ef migrations remove --project ../CommuniQueue.DataAccess/CommuniQueue.DataAccess.csproj
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public class AppDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions<AppDbContext> options) : MultiTenantDbContext(multiTenantContextAccessor, options)
 {
-    public DbSet<User> Users { get; set; }
-    public DbSet<Project> Projects { get; set; }
-    public DbSet<Container> Containers { get; set; }
-    public DbSet<Template> Templates { get; set; }
-    public DbSet<Permission> Permissions { get; set; }
-    public DbSet<Stage> Stages { get; set; }
-    public DbSet<TemplateVersion> TemplateVersions { get; set; }
-    public DbSet<TemplateStageAssignment> TemplateStageAssignments { get; set; }
-    public DbSet<ApiKey> ApiKeys { get; set; }
+    public DbSet<AppTenantInfo> AppTenantInfo => Set<AppTenantInfo>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<UserTenantMembership> UserTenantMemberships => Set<UserTenantMembership>();
+    public DbSet<Project> Projects => Set<Project>();
+    public DbSet<Container> Containers => Set<Container>();
+    public DbSet<Template> Templates => Set<Template>();
+    public DbSet<Permission> Permissions => Set<Permission>();
+    public DbSet<Stage> Stages => Set<Stage>();
+    public DbSet<TemplateVersion> TemplateVersions => Set<TemplateVersion>();
+    public DbSet<TemplateStageAssignment> TemplateStageAssignments => Set<TemplateStageAssignment>();
+    public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<AppTenantInfo>(entity =>
+        {
+            entity.HasKey(t => t.Id);
+            entity.HasIndex(t => t.OwnerUserId);
+        });
+
+        modelBuilder.Entity<UserTenantMembership>(entity =>
+        {
+            entity.HasKey(x => x.Id);
+
+            entity.HasIndex(x => new { x.UserId, x.TenantId })
+                .IsUnique();
+
+            entity.HasOne(x => x.User)
+                .WithMany()
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(x => x.Tenant)
+                .WithMany()
+                .HasForeignKey(x => x.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(x => x.UserId);
+            entity.HasIndex(x => x.TenantId);
+        });
 
         modelBuilder.Entity<User>(entity =>
         {
@@ -73,6 +105,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .HasPrincipalKey(pr => pr.Id)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(p => p.Tenant)
+                .WithMany()
+                .HasForeignKey(p => p.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Container>(entity =>
@@ -89,6 +126,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .HasForeignKey(c => c.ProjectId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(p => p.Tenant)
+                .WithMany()
+                .HasForeignKey(p => p.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Template>(entity =>
@@ -104,6 +146,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .WithMany(p => p.Templates)
                 .HasForeignKey(t => t.ProjectId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(p => p.Tenant)
+                .WithMany()
+                .HasForeignKey(p => p.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<TemplateVersion>(entity =>
@@ -113,6 +160,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.HasOne(tv => tv.Template)
                 .WithMany(t => t.Versions)
                 .HasForeignKey(tv => tv.TemplateId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(p => p.Tenant)
+                .WithMany()
+                .HasForeignKey(p => p.TenantId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
@@ -131,6 +183,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasIndex(e => new { e.StageId, e.TemplateVersionId }).IsUnique();
+
+            entity.HasOne(p => p.Tenant)
+                .WithMany()
+                .HasForeignKey(p => p.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Stage>(entity =>
@@ -143,11 +200,21 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasIndex(e => new { e.ProjectId, e.Name }).IsUnique();
+
+            entity.HasOne(p => p.Tenant)
+                .WithMany()
+                .HasForeignKey(p => p.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Project>(entity =>
         {
             entity.HasKey(e => e.Id);
+
+            entity.HasOne(p => p.Tenant)
+                .WithMany()
+                .HasForeignKey(p => p.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<ApiKey>(entity =>
@@ -165,6 +232,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
                     v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null));
+
+            entity.HasOne(p => p.Tenant)
+                .WithMany()
+                .HasForeignKey(p => p.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 
@@ -172,39 +244,90 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     {
         var entries = ChangeTracker
             .Entries()
-            .Where(e => e is { Entity: IEntity, State: EntityState.Added or EntityState.Modified });
+            .Where(e => e.State is EntityState.Added or EntityState.Modified);
 
-        foreach (var entityEntry in entries)
+        var now = DateTime.UtcNow;
+
+        foreach (var entry in entries)
         {
-            ((IEntity)entityEntry.Entity).UpdatedDateTime = DateTime.UtcNow;
-
-            if (entityEntry.State == EntityState.Added)
+            if (entry.Entity is IEntity entity)
             {
-                ((IEntity)entityEntry.Entity).Id = Guid.CreateVersion7();
-                ((IEntity)entityEntry.Entity).CreatedDateTime = DateTime.UtcNow;
+                entity.UpdatedDateTime = now;
+
+                if (entry.State == EntityState.Added)
+                {
+                    entity.Id = Guid.CreateVersion7();
+                    entity.CreatedDateTime = now;
+                }
+            }
+
+            if (entry.Entity is ITenantInfo tenant)
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    if (string.IsNullOrWhiteSpace(tenant.Id))
+                    {
+                        tenant.Id = Guid.CreateVersion7().ToString();
+                    }
+                }
+
+                if (entry.Entity is AppTenantInfo appTenant)
+                {
+                    if (entry.State == EntityState.Added)
+                    {
+                        appTenant.CreatedDateTime = now;
+                    }
+
+                    appTenant.UpdatedDateTime = now;
+                }
             }
         }
 
         return base.SaveChanges();
     }
 
-    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var entries = ChangeTracker
             .Entries()
-            .Where(e => e is { Entity: IEntity, State: EntityState.Added or EntityState.Modified });
+            .Where(e => e.State is EntityState.Added or EntityState.Modified);
 
-        foreach (var entityEntry in entries)
+        var now = DateTime.UtcNow;
+
+        foreach (var entry in entries)
         {
-            ((IEntity)entityEntry.Entity).UpdatedDateTime = DateTime.UtcNow;
-
-            if (entityEntry.State == EntityState.Added)
+            if (entry.Entity is IEntity entity)
             {
-                ((IEntity)entityEntry.Entity).Id = Guid.CreateVersion7();
-                ((IEntity)entityEntry.Entity).CreatedDateTime = DateTime.UtcNow;
+                entity.UpdatedDateTime = now;
+
+                if (entry.State == EntityState.Added)
+                {
+                    entity.Id = Guid.CreateVersion7();
+                    entity.CreatedDateTime = now;
+                }
+            }
+
+            if (entry.Entity is ITenantInfo tenant)
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    if (string.IsNullOrWhiteSpace(tenant.Id))
+                    {
+                        tenant.Id = Guid.CreateVersion7().ToString();
+                    }
+                }
+
+                if (entry.Entity is AppTenantInfo appTenant)
+                {
+                    if (entry.State == EntityState.Added)
+                    {
+                        appTenant.CreatedDateTime = now;
+                    }
+                    appTenant.UpdatedDateTime = now;
+                }
             }
         }
 
-        return base.SaveChangesAsync(cancellationToken);
+        return await base.SaveChangesAsync(cancellationToken);
     }
 }

@@ -1,0 +1,1970 @@
+I'm making an application called communiqueue. its a email and texting template tool where users will come and create templates that take in data on my website and then use my API to send email and text messages by passing me data and I'll built the content.
+
+Users log in and create projects. Each project contains containers. a project contains a default container. the container can contain other containers like a windows folder structure. Inside of these contains are templates. Templates are the things the user will update and manage and these can be stored at any level of containers the user creates for organizational purposes.
+
+My site is built using nuxt 3 Typescript composition api built as SSG and tailwind css as my UI library. Below is my tailwind config and theme:
+// https://tailwindcss.com/docs/configuration
+const sharedConfig = require('tailwindcss-settings/tailwind.config');
+
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  presets: [sharedConfig],
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        // Light theme colors
+        light: {
+          textbase: '#333333', // Dark gray for main text
+          background: '#f8fafc', // Very light blue-gray for background
+          surface: '#ffffff', // White for surface elements
+          primary: '#3b82f6', // Bright blue for primary actions
+          secondary: '#64748b', // Slate blue for secondary elements
+          accent: '#06b6d4', // Cyan for accents and highlights
+          error: '#ef4444', // Red for errors
+          info: '#0ea5e9', // Sky blue for informational messages
+          success: '#22c55e', // Green for success messages
+          warning: '#f59e0b' // Amber for warnings
+        },
+        // Dark theme colors
+        dark: {
+          textbase: '#e2e8f0', // Light gray for main text
+          background: '#0f172a', // Very dark blue for background
+          surface: '#1e293b', // Dark blue-gray for surface elements
+          primary: '#60a5fa', // Lighter blue for primary actions
+          secondary: '#94a3b8', // Light slate blue for secondary elements
+          accent: '#22d3ee', // Bright cyan for accents
+          error: '#f87171', // Light red for errors
+          info: '#38bdf8', // Bright sky blue for info
+          success: '#4ade80', // Bright green for success
+          warning: '#fbbf24' // Bright amber for warnings
+        }
+      }
+    }
+  }
+};
+
+All of my service calls to my API are composables, shown below:
+import type { IApiKey, IApiResponse, IGenerateApiKeyRequest, IValidateApiKeyRequest } from '~/types';
+
+export default function useApiKeys() {
+  const config = useRuntimeConfig();
+  const baseUrl = `${config.public.apiBaseUrl}/api/v1/apikeys`;
+  const { handleApiCall, createFetchOptions } = useApiUtils();
+
+  const generateApiKey = (request: IGenerateApiKeyRequest) => {
+    return handleApiCall(
+      $fetch<IApiResponse<{ apiKey: IApiKey; apiKeyString: string }>>(`${baseUrl}/generate`, {
+        ...createFetchOptions<IApiResponse<{ apiKey: IApiKey; apiKeyString: string }>>(),
+        method: 'POST',
+        body: request
+      }),
+      'generateApiKey'
+    );
+  };
+
+  const getApiKeyById = (apiKeyId: string) => {
+    return handleApiCall($fetch<IApiResponse<IApiKey>>(`${baseUrl}/${apiKeyId}`, createFetchOptions<IApiResponse<IApiKey>>()), 'getApiKeyById');
+  };
+
+  const getApiKeysByProjectId = (projectId: string) => {
+    return handleApiCall($fetch<IApiResponse<IApiKey[]>>(`${baseUrl}/project/${projectId}`, createFetchOptions<IApiResponse<IApiKey[]>>()), 'getApiKeysByProjectId');
+  };
+
+  const validateApiKey = (request: IValidateApiKeyRequest) => {
+    return handleApiCall(
+      $fetch<IApiResponse<boolean>>(`${baseUrl}/validate`, {
+        ...createFetchOptions<IApiResponse<boolean>>(),
+        method: 'POST',
+        body: request
+      }),
+      'validateApiKey'
+    );
+  };
+
+  const expireApiKey = (apiKeyId: string) => {
+    return handleApiCall(
+      $fetch<IApiResponse<boolean>>(`${baseUrl}/expire/${apiKeyId}`, {
+        ...createFetchOptions<IApiResponse<boolean>>(),
+        method: 'POST'
+      }),
+      'expireApiKey'
+    );
+  };
+
+  const hasValidApiKey = (projectId: string) => {
+    return handleApiCall($fetch<IApiResponse<boolean>>(`${baseUrl}/valid/${projectId}`, createFetchOptions<IApiResponse<boolean>>()), 'hasValidApiKey');
+  };
+
+  return {
+    generateApiKey,
+    getApiKeyById,
+    getApiKeysByProjectId,
+    validateApiKey,
+    expireApiKey,
+    hasValidApiKey
+  };
+}
+import type { FetchContext } from 'ofetch';
+import type { NitroFetchOptions, NitroFetchRequest } from 'nitropack';
+
+export function useApiUtils() {
+  return {
+    handleApiCall: async <T>(apiCall: Promise<T>, actionName: string): Promise<T> => {
+      try {
+        console.log(`Starting ${actionName}`);
+
+        // For development, temporarily disable SSL verification
+        if (process.env.NODE_ENV === 'development') {
+          process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+        }
+
+        const result = await apiCall;
+        console.log(`Completed ${actionName}`);
+        return result;
+      } catch (error) {
+        console.error(`Error in ${actionName}:`, error);
+        throw error;
+      } finally {
+        // Reset SSL verification for other calls
+        if (process.env.NODE_ENV === 'development') {
+          process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1';
+        }
+      }
+    },
+    createFetchOptions: <ResponseType>(): NitroFetchOptions<NitroFetchRequest, 'post' | 'get' | 'head' | 'patch' | 'put' | 'delete' | 'connect' | 'options' | 'trace'> => {
+      return {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        onResponseError(context: FetchContext<ResponseType>): void {
+          const { request, response } = context;
+          const url = request instanceof Request ? request.url : String(request);
+          console.error(`API Error: ${response?.status}`, { url });
+        },
+        onRequestError(context: FetchContext<ResponseType>): void {
+          const { request, error } = context;
+          const url = request instanceof Request ? request.url : String(request);
+          console.error(`Request Error: ${error?.message}`, { url });
+        }
+      } as NitroFetchOptions<NitroFetchRequest, 'post' | 'get' | 'head' | 'patch' | 'put' | 'delete' | 'connect' | 'options' | 'trace'>;
+    }
+  };
+}
+import type { IApiResponse, IContainer, ICreateContainerRequest, IUpdateContainerRequest, IMoveContainerRequest } from '~/types';
+
+export default function useContainers() {
+  const config = useRuntimeConfig();
+  const baseUrl = `${config.public.apiBaseUrl}/api/v1/containers`;
+  const { handleApiCall, createFetchOptions } = useApiUtils();
+
+  const createContainer = (request: ICreateContainerRequest) => {
+    return handleApiCall(
+      $fetch<IApiResponse<IContainer>>(`${baseUrl}`, {
+        ...createFetchOptions<IApiResponse<IContainer>>(),
+        method: 'POST',
+        body: request
+      }),
+      'createContainer'
+    );
+  };
+
+  const getContainerById = (containerId: string) => {
+    return handleApiCall($fetch<IApiResponse<IContainer>>(`${baseUrl}/${containerId}`, createFetchOptions<IApiResponse<IContainer>>()), 'getContainerById');
+  };
+
+  const getContainersByProjectId = (projectId: string) => {
+    return handleApiCall($fetch<IApiResponse<IContainer[]>>(`${baseUrl}/project/${projectId}`, createFetchOptions<IApiResponse<IContainer[]>>()), 'getContainersByProjectId');
+  };
+
+  const updateContainer = (containerId: string, request: IUpdateContainerRequest) => {
+    return handleApiCall(
+      $fetch<IApiResponse<IContainer>>(`${baseUrl}/${containerId}`, {
+        ...createFetchOptions<IApiResponse<IContainer>>(),
+        method: 'PUT',
+        body: request
+      }),
+      'updateContainer'
+    );
+  };
+
+  const deleteContainer = (containerId: string) => {
+    return handleApiCall(
+      $fetch<IApiResponse<boolean>>(`${baseUrl}/${containerId}`, {
+        ...createFetchOptions<IApiResponse<boolean>>(),
+        method: 'DELETE'
+      }),
+      'deleteContainer'
+    );
+  };
+
+  const getChildContainers = (parentContainerId: string) => {
+    return handleApiCall($fetch<IApiResponse<IContainer[]>>(`${baseUrl}/${parentContainerId}/children`, createFetchOptions<IApiResponse<IContainer[]>>()), 'getChildContainers');
+  };
+
+  const moveContainer = (containerId: string, request: IMoveContainerRequest) => {
+    return handleApiCall(
+      $fetch<IApiResponse<boolean>>(`${baseUrl}/${containerId}/move`, {
+        ...createFetchOptions<IApiResponse<boolean>>(),
+        method: 'PUT',
+        body: request
+      }),
+      'moveContainer'
+    );
+  };
+
+  return {
+    createContainer,
+    getContainerById,
+    getContainersByProjectId,
+    updateContainer,
+    deleteContainer,
+    getChildContainers,
+    moveContainer
+  };
+}
+import type { IPermission, IApiResponse, ICreatePermissionRequest, IUpdatePermissionRequest, EntityType } from '~/types';
+
+export default function usePermissions() {
+  const config = useRuntimeConfig();
+  const baseUrl = `${config.public.apiBaseUrl}/api/v1/permissions`;
+  const { handleApiCall, createFetchOptions } = useApiUtils();
+
+  const createPermission = (request: ICreatePermissionRequest) => {
+    return handleApiCall(
+      $fetch<IApiResponse<IPermission>>(`${baseUrl}`, {
+        ...createFetchOptions<IApiResponse<IPermission>>(),
+        method: 'POST',
+        body: request
+      }),
+      'createPermission'
+    );
+  };
+
+  const getPermission = (userId: string, entityId: string, entityType: EntityType) => {
+    return handleApiCall($fetch<IApiResponse<IPermission>>(`${baseUrl}/${userId}/${entityId}/${entityType}`, createFetchOptions<IApiResponse<IPermission>>()), 'getPermission');
+  };
+
+  const getPermissionsByEntity = (entityId: string, entityType: EntityType) => {
+    console.log('getPermissionsByEntity', entityId, entityType);
+    return handleApiCall(
+      $fetch<IApiResponse<IPermission[]>>(`${baseUrl}/entity/${entityId}/${entityType}`, createFetchOptions<IApiResponse<IPermission[]>>()),
+      'getPermissionsByEntity'
+    );
+  };
+
+  const updatePermission = (request: IUpdatePermissionRequest) => {
+    return handleApiCall(
+      $fetch<IApiResponse<IPermission>>(`${baseUrl}`, {
+        ...createFetchOptions<IApiResponse<IPermission>>(),
+        method: 'PUT',
+        body: request
+      }),
+      'updatePermission'
+    );
+  };
+
+  const deletePermission = (userId: string, entityId: string, entityType: EntityType) => {
+    return handleApiCall(
+      $fetch<IApiResponse<boolean>>(`${baseUrl}/${userId}/${entityId}/${entityType}`, {
+        ...createFetchOptions<IApiResponse<boolean>>(),
+        method: 'DELETE'
+      }),
+      'deletePermission'
+    );
+  };
+
+  return {
+    createPermission,
+    getPermission,
+    getPermissionsByEntity,
+    updatePermission,
+    deletePermission
+  };
+}
+import type {
+  IApiResponse,
+  IProject,
+  IStage,
+  ICreateProjectRequest,
+  IUpdateProjectRequest,
+  IAddUserToProjectRequest,
+  IUpdateUserPermissionRequest,
+  IAddStageToProjectRequest,
+  IUpdateProjectStageRequest,
+  IProjectKpis
+} from '~/types';
+
+export default function useProjects() {
+  const config = useRuntimeConfig();
+  const { handleApiCall, createFetchOptions } = useApiUtils();
+
+  const baseUrl = `${config.public.apiBaseUrl}/api/v1/projects`;
+
+  const createProject = (request: ICreateProjectRequest) => {
+    return handleApiCall(
+      $fetch<IApiResponse<IProject>>(`${baseUrl}`, {
+        ...createFetchOptions<IApiResponse<IProject>>(),
+        method: 'POST',
+        body: request
+      }),
+      'createProject'
+    );
+  };
+
+  const getProjectKpis = (projectId: string) => {
+    return handleApiCall($fetch<IApiResponse<IProjectKpis>>(`${baseUrl}/kpis?${projectId}`, createFetchOptions<IApiResponse<IProjectKpis>>()), 'getProjectKpis');
+  };
+
+  const getProjectById = (projectId: string) => {
+    return handleApiCall($fetch<IApiResponse<IProject>>(`${baseUrl}/${projectId}`, createFetchOptions<IApiResponse<IProject>>()), 'getProjectById');
+  };
+
+  const getProjectsByUserId = (userId: string) => {
+    return handleApiCall($fetch<IApiResponse<IProject[]>>(`${baseUrl}/user/${userId}`, createFetchOptions<IApiResponse<IProject[]>>()), 'getProjectsByUserId');
+  };
+
+  const updateProject = (projectId: string, request: IUpdateProjectRequest) => {
+    return handleApiCall(
+      $fetch<IApiResponse<IProject>>(`${baseUrl}/${projectId}`, {
+        ...createFetchOptions<IApiResponse<IProject>>(),
+        method: 'PUT',
+        body: request
+      }),
+      'updateProject'
+    );
+  };
+
+  const deleteProject = (projectId: string) => {
+    return handleApiCall(
+      $fetch<IApiResponse<boolean>>(`${baseUrl}/${projectId}`, {
+        ...createFetchOptions<IApiResponse<boolean>>(),
+        method: 'DELETE'
+      }),
+      'deleteProject'
+    );
+  };
+
+  const addUserToProject = (projectId: string, request: IAddUserToProjectRequest) => {
+    return handleApiCall(
+      $fetch<IApiResponse<boolean>>(`${baseUrl}/${projectId}/users`, {
+        ...createFetchOptions<IApiResponse<boolean>>(),
+        method: 'POST',
+        body: request
+      }),
+      'addUserToProject'
+    );
+  };
+
+  const removeUserFromProject = (projectId: string, userId: string) => {
+    return handleApiCall(
+      $fetch<IApiResponse<boolean>>(`${baseUrl}/${projectId}/users/${userId}`, {
+        ...createFetchOptions<IApiResponse<boolean>>(),
+        method: 'DELETE'
+      }),
+      'removeUserFromProject'
+    );
+  };
+
+  const updateUserPermissionInProject = (projectId: string, userId: string, request: IUpdateUserPermissionRequest) => {
+    return handleApiCall(
+      $fetch<IApiResponse<boolean>>(`${baseUrl}/${projectId}/users/${userId}/permission`, {
+        ...createFetchOptions<IApiResponse<boolean>>(),
+        method: 'PUT',
+        body: request
+      }),
+      'updateUserPermissionInProject'
+    );
+  };
+
+  const getProjectStages = (projectId: string) => {
+    return handleApiCall($fetch<IApiResponse<IStage[]>>(`${baseUrl}/${projectId}/stages`, createFetchOptions<IApiResponse<IStage[]>>()), 'getProjectStages');
+  };
+
+  const addStageToProject = (projectId: string, request: IAddStageToProjectRequest) => {
+    return handleApiCall(
+      $fetch<IApiResponse<IStage>>(`${baseUrl}/${projectId}/stages`, {
+        ...createFetchOptions<IApiResponse<IStage>>(),
+        method: 'POST',
+        body: request
+      }),
+      'addStageToProject'
+    );
+  };
+
+  const removeStageFromProject = (projectId: string, stageId: string) => {
+    return handleApiCall(
+      $fetch<IApiResponse<boolean>>(`${baseUrl}/${projectId}/stages/${stageId}`, {
+        ...createFetchOptions<IApiResponse<boolean>>(),
+        method: 'DELETE'
+      }),
+      'removeStageFromProject'
+    );
+  };
+
+  const updateProjectStage = (projectId: string, stageId: string, request: IUpdateProjectStageRequest) => {
+    return handleApiCall(
+      $fetch<IApiResponse<IStage>>(`${baseUrl}/${projectId}/stages/${stageId}`, {
+        ...createFetchOptions<IApiResponse<IStage>>(),
+        method: 'PUT',
+        body: request
+      }),
+      'updateProjectStage'
+    );
+  };
+
+  return {
+    createProject,
+    getProjectKpis,
+    getProjectById,
+    getProjectsByUserId,
+    updateProject,
+    deleteProject,
+    addUserToProject,
+    removeUserFromProject,
+    updateUserPermissionInProject,
+    getProjectStages,
+    addStageToProject,
+    removeStageFromProject,
+    updateProjectStage
+  };
+}
+import type {
+  IApiResponse,
+  ITemplate,
+  ITemplateVersion,
+  ICreateTemplateRequest,
+  ICreateVersionRequest,
+  IAssignVersionToStageRequest,
+  IRemoveVersionFromStageRequest
+} from '~/types';
+
+export default function useTemplates() {
+  const config = useRuntimeConfig();
+  const baseUrl = `${config.public.apiBaseUrl}/api/v1/templates`;
+  const { handleApiCall, createFetchOptions } = useApiUtils();
+
+  const createTemplate = (request: ICreateTemplateRequest) => {
+    return handleApiCall(
+      $fetch<IApiResponse<ITemplate>>(`${baseUrl}`, {
+        ...createFetchOptions<IApiResponse<ITemplate>>(),
+        method: 'POST',
+        body: request
+      }),
+      'createTemplate'
+    );
+  };
+
+  const getTemplateById = (templateId: string) => {
+    return handleApiCall($fetch<IApiResponse<ITemplate>>(`${baseUrl}/${templateId}`, createFetchOptions<IApiResponse<ITemplate>>()), 'getTemplateById');
+  };
+
+  const getTemplatesByProjectId = (projectId: string) => {
+    return handleApiCall($fetch<IApiResponse<ITemplate[]>>(`${baseUrl}/project/${projectId}`, createFetchOptions<IApiResponse<ITemplate[]>>()), 'getTemplatesByProjectId');
+  };
+
+  const getTemplatesByContainerId = (containerId: string) => {
+    return handleApiCall($fetch<IApiResponse<ITemplate[]>>(`${baseUrl}/container/${containerId}`, createFetchOptions<IApiResponse<ITemplate[]>>()), 'getTemplatesByContainerId');
+  };
+
+  const getLatestVersion = (templateId: string) => {
+    return handleApiCall(
+      $fetch<IApiResponse<ITemplateVersion>>(`${baseUrl}/${templateId}/latest-version`, createFetchOptions<IApiResponse<ITemplateVersion>>()),
+      'getLatestVersion'
+    );
+  };
+
+  const getAllVersions = (templateId: string) => {
+    return handleApiCall($fetch<IApiResponse<ITemplateVersion[]>>(`${baseUrl}/${templateId}/versions`, createFetchOptions<IApiResponse<ITemplateVersion[]>>()), 'getAllVersions');
+  };
+
+  const createNewVersion = (templateId: string, request: ICreateVersionRequest) => {
+    return handleApiCall(
+      $fetch<IApiResponse<ITemplateVersion>>(`${baseUrl}/${templateId}/versions`, {
+        ...createFetchOptions<IApiResponse<ITemplateVersion>>(),
+        method: 'POST',
+        body: request
+      }),
+      'createNewVersion'
+    );
+  };
+
+  const assignVersionToStage = (templateVersionId: string, request: IAssignVersionToStageRequest) => {
+    return handleApiCall(
+      $fetch<IApiResponse<boolean>>(`${baseUrl}/versions/${templateVersionId}/assign`, {
+        ...createFetchOptions<IApiResponse<boolean>>(),
+        method: 'POST',
+        body: request
+      }),
+      'assignVersionToStage'
+    );
+  };
+
+  const removeVersionFromStage = (templateVersionId: string, request: IRemoveVersionFromStageRequest) => {
+    return handleApiCall(
+      $fetch<IApiResponse<boolean>>(`${baseUrl}/versions/${templateVersionId}/unassign`, {
+        ...createFetchOptions<IApiResponse<boolean>>(),
+        method: 'DELETE',
+        body: request
+      }),
+      'removeVersionFromStage'
+    );
+  };
+
+  const getVersionAssignedToStage = (templateId: string, stageId: string) => {
+    return handleApiCall(
+      $fetch<IApiResponse<ITemplateVersion>>(`${baseUrl}/${templateId}/stage/${stageId}`, createFetchOptions<IApiResponse<ITemplateVersion>>()),
+      'getVersionAssignedToStage'
+    );
+  };
+
+  return {
+    createTemplate,
+    getTemplateById,
+    getTemplatesByProjectId,
+    getTemplatesByContainerId,
+    getLatestVersion,
+    getAllVersions,
+    createNewVersion,
+    assignVersionToStage,
+    removeVersionFromStage,
+    getVersionAssignedToStage
+  };
+}
+import { ref } from 'vue';
+
+interface ToastOptions {
+  type: 'success' | 'error' | 'info' | 'warning';
+  title: string;
+  message?: string;
+}
+
+export function useToast() {
+  const toastRef = ref();
+
+  const showToast = (options: ToastOptions) => {
+    if (toastRef.value) {
+      toastRef.value.addToast(options);
+    }
+  };
+
+  return {
+    toastRef,
+    showToast
+  };
+}
+import type { EntityType, IApiResponse, ICreateUserRequest, IPermission, IUpdateUserRequest, IUser } from '~/types';
+
+export default function useUsers() {
+  const config = useRuntimeConfig();
+  const { handleApiCall, createFetchOptions } = useApiUtils();
+
+  const baseUrl = `${config.public.apiBaseUrl}/api/v1/users`;
+
+  const createUser = (request: ICreateUserRequest) => {
+    return handleApiCall(
+      $fetch<IApiResponse<IUser>>(`${baseUrl}`, {
+        ...createFetchOptions<IApiResponse<IUser>>(),
+        method: 'POST',
+        body: request
+      }),
+      'createUser'
+    );
+  };
+
+  const getUserById = (userId: string) => {
+    return handleApiCall($fetch<IApiResponse<IUser>>(`${baseUrl}/${userId}`, createFetchOptions<IApiResponse<IUser>>()), 'getUserById');
+  };
+
+  const getUserBySsoId = (ssoId: string) => {
+    return handleApiCall($fetch<IApiResponse<IUser>>(`${baseUrl}/sso/${ssoId}`, createFetchOptions<IApiResponse<IUser>>()), 'getUserBySsoId');
+  };
+
+  const getUserByEmail = (email: string) => {
+    return handleApiCall($fetch<IApiResponse<IUser>>(`${baseUrl}/email/${email}`, createFetchOptions<IApiResponse<IUser>>()), 'getUserByEmail');
+  };
+
+  const getAllUsers = () => {
+    return handleApiCall($fetch<IApiResponse<IUser[]>>(`${baseUrl}`, createFetchOptions<IApiResponse<IUser[]>>()), 'getAllUsers');
+  };
+
+  const updateUser = (userId: string, request: IUpdateUserRequest) => {
+    return handleApiCall(
+      $fetch<IApiResponse<IUser>>(`${baseUrl}/${userId}`, {
+        ...createFetchOptions<IApiResponse<IUser>>(),
+        method: 'PUT',
+        body: request
+      }),
+      'updateUser'
+    );
+  };
+
+  const deleteUser = (userId: string) => {
+    return handleApiCall(
+      $fetch<IApiResponse<boolean>>(`${baseUrl}/${userId}`, {
+        ...createFetchOptions<IApiResponse<boolean>>(),
+        method: 'DELETE'
+      }),
+      'deleteUser'
+    );
+  };
+
+  const getUserPermissions = (userId: string) => {
+    return handleApiCall($fetch<IApiResponse<IPermission[]>>(`${baseUrl}/${userId}/permissions`, createFetchOptions<IApiResponse<IPermission[]>>()), 'getUserPermissions');
+  };
+
+  const searchUsers = (searchTerm: string) => {
+    return handleApiCall(
+      $fetch<IApiResponse<IUser[]>>(`${baseUrl}/search?searchTerm=${encodeURIComponent(searchTerm)}`, createFetchOptions<IApiResponse<IUser[]>>()),
+      'searchUsers'
+    );
+  };
+
+  const getUsersWithEntityPermissions = (entityId: string, entityType: EntityType) => {
+    return handleApiCall(
+      $fetch<IApiResponse<IUser[]>>(`${baseUrl}/entity/${entityType}/${entityId}/permissions`, createFetchOptions<IApiResponse<IUser[]>>()),
+      'getUsersWithEntityPermissions'
+    );
+  };
+
+  return {
+    createUser,
+    getUserById,
+    getUserBySsoId,
+    getUserByEmail,
+    getAllUsers,
+    updateUser,
+    deleteUser,
+    getUserPermissions,
+    searchUsers,
+    getUsersWithEntityPermissions
+  };
+}
+export default function useLocalTime() {
+  const localTime = ref<string>('');
+
+  const toLocalTime = (isoUtcDatetime: string | Date | undefined): string => {
+    if (!isoUtcDatetime) return '';
+
+    const date = new Date(isoUtcDatetime);
+
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+      timeZoneName: 'short'
+    };
+
+    localTime.value = new Intl.DateTimeFormat(undefined, options).format(date);
+
+    return localTime.value;
+  };
+
+  return {
+    localTime,
+    toLocalTime
+  };
+}
+// usePhoneFormat.ts
+import { ref, watch } from 'vue';
+
+export default function usePhoneFormat(value: string) {
+  const formattedPhoneValue = ref(value);
+
+  const formatPhoneNumber = (value: string) => {
+    let cleaned = value.replace(/\D/g, '');
+    cleaned = cleaned.replace(/(\d{1})(\d{3})(\d{3})(\d{4})/, '$1 ($2) $3-$4');
+    formattedPhoneValue.value = cleaned.trim().substring(0, 16);
+  };
+
+  watch(
+    () => value,
+    (newValue) => {
+      formatPhoneNumber(newValue);
+    }
+  );
+
+  return {
+    formattedPhoneValue
+  };
+}
+import { useNuxtApp } from '#app';
+import type { RouteLocationRaw } from 'vue-router';
+
+export function useNavbarParser() {
+  const parseMenuRoute = (to?: RouteLocationRaw | ((nuxt: any) => RouteLocationRaw)) => {
+    const nuxtApp = useNuxtApp();
+    return typeof to === 'function' ? to(nuxtApp) : to;
+  };
+
+  const parseMenuTitle = (title: string) => title;
+
+  return { parseMenuRoute, parseMenuTitle };
+}
+export type ScreenSize = 'sm' | 'md' | 'lg' | 'xl';
+
+// { sm: '640px', md: '768px', lg: '1024px', xl: '1280px', '2xl': '1536px' }
+export const defaultScreenConfig: {
+  [key in ScreenSize]: number;
+} = {
+  sm: 640,
+  md: 768,
+  lg: 1024,
+  xl: 1280
+};
+
+export const useScreen = () => {
+  const screenSize = reactive({
+    width: 0,
+    height: 0
+  });
+
+  const current = ref<ScreenSize>('sm');
+
+  const getSize = (width?: number) => {
+    if (width === undefined) width = screenSize.width;
+    const { sm, md, lg, xl } = defaultScreenConfig;
+    if (width < Number(sm)) return 'sm';
+    if (width < Number(md)) return 'md';
+    if (width < Number(lg)) return 'lg';
+    if (width < Number(xl)) return 'xl';
+    return 'xl';
+  };
+
+  const onWindowResize = () => {
+    const { innerWidth, innerHeight } = window;
+    screenSize.width = innerWidth;
+    screenSize.height = innerHeight;
+    current.value = getSize();
+  };
+
+  const higherThan = (size: ScreenSize, defScreenSize?: ScreenSize) => {
+    const { sm, md, lg, xl } = defaultScreenConfig;
+    const width = defaultScreenConfig[defScreenSize || current.value];
+    if (size === 'sm') return width >= Number(sm);
+    if (size === 'md') return width >= Number(md);
+    if (size === 'lg') return width >= Number(lg);
+    if (size === 'xl') return width >= Number(xl);
+    return false;
+  };
+
+  onMounted(() => {
+    if (typeof window === 'undefined') return;
+    window.addEventListener('resize', onWindowResize);
+    current.value = getSize(window.innerWidth);
+  });
+
+  onUnmounted(() => {
+    if (typeof window === 'undefined') return;
+    window.removeEventListener('resize', onWindowResize);
+  });
+
+  return {
+    getSize,
+    screenSize,
+    current,
+    higherThan
+  };
+};
+import type { WritableComputedRef } from 'vue';
+
+export const useSyncProps = <T>(props: any, key: string, emit: any): WritableComputedRef<T> => {
+  return computed({
+    get() {
+      return props[key];
+    },
+    set(value) {
+      emit(`update:${key}`, value);
+    }
+  });
+};
+
+
+Here are my data models:
+export enum EntityType {
+  Application = 'Application',
+  Project = 'Project',
+  Container = 'Container',
+  Template = 'Template'
+}
+export enum PermissionLevel {
+  ReadOnly = 'ReadOnly',
+  Contributor = 'Contributor',
+  Admin = 'Admin',
+  SuperAdmin = 'SuperAdmin'
+}
+export enum GlobalRoleType {
+  Owner = 'Owner',
+  SuperAdmin = 'SuperAdmin',
+  Contributor = 'Contributor',
+  ReadOnly = 'ReadOnly'
+}
+export interface IApiResponse<T> {
+  data: T | null;
+  isSuccess: boolean;
+  status: number;
+  errors: string[];
+  message: string;
+}
+export interface IProjectKpis {
+  templateCount: number;
+  containerCount: number;
+  stageCount: number;
+}
+import type { IProject } from '~/types';
+export interface IApiKey {
+  id: string; // Guid in C#
+  keyHash: string;
+  projectId: string; // Guid in C#
+  project?: IProject;
+  createdDateTime: Date;
+  updatedDateTime: Date;
+  startDate: Date;
+  endDate: Date;
+  isExpired: boolean;
+  scopes: string[];
+}
+import type { IProject, ITemplate } from '~/types';
+export interface IContainer {
+  id: string; // Guid in C#
+  name: string;
+  description: string | null;
+  projectId: string; // Guid in C#
+  parentId: string | null; // Guid? in C#
+  parent?: IContainer;
+  children: IContainer[];
+  project?: IProject;
+  templates: ITemplate[];
+  isRoot: boolean;
+  createdDateTime: Date;
+  updatedDateTime: Date;
+}
+import type { EntityType, IProject, IUser, PermissionLevel } from '~/types';
+export interface IPermission {
+  id: string; // Guid in C#
+  userId: string; // Guid in C#
+  entityId: string; // Guid in C#
+  entityType: EntityType;
+  permissionLevel: PermissionLevel;
+  user?: IUser;
+  project?: IProject | null;
+  createdDateTime: Date;
+  updatedDateTime: Date;
+}
+import type { IContainer, IPermission, IStage, ITemplate } from '~/types';
+export interface IProject {
+  id: string; // Guid in C#
+  name: string;
+  description: string | null;
+  customerId: string | null;
+  rootContainerId: string; // Guid in C#
+  rootContainer: IContainer;
+  stages: IStage[];
+  containers: IContainer[];
+  templates: ITemplate[];
+  permissions: IPermission[];
+  createdDateTime: Date;
+  updatedDateTime: Date;
+}
+import type { IProject } from '~/types';
+export interface IStage {
+  id: string; // Guid in C#
+  name: string;
+  order: number;
+  projectId: string; // Guid in C#
+  project?: IProject;
+  createdDateTime: Date;
+  updatedDateTime: Date;
+}
+import type { IContainer, IProject, ITemplateVersion } from '~/types';
+export interface ITemplate {
+  id: string; // Guid in C#
+  name: string;
+  projectId: string; // Guid in C#
+  project?: IProject;
+  containerId: string; // Guid in C#
+  container?: IContainer;
+  versions: ITemplateVersion[];
+  createdDateTime: Date;
+  updatedDateTime: Date;
+}
+import type { IStage, ITemplateVersion } from '~/types';
+export interface ITemplateStageAssignment {
+  id: string; // Guid in C#
+  templateVersionId: string; // Guid in C#
+  templateVersion?: ITemplateVersion;
+  stageId: string; // Guid in C#
+  stage?: IStage;
+  createdDateTime: Date;
+  updatedDateTime: Date;
+}
+import type { ITemplate, ITemplateStageAssignment } from '~/types';
+export interface ITemplateVersion {
+  id: string; // Guid in C#
+  versionNumber: number;
+  subject: string;
+  body: string;
+  templateId: string; // Guid in C#
+  template?: ITemplate;
+  stageAssignments: ITemplateStageAssignment[];
+  createdDateTime: Date;
+  updatedDateTime: Date;
+}
+import type { GlobalRoleType, IPermission } from '~/types';
+export interface IUser {
+  id: string; // Guid in C#
+  createdDateTime: Date;
+  updatedDateTime: Date;
+  email: string;
+  ssoId: string;
+  firstName: string;
+  lastName: string;
+  isActive: boolean;
+  globalRole: GlobalRoleType;
+  permissions?: IPermission[];
+}
+export interface IGenerateApiKeyRequest {
+  projectId: string;
+  startDate: string;
+  endDate: string;
+  scopes: string[];
+}
+export interface IValidateApiKeyRequest {
+  apiKey: string;
+}
+export interface ICreateContainerRequest {
+  name: string;
+  description: string;
+  projectId: string;
+  parentContainerId?: string;
+}
+export interface IMoveContainerRequest {
+  newParentContainerId?: string;
+}
+export interface IUpdateContainerRequest {
+  name: string;
+  description: string;
+}
+import type { EntityType, PermissionLevel } from "~/types";
+export interface ICreatePermissionRequest {
+  userId: string;
+  entityId: string;
+  entityType: EntityType;
+  permissionLevel: PermissionLevel;
+}
+import type { EntityType, PermissionLevel } from "~/types";
+export interface IUpdatePermissionRequest {
+  userId: string;
+  entityId: string;
+  entityType: EntityType;
+  newPermissionLevel: PermissionLevel;
+}
+export interface IAddStageToProjectRequest {
+  name: string;
+  order: number;
+}
+import type { PermissionLevel } from "~/types";
+export interface IAddUserToProjectRequest {
+  userId: string;
+  permissionLevel: PermissionLevel;
+}
+export interface ICreateProjectRequest {
+  name: string;
+  description: string;
+  ownerId: string;
+}
+export interface IUpdateProjectRequest {
+  name: string;
+  description: string;
+}
+export interface IUpdateProjectStageRequest {
+  name: string;
+  order: number;
+}
+import type { PermissionLevel } from "~/types";
+export interface IUpdateUserPermissionRequest {
+  newPermissionLevel: PermissionLevel;
+}
+export interface IAssignVersionToStageRequest {
+  stageId: string;
+}
+export interface ICreateTemplateRequest {
+  projectId: string;
+  containerId: string;
+  name: string;
+  subject: string;
+  body: string;
+}
+export interface ICreateVersionRequest {
+  subject: string;
+  body: string;
+}
+export interface IRemoveVersionFromStageRequest {
+  stageId: string;
+}
+import type { GlobalRoleType } from "~/types";
+export type ICreateUserRequest = {
+  email: string;
+  ssoId: string;
+  isActive: boolean;
+  globalRole: GlobalRoleType;
+  firstName: string;
+  lastName: string;
+};
+
+import type { GlobalRoleType } from '~/types';
+export type IUpdateUserRequest = {
+  email: string;
+  isActive: boolean;
+  globalRole: GlobalRoleType;
+  firstName: string;
+  lastName: string;
+};
+
+we are going to skip out on using pinia for a global store and instead orchestrate data using Tanstacks vue Query. Here is an example from our app so you know how to use it:
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import useProjects from '~/composables/use-projects-service';
+import type { ICreateProjectRequest } from '~/types';
+
+const emit = defineEmits(['close']);
+const { createProject } = useProjects();
+const queryClient = useQueryClient();
+
+const projectName = ref('');
+const projectDescription = ref('');
+
+const { mutate, isPending } = useMutation({
+  mutationFn: async (newProject: ICreateProjectRequest) => {
+    const result = await createProject(newProject);
+    if (result.data) {
+      return result.data;
+    }
+    throw new Error('Failed to create project');
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['projects'] });
+    emit('close');
+  },
+  onError: (error: Error) => {
+    console.error('Failed to create project:', error);
+    // Add user-facing error handling here
+  }
+});
+
+const handleSubmit = () => {
+  mutate({
+    name: projectName.value,
+    description: projectDescription.value,
+    ownerId: '7F58AFB9-CFEB-4117-998A-A6658C3BCC90' // TODO: Replace with actual user ID from auth system
+  });
+};
+</script>
+
+Here are my pages:
+HomePage indexed.vue:
+<script setup></script>
+
+<template>
+  <LayoutPageWrapper class="flex-1 flex relative">
+    <!-- Center Content -->
+    <div class="flex-1 z-10">
+      <!-- Hero Section -->
+      <HomePageHero />
+
+      <!-- Features Section -->
+      <HomePageFeatures />
+
+      <!-- Call To Action Section -->
+      <HomePageCta />
+    </div>
+  </LayoutPageWrapper>
+</template>
+
+<style lang="scss">
+:root {
+  --padding: 0.05em;
+}
+
+@keyframes anim-fg-1 {
+  0%,
+  16.667%,
+  100% {
+    opacity: 1;
+  }
+  33.333%,
+  83.333% {
+    opacity: 0;
+  }
+}
+@keyframes anim-fg-2 {
+  0%,
+  16.667%,
+  66.667%,
+  100% {
+    opacity: 0;
+  }
+  33.333%,
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes anim-fg-3 {
+  0%,
+  50%,
+  100% {
+    opacity: 0;
+  }
+  66.667%,
+  83.333% {
+    opacity: 1;
+  }
+}
+.animated-text-bg {
+  position: relative;
+  display: block;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  content: var(--content);
+  display: block;
+  width: 100%;
+  color: theme('colors.slate.200');
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 0;
+  padding-left: var(--padding);
+  padding-right: var(--padding);
+  &:before {
+    content: var(--content);
+    position: absolute;
+    display: block;
+    width: 100%;
+    color: theme('colors.slate.100');
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 0;
+    padding-left: var(--padding);
+    padding-right: var(--padding);
+  }
+}
+.animated-text-fg {
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding-left: var(--padding);
+  padding-right: var(--padding);
+  background-image: linear-gradient(90deg, var(--start-color), var(--end-color));
+  position: relative;
+  opacity: 0;
+  z-index: 1;
+  animation: var(--animation-name) 8s infinite;
+}
+html.dark {
+  .animated-text-bg {
+    color: theme('colors.gray.100');
+    &:before {
+      color: theme('colors.gray.100');
+    }
+  }
+}
+</style>
+
+features.vue:
+<template>
+  <h1>CommuniQueue Features</h1>
+</template>
+
+<script setup lang="ts"></script>
+
+userManagement index.vue:
+<template>
+  <div class="space-y-6">
+    <div class="bg-light-surface dark:bg-dark-surface p-6 rounded-lg shadow-sm">
+      <!-- Header Section -->
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-light-textbase dark:text-dark-textbase">User Management</h2>
+        <button
+          v-if="canManageUsers"
+          class="bg-light-primary dark:bg-dark-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
+          @click="showAddUserModal = true"
+        >
+          Add User
+        </button>
+      </div>
+
+      <!-- Loading State -->
+      <div v-if="isLoading" class="py-8 text-center text-light-secondary dark:text-dark-secondary">
+        <LoadingSpinner />
+      </div>
+
+      <!-- Empty State -->
+      <div v-else-if="users?.length === 0" class="text-center py-8">
+        <Icon name="mdi:account-group-outline" class="w-16 h-16 mx-auto text-light-secondary dark:text-dark-secondary mb-2" />
+        <p class="text-light-secondary dark:text-dark-secondary">No users found</p>
+      </div>
+
+      <!-- User List -->
+      <div v-else class="space-y-4">
+        <UserManagementCard
+          v-for="user in users"
+          :key="user.id"
+          :user="user"
+          :can-manage="canManageUsers"
+          :is-current-user="isCurrentUser(user.id)"
+          @update="handleUserUpdate"
+          @remove="handleUserRemove"
+        />
+      </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <UserManagementAddUserModal
+      v-if="showAddUserModal"
+      @close="showAddUserModal = false"
+      @added="handleUserAdded"
+    />
+
+    <!-- Confirmation Modal -->
+    <ConfirmationModal
+      v-if="showRemoveConfirmation"
+      title="Remove User"
+      :message="removeConfirmationMessage"
+      confirm-text="Remove"
+      :is-processing="isRemoving"
+      processing-text="Removing..."
+      @confirm="confirmRemoveUser"
+      @cancel="cancelRemoveUser"
+    />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
+import type { IUser } from '~/types';
+import useUsers from '~/composables/use-user-service';
+import { useToast } from '~/composables/use-toast-service';
+
+const { getAllUsers, updateUser, deleteUser } = useUsers();
+const { showToast } = useToast();
+const queryClient = useQueryClient();
+
+// State management
+const showAddUserModal = ref(false);
+const showRemoveConfirmation = ref(false);
+const userToRemove = ref<IUser | null>(null);
+
+// Query for users
+const { data: usersData, isLoading } = useQuery({
+  queryKey: ['users'],
+  queryFn: () => getAllUsers()
+});
+
+const users = computed(() => usersData.value?.data || []);
+
+// Computed properties
+const canManageUsers = computed(() => {
+  // Implement your permission logic here
+  return true; // Temporary, replace with actual permission check
+});
+
+const removeConfirmationMessage = computed(() => {
+  return `Are you sure you want to remove ${userToRemove.value?.email}? This action cannot be undone.`;
+});
+
+// User mutation
+const { mutate: removeUser, isPending: isRemoving } = useMutation({
+  mutationFn: async (userId: string) => {
+    return await deleteUser(userId);
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['users'] });
+    showToast({
+      type: 'success',
+      title: 'User Removed',
+      message: 'User has been removed successfully.'
+    });
+    showRemoveConfirmation.value = false;
+    userToRemove.value = null;
+  },
+  onError: (error: Error) => {
+    showToast({
+      type: 'error',
+      title: 'Removal Failed',
+      message: error.message || 'Failed to remove user.'
+    });
+  }
+});
+
+// Methods
+const isCurrentUser = (userId: string) => {
+  // Replace with actual auth check
+  return userId === 'current-user-id';
+};
+
+const handleUserUpdate = async (user: IUser) => {
+  // Implement user update logic
+};
+
+const handleUserRemove = (user: IUser) => {
+  userToRemove.value = user;
+  showRemoveConfirmation.value = true;
+};
+
+const confirmRemoveUser = () => {
+  if (userToRemove.value) {
+    removeUser(userToRemove.value.id);
+  }
+};
+
+const cancelRemoveUser = () => {
+  showRemoveConfirmation.value = false;
+  userToRemove.value = null;
+};
+
+const handleUserAdded = () => {
+  showAddUserModal.value = false;
+  queryClient.invalidateQueries({ queryKey: ['users'] });
+};
+</script>
+
+dashboard\project\index.vue:
+<template>
+  <DashboardProjectLayout>
+    <template #main-content>
+      <div class="p-4 sm:p-6 lg:p-8">
+        <DashboardProjectList />
+      </div>
+    </template>
+    <template #side-content>
+      <div class="p-4 sm:p-6 lg:p-8">
+        <!-- Side content, if any -->
+      </div>
+    </template>
+  </DashboardProjectLayout>
+</template>
+
+<script setup lang="ts">
+
+</script>
+dashboard\projects\[id]\manage.vue:
+<template>
+  <div class="project-management p-6">
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-light-textbase dark:text-dark-textbase">Project Management</h1>
+    </div>
+
+    <TabNavigation v-model="activeTab" :tabs="tabs" />
+
+    <div class="mt-6">
+      <DashboardProjectDetails v-if="activeTab === 'general'" :project="project!" />
+      <DashboardAccess
+        v-else-if="activeTab === 'access'"
+        :project="project!"
+      />
+      <!-- <ProjectApiKeys
+        v-else-if="activeTab === 'api'"
+        :project="project"
+      /> -->
+    </div>
+    <ToastNotification ref="toastRef" />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useQuery } from '@tanstack/vue-query';
+import useProjects from '~/composables/use-projects-service';
+
+const route = useRoute();
+const projectId = route.params.id as string;
+const { getProjectById } = useProjects();
+const { toastRef } = useToast();
+
+
+const tabs = [
+  { id: 'general', label: 'General' },
+  { id: 'access', label: 'Access Control' },
+  { id: 'api', label: 'API Keys' }
+];
+
+const activeTab = ref('general');
+
+const { data: projectData } = useQuery({
+  queryKey: ['project', projectId],
+  queryFn: () => getProjectById(projectId)
+});
+
+const project = computed(() => projectData.value?.data);
+
+// const handleProjectUpdated = () => {
+//   showToast({
+//     type: 'success',
+//     title: 'Project Updated',
+//     message: 'Project details have been successfully updated.'
+//   });
+// };
+
+// const handleUserAdded = () => {
+//   showToast({
+//     type: 'success',
+//     title: 'Team Member Added',
+//     message: 'New team member has been successfully added to the project.'
+//   });
+// };
+
+// const handleUserRemoved = () => {
+//   showToast({
+//     type: 'info',
+//     title: 'Team Member Removed',
+//     message: 'Team member has been removed from the project.'
+//   });
+// };
+
+// const handleKeyGenerated = () => {
+//   showToast({
+//     type: 'success',
+//     title: 'API Key Generated',
+//     message: 'New API key has been successfully generated.'
+//   });
+// };
+
+// const handleKeyExpired = () => {
+//   showToast({
+//     type: 'info',
+//     title: 'API Key Expired',
+//     message: 'The API key has been expired successfully.'
+//   });
+// };
+</script>
+
+accountsettings\index.vue:
+<template>
+  <h1>Account Settings</h1>
+</template>
+
+<script setup lang="ts"></script>
+
+
+Here is my primary app layout:
+<template>
+  <div class="flex flex-col min-h-screen bg-light-background dark:bg-dark-background text-light-textbase dark:text-dark-textbase">
+    <!-- Sticky Navbar -->
+    <LayoutPageNavbar class="sticky top-0 z-30 flex-shrink-0 bg-light-surface dark:bg-dark-surface">
+      <template #title>
+        <NuxtLink to="/" class="flex items-center space-x-2">
+          <img alt="CommuniQueue Logo" src="/assets/images/communiqueueLogo.png" class="h-10 w-auto object-contain" />
+          <span
+            class="font-extrabold text-xl bg-gradient-to-r from-light-primary to-light-accent dark:from-dark-primary dark:to-dark-accent bg-clip-text text-transparent transition-colors duration-300 ease-in-out hover:from-light-accent hover:to-light-primary dark:hover:from-dark-accent dark:hover:to-dark-primary"
+          >
+            Communi<span class="text-light-accent dark:text-dark-accent">Queue</span>
+          </span>
+        </NuxtLink>
+      </template>
+    </LayoutPageNavbar>
+
+    <!-- Main Content - now takes up full width -->
+    <div class="flex-grow overflow-auto">
+      <slot />
+    </div>
+
+    <!-- Sticky Footer -->
+    <LayoutPageFooter :app-name="'CommuniQueue'" :year="currentYear" name="Battleline Productions" class="sticky bottom-0 z-30 bg-light-surface dark:bg-dark-surface" />
+  </div>
+</template>
+
+<script setup lang="ts">
+const currentYear = new Date().getFullYear();
+</script>
+
+and some common components:
+ToastNotification.vue:
+<!-- components/ToastNotification.vue -->
+<template>
+  <div class="fixed bottom-4 right-4 z-50 space-y-2" @mouseleave="resumeTimeout">
+    <TransitionGroup name="toast">
+      <div
+        v-for="toast in toasts"
+        :key="toast.id"
+        class="flex items-center p-4 rounded-lg shadow-lg max-w-md transform transition-all duration-300"
+        :class="toastTypeClasses[toast.type]"
+        @mouseenter="pauseTimeout(toast.id)"
+      >
+        <Icon :name="toastTypeIcons[toast.type]" class="w-5 h-5 mr-3 flex-shrink-0" />
+        <div class="flex-1">
+          <div class="font-medium">{{ toast.title }}</div>
+          <div v-if="toast.message" class="text-sm mt-1">
+            {{ toast.message }}
+          </div>
+        </div>
+        <button class="ml-4 hover:opacity-80" @click="removeToast(toast.id)">
+          <Icon name="mdi:close" class="w-5 h-5" />
+        </button>
+      </div>
+    </TransitionGroup>
+  </div>
+</template>
+
+<script setup lang="ts">
+interface Toast {
+  id: number;
+  type: 'success' | 'error' | 'info' | 'warning';
+  title: string;
+  message?: string;
+  timeout: number;
+}
+
+const toasts = ref<Toast[]>([]);
+const timeouts = new Map<number, NodeJS.Timeout>();
+
+const toastTypeClasses = {
+  success: 'bg-light-success/10 text-light-success dark:bg-dark-success/10 dark:text-dark-success',
+  error: 'bg-light-error/10 text-light-error dark:bg-dark-error/10 dark:text-dark-error',
+  info: 'bg-light-info/10 text-light-info dark:bg-dark-info/10 dark:text-dark-info',
+  warning: 'bg-light-warning/10 text-light-warning dark:bg-dark-warning/10 dark:text-dark-warning'
+};
+
+const toastTypeIcons = {
+  success: 'mdi:check-circle',
+  error: 'mdi:alert-circle',
+  info: 'mdi:information',
+  warning: 'mdi:alert'
+};
+
+const addToast = (toast: Omit<Toast, 'id' | 'timeout'>) => {
+  const id = Date.now();
+  const newToast = {
+    ...toast,
+    id,
+    timeout: 5000
+  };
+
+  toasts.value.push(newToast);
+  startTimeout(newToast);
+};
+
+const removeToast = (id: number) => {
+  const timeout = timeouts.get(id);
+  if (timeout) {
+    clearTimeout(timeout);
+    timeouts.delete(id);
+  }
+  toasts.value = toasts.value.filter((t) => t.id !== id);
+};
+
+const startTimeout = (toast: Toast) => {
+  const timeout = setTimeout(() => {
+    removeToast(toast.id);
+  }, toast.timeout);
+  timeouts.set(toast.id, timeout);
+};
+
+const pauseTimeout = (id: number) => {
+  const timeout = timeouts.get(id);
+  if (timeout) {
+    clearTimeout(timeout);
+  }
+};
+
+const resumeTimeout = () => {
+  toasts.value.forEach(startTimeout);
+};
+
+onBeforeUnmount(() => {
+  timeouts.forEach(clearTimeout);
+});
+
+// Expose the addToast method to be used by other components
+defineExpose({ addToast });
+</script>
+
+<style scoped>
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.3s ease;
+}
+
+.toast-enter-from {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.toast-leave-to {
+  opacity: 0;
+  transform: translateX(100%);
+}
+</style>
+
+TabNavigation.vue:
+<template>
+  <div class="border-b border-light-secondary/20 dark:border-dark-secondary/20">
+    <nav class="flex space-x-8">
+      <button
+        v-for="tab in tabs"
+        :key="tab.id"
+        class="px-1 py-4 border-b-2 font-medium text-sm transition-colors"
+        :class="[
+          modelValue === tab.id
+            ? 'border-light-primary dark:border-dark-primary text-light-primary dark:text-dark-primary'
+            : 'border-transparent text-light-secondary dark:text-dark-secondary hover:text-light-textbase dark:hover:text-dark-textbase'
+        ]"
+        @click="$emit('update:modelValue', tab.id)"
+      >
+        {{ tab.label }}
+      </button>
+    </nav>
+  </div>
+</template>
+
+<script setup lang="ts">
+interface Tab {
+  id: string;
+  label: string;
+}
+
+defineProps<{
+  modelValue: string;
+  tabs: Tab[];
+}>();
+
+defineEmits<{
+  'update:modelValue': [value: string];
+}>();
+</script>
+
+StatCard.vue:
+<!-- components/StatCard.vue -->
+<template>
+  <div class="bg-light-background dark:bg-dark-background p-4 rounded-lg">
+    <div class="flex items-center justify-between mb-2">
+      <Icon :name="icon" class="w-6 h-6 text-light-primary dark:text-dark-primary" />
+      <span class="text-2xl font-bold text-light-primary dark:text-dark-primary">{{ value }}</span>
+    </div>
+    <div class="text-sm text-light-secondary dark:text-dark-secondary">
+      {{ label }}
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+defineProps<{
+  value: number;
+  label: string;
+  icon: string;
+}>();
+</script>
+
+LoadingSpinner.Vue:
+<!-- components/LoadingSpinner.vue -->
+<template>
+  <div class="flex items-center justify-center">
+    <div class="animate-spin rounded-full border-t-2 border-b-2 border-light-primary dark:border-dark-primary h-8 w-8" />
+  </div>
+</template>
+
+InputField.vue:
+<template>
+  <div class="mb-6">
+    <label :for="fieldId" class="block mb-2 text-sm font-medium text-light-textbase dark:text-dark-textbase">{{ label }}</label>
+    <FormTextInput
+      v-if="type !== 'textarea'"
+      :id="fieldId"
+      :type="type"
+      :name="name"
+      :placeholder="placeholder"
+      :required="required"
+      :model-value="modelValue"
+      class="bg-light-background dark:bg-dark-surface border-light-secondary dark:border-dark-secondary text-light-textbase dark:text-dark-textbase rounded-lg focus:ring-light-primary dark:focus:ring-dark-primary focus:border-light-primary dark:focus:border-dark-primary block w-full"
+      :class="[inputClass, { 'border-red-500': error }]"
+      @input="$emit('update:modelValue', $event.target.value)"
+    />
+    <FormTextInput
+      v-else
+      :id="fieldId"
+      :name="name"
+      type="textarea"
+      :placeholder="placeholder"
+      :model-value="modelValue"
+      :rows="4"
+      class="bg-light-background dark:bg-dark-background border-light-secondary dark:border-dark-secondary text-light-textbase dark:text-dark-textbase rounded-lg focus:ring-light-primary dark:focus:ring-dark-primary focus:border-light-primary dark:focus:border-dark-primary block w-full"
+      :class="[inputClass, { 'border-red-500': error }]"
+      @input="$emit('update:modelValue', $event.target.value)"
+    />
+    <p v-if="error" class="text-red-500 text-sm mt-1">{{ error }}</p>
+  </div>
+</template>
+
+<script setup lang="ts">
+defineProps<{
+  label?: string;
+  fieldId?: string;
+  name?: string;
+  type?: string;
+  placeholder?: string;
+  inputClass?: string;
+  modelValue?: string;
+  required?: boolean;
+  error?: string;
+}>();
+
+defineEmits(['update:modelValue']);
+</script>
+
+FormField.vue:
+<template>
+  <div class="form-field">
+    <label :for="id" class="block text-sm font-medium text-light-textbase dark:text-dark-textbase mb-1">
+      {{ label }}
+      <span v-if="required" class="text-light-error dark:text-dark-error">*</span>
+    </label>
+
+    <template v-if="type === 'textarea'">
+      <textarea
+        :id="id"
+        :value="modelValue"
+        :placeholder="placeholder"
+        :rows="rows"
+        :disabled="disabled"
+        :required="required"
+        class="w-full px-3 py-2 border rounded-md text-light-textbase dark:text-dark-textbase bg-light-background dark:bg-dark-background disabled:opacity-50 disabled:cursor-not-allowed"
+        :class="[
+          error
+            ? 'border-light-error dark:border-dark-error focus:ring-light-error dark:focus:ring-dark-error'
+            : 'border-light-secondary/20 dark:border-dark-secondary/20 focus:border-light-primary dark:focus:border-dark-primary focus:ring-light-primary dark:focus:ring-dark-primary'
+        ]"
+        v-bind="$attrs"
+        @input="$emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)"
+      />
+    </template>
+
+    <template v-else-if="type === 'select'">
+      <select
+        :id="id"
+        :value="modelValue"
+        :disabled="disabled"
+        :required="required"
+        class="w-full px-3 py-2 border rounded-md text-light-textbase dark:text-dark-textbase bg-light-background dark:bg-dark-background disabled:opacity-50 disabled:cursor-not-allowed"
+        :class="[
+          error
+            ? 'border-light-error dark:border-dark-error focus:ring-light-error dark:focus:ring-dark-error'
+            : 'border-light-secondary/20 dark:border-dark-secondary/20 focus:border-light-primary dark:focus:border-dark-primary focus:ring-light-primary dark:focus:ring-dark-primary'
+        ]"
+        v-bind="$attrs"
+        @change="$emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
+      >
+        <option v-if="placeholder" value="">{{ placeholder }}</option>
+        <slot />
+      </select>
+    </template>
+
+    <template v-else>
+      <div class="relative">
+        <input
+          :id="id"
+          :type="type"
+          :value="modelValue"
+          :placeholder="placeholder"
+          :disabled="disabled"
+          :required="required"
+          :maxlength="maxLength"
+          class="w-full px-3 py-2 border rounded-md text-light-textbase dark:text-dark-textbase bg-light-background dark:bg-dark-background disabled:opacity-50 disabled:cursor-not-allowed"
+          :class="[
+            error
+              ? 'border-light-error dark:border-dark-error focus:ring-light-error dark:focus:ring-dark-error'
+              : 'border-light-secondary/20 dark:border-dark-secondary/20 focus:border-light-primary dark:focus:border-dark-primary focus:ring-light-primary dark:focus:ring-dark-primary',
+            { 'pr-10': isPasswordType || showCharCount }
+          ]"
+          v-bind="$attrs"
+          @input="handleInput"
+        >
+
+        <!-- Password Toggle Button -->
+        <button
+          v-if="isPasswordType"
+          type="button"
+          class="absolute inset-y-0 right-0 flex items-center pr-3 text-light-secondary dark:text-dark-secondary hover:text-light-primary dark:hover:text-dark-primary"
+          @click="togglePasswordVisibility"
+        >
+          <Icon :name="showPassword ? 'mdi:eye-off' : 'mdi:eye'" class="w-5 h-5" />
+        </button>
+
+        <!-- Character Count -->
+        <div v-if="showCharCount" class="absolute inset-y-0 right-0 flex items-center pr-3 text-sm text-light-secondary dark:text-dark-secondary">
+          {{ modelValue?.length || 0 }}/{{ maxLength }}
+        </div>
+      </div>
+    </template>
+
+    <!-- Helper Text -->
+    <div v-if="helperText" class="mt-1 text-sm text-light-secondary dark:text-dark-secondary">
+      {{ helperText }}
+    </div>
+
+    <!-- Error Message -->
+    <div v-if="error" class="mt-1 text-sm text-light-error dark:text-dark-error flex items-center space-x-1">
+      <Icon name="mdi:alert-circle" class="w-4 h-4" />
+      <span>{{ error }}</span>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+
+const props = withDefaults(
+  defineProps<{
+    modelValue: string;
+    label: string;
+    type?: string;
+    placeholder?: string;
+    helperText?: string;
+    error?: string;
+    required?: boolean;
+    disabled?: boolean;
+    rows?: number;
+    maxLength?: number;
+    showCharCount?: boolean;
+    id?: string;
+  }>(),
+  {
+    type: 'text',
+    placeholder: '',
+    helperText: '',
+    error: '',
+    maxLength: 1000,
+    id: '',
+    required: false,
+    disabled: false,
+    rows: 3,
+    showCharCount: false
+  }
+);
+
+const emit = defineEmits<{
+  'update:modelValue': [value: string];
+}>();
+
+// Generate a unique ID if not provided
+// const uniqueId = computed(() => props.id || `field-${Math.random().toString(36).substring(2, 9)}`);
+
+// Password visibility handling
+const showPassword = ref(false);
+const isPasswordType = computed(() => props.type === 'password');
+// const effectiveType = computed(() => {
+//   if (isPasswordType.value && showPassword.value) {
+//     return 'text';
+//   }
+//   return props.type;
+// });
+
+const togglePasswordVisibility = () => {
+  showPassword.value = !showPassword.value;
+};
+
+const handleInput = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  let value = target.value;
+
+  // Handle maxLength if specified
+  if (props.maxLength && value.length > props.maxLength) {
+    value = value.slice(0, props.maxLength);
+  }
+
+  emit('update:modelValue', value);
+};
+</script>
+
+<style scoped>
+.form-field {
+  @apply relative;
+}
+
+/* Focus styles */
+input:focus,
+textarea:focus,
+select:focus {
+  @apply outline-none ring-2 ring-opacity-50;
+}
+
+/* Transition for all interactive states */
+input,
+textarea,
+select,
+button {
+  @apply transition-all duration-200;
+}
+</style>
+
+FormContainer.vue:
+<!-- FormContainer.vue -->
+<template>
+  <div class="max-w-lg mx-auto bg-light-primary dark:bg-dark-surface p-8 rounded-lg shadow"> <slot /> </div>
+</template>
+
+ConfirmationModal.vue:
+<template>
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-light-surface dark:bg-dark-surface p-6 rounded-lg max-w-sm w-full">
+      <h2 class="text-lg font-semibold mb-4 text-light-textbase dark:text-dark-textbase">
+        {{ title }}
+      </h2>
+      <p class="text-sm text-light-secondary dark:text-dark-secondary mb-6">
+        {{ message }}
+      </p>
+      <div class="flex justify-end space-x-2">
+        <button class="px-4 py-2 text-light-secondary dark:text-dark-secondary hover:underline" :disabled="isProcessing" @click="$emit('cancel')">
+          {{ cancelText }}
+        </button>
+        <button
+          :disabled="isProcessing"
+          :class="[
+            'text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity disabled:opacity-50',
+            variant === 'danger' ? 'bg-light-error dark:bg-dark-error' : 'bg-light-primary dark:bg-dark-primary'
+          ]"
+          @click="$emit('confirm')"
+        >
+          {{ isProcessing ? processingText : confirmText }}
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    title: string;
+    message: string;
+    confirmText?: string;
+    cancelText?: string;
+    processingText?: string;
+    isProcessing?: boolean;
+    variant?: 'danger' | 'primary';
+  }>(),
+  {
+    confirmText: 'Confirm',
+    cancelText: 'Cancel',
+    processingText: 'Processing...',
+    isProcessing: false,
+    variant: 'primary'
+  }
+);
+
+defineEmits<{
+  cancel: [];
+  confirm: [];
+}>();
+</script>
+
+
+any time you are helping me build code you need to keep in mind that you are acting as the UI Designer as I have no UI/UX experience. Also we want to build code to be as re-usable as possible so small components are preferred. I also have many components already designed like my header and footer. Are you ready to help me build my application?

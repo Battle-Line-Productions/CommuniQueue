@@ -1,10 +1,10 @@
 #region Copyright
 // ---------------------------------------------------------------------------
 // Copyright (c) 2024 Battleline Productions LLC. All rights reserved.
-// 
+//
 // Licensed under the Battleline Productions LLC license agreement.
 // See LICENSE file in the project root for full license information.
-// 
+//
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
 // Date: 11/03/2024
@@ -15,11 +15,13 @@
 // ---------------------------------------------------------------------------
 #endregion
 
-using BattlelineExtras.Contracts.Interfaces;
+using CommuniQueue.Contracts.Interfaces;
+using Finbuckle.MultiTenant;
 
 namespace CommuniQueue.Contracts.Models;
 
-public class TemplateVersion : IEntity
+[MultiTenant]
+public class TemplateVersion : IMultiTenantEntity
 {
     public Guid Id { get; set; }
     public int VersionNumber { get; set; }
@@ -31,4 +33,6 @@ public class TemplateVersion : IEntity
     public ICollection<TemplateStageAssignment> StageAssignments { get; set; } = [];
     public DateTime CreatedDateTime { get; set; }
     public DateTime UpdatedDateTime { get; set; }
+    public string TenantId { get; set; }
+    public AppTenantInfo Tenant { get; set; }
 }

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CommuniQueue.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241224043349_InitialMigration")]
+    [Migration("20241225041818_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -62,6 +62,12 @@ namespace CommuniQueue.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("start_date");
 
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("tenant_id");
+
                     b.Property<DateTime>("UpdatedDateTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date_time");
@@ -72,7 +78,51 @@ namespace CommuniQueue.DataAccess.Migrations
                     b.HasIndex("ProjectId")
                         .HasDatabaseName("ix_api_keys_project_id");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_api_keys_tenant_id");
+
                     b.ToTable("api_keys", (string)null);
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("CommuniQueue.Contracts.Models.AppTenantInfo", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedDateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_date_time");
+
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("text")
+                        .HasColumnName("display_name");
+
+                    b.Property<string>("Identifier")
+                        .HasColumnType("text")
+                        .HasColumnName("identifier");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<Guid>("OwnerUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("owner_user_id");
+
+                    b.Property<DateTime>("UpdatedDateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_date_time");
+
+                    b.HasKey("Id")
+                        .HasName("pk_app_tenant_info");
+
+                    b.HasIndex("OwnerUserId")
+                        .HasDatabaseName("ix_app_tenant_info_owner_user_id");
+
+                    b.ToTable("app_tenant_info", (string)null);
                 });
 
             modelBuilder.Entity("CommuniQueue.Contracts.Models.Container", b =>
@@ -107,6 +157,12 @@ namespace CommuniQueue.DataAccess.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("project_id");
 
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("tenant_id");
+
                     b.Property<DateTime>("UpdatedDateTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date_time");
@@ -120,7 +176,12 @@ namespace CommuniQueue.DataAccess.Migrations
                     b.HasIndex("ProjectId")
                         .HasDatabaseName("ix_containers_project_id");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_containers_tenant_id");
+
                     b.ToTable("containers", (string)null);
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("CommuniQueue.Contracts.Models.Permission", b =>
@@ -150,6 +211,11 @@ namespace CommuniQueue.DataAccess.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("project_id");
 
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("tenant_id");
+
                     b.Property<DateTime>("UpdatedDateTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date_time");
@@ -166,6 +232,9 @@ namespace CommuniQueue.DataAccess.Migrations
 
                     b.HasIndex("ProjectId")
                         .HasDatabaseName("ix_permissions_project_id");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_permissions_tenant_id");
 
                     b.HasIndex("UserId", "EntityId", "EntityType")
                         .IsUnique()
@@ -198,6 +267,12 @@ namespace CommuniQueue.DataAccess.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("tenant_id");
+
                     b.Property<DateTime>("UpdatedDateTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date_time");
@@ -205,7 +280,12 @@ namespace CommuniQueue.DataAccess.Migrations
                     b.HasKey("Id")
                         .HasName("pk_projects");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_projects_tenant_id");
+
                     b.ToTable("projects", (string)null);
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("CommuniQueue.Contracts.Models.Stage", b =>
@@ -232,6 +312,12 @@ namespace CommuniQueue.DataAccess.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("project_id");
 
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("tenant_id");
+
                     b.Property<DateTime>("UpdatedDateTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date_time");
@@ -239,11 +325,16 @@ namespace CommuniQueue.DataAccess.Migrations
                     b.HasKey("Id")
                         .HasName("pk_stages");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_stages_tenant_id");
+
                     b.HasIndex("ProjectId", "Name")
                         .IsUnique()
                         .HasDatabaseName("ix_stages_project_id_name");
 
                     b.ToTable("stages", (string)null);
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("CommuniQueue.Contracts.Models.Template", b =>
@@ -270,6 +361,12 @@ namespace CommuniQueue.DataAccess.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("project_id");
 
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("tenant_id");
+
                     b.Property<DateTime>("UpdatedDateTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date_time");
@@ -283,7 +380,12 @@ namespace CommuniQueue.DataAccess.Migrations
                     b.HasIndex("ProjectId")
                         .HasDatabaseName("ix_templates_project_id");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_templates_tenant_id");
+
                     b.ToTable("templates", (string)null);
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("CommuniQueue.Contracts.Models.TemplateStageAssignment", b =>
@@ -305,6 +407,12 @@ namespace CommuniQueue.DataAccess.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("template_version_id");
 
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("tenant_id");
+
                     b.Property<DateTime>("UpdatedDateTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date_time");
@@ -315,11 +423,16 @@ namespace CommuniQueue.DataAccess.Migrations
                     b.HasIndex("TemplateVersionId")
                         .HasDatabaseName("ix_template_stage_assignments_template_version_id");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_template_stage_assignments_tenant_id");
+
                     b.HasIndex("StageId", "TemplateVersionId")
                         .IsUnique()
                         .HasDatabaseName("ix_template_stage_assignments_stage_id_template_version_id");
 
                     b.ToTable("template_stage_assignments", (string)null);
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("CommuniQueue.Contracts.Models.TemplateVersion", b =>
@@ -347,6 +460,12 @@ namespace CommuniQueue.DataAccess.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("template_id");
 
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("tenant_id");
+
                     b.Property<DateTime>("UpdatedDateTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date_time");
@@ -361,7 +480,12 @@ namespace CommuniQueue.DataAccess.Migrations
                     b.HasIndex("TemplateId")
                         .HasDatabaseName("ix_template_versions_template_id");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_template_versions_tenant_id");
+
                     b.ToTable("template_versions", (string)null);
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("CommuniQueue.Contracts.Models.User", b =>
@@ -421,6 +545,46 @@ namespace CommuniQueue.DataAccess.Migrations
                     b.ToTable("users", (string)null);
                 });
 
+            modelBuilder.Entity("CommuniQueue.Contracts.Models.UserTenantMembership", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedDateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_date_time");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<DateTime>("UpdatedDateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_date_time");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_user_tenant_memberships");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_user_tenant_memberships_tenant_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_user_tenant_memberships_user_id");
+
+                    b.HasIndex("UserId", "TenantId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_user_tenant_memberships_user_id_tenant_id");
+
+                    b.ToTable("user_tenant_memberships", (string)null);
+                });
+
             modelBuilder.Entity("CommuniQueue.Contracts.Models.ApiKey", b =>
                 {
                     b.HasOne("CommuniQueue.Contracts.Models.Project", "Project")
@@ -430,7 +594,16 @@ namespace CommuniQueue.DataAccess.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_api_keys_projects_project_id");
 
+                    b.HasOne("CommuniQueue.Contracts.Models.AppTenantInfo", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_api_keys_app_tenant_info_tenant_id");
+
                     b.Navigation("Project");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("CommuniQueue.Contracts.Models.Container", b =>
@@ -448,9 +621,18 @@ namespace CommuniQueue.DataAccess.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_containers_projects_project_id");
 
+                    b.HasOne("CommuniQueue.Contracts.Models.AppTenantInfo", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_containers_app_tenant_info_tenant_id");
+
                     b.Navigation("Parent");
 
                     b.Navigation("Project");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("CommuniQueue.Contracts.Models.Permission", b =>
@@ -466,6 +648,13 @@ namespace CommuniQueue.DataAccess.Migrations
                         .HasForeignKey("ProjectId")
                         .HasConstraintName("fk_permissions_projects_project_id");
 
+                    b.HasOne("CommuniQueue.Contracts.Models.AppTenantInfo", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_permissions_app_tenant_info_tenant_id");
+
                     b.HasOne("CommuniQueue.Contracts.Models.User", "User")
                         .WithMany("Permissions")
                         .HasForeignKey("UserId")
@@ -475,7 +664,21 @@ namespace CommuniQueue.DataAccess.Migrations
 
                     b.Navigation("Project");
 
+                    b.Navigation("Tenant");
+
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CommuniQueue.Contracts.Models.Project", b =>
+                {
+                    b.HasOne("CommuniQueue.Contracts.Models.AppTenantInfo", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_projects_app_tenant_info_tenant_id");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("CommuniQueue.Contracts.Models.Stage", b =>
@@ -487,7 +690,16 @@ namespace CommuniQueue.DataAccess.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_stages_projects_project_id");
 
+                    b.HasOne("CommuniQueue.Contracts.Models.AppTenantInfo", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_stages_app_tenant_info_tenant_id");
+
                     b.Navigation("Project");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("CommuniQueue.Contracts.Models.Template", b =>
@@ -506,9 +718,18 @@ namespace CommuniQueue.DataAccess.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_templates_projects_project_id");
 
+                    b.HasOne("CommuniQueue.Contracts.Models.AppTenantInfo", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_templates_app_tenant_info_tenant_id");
+
                     b.Navigation("Container");
 
                     b.Navigation("Project");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("CommuniQueue.Contracts.Models.TemplateStageAssignment", b =>
@@ -527,9 +748,18 @@ namespace CommuniQueue.DataAccess.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_template_stage_assignments_template_versions_template_versi");
 
+                    b.HasOne("CommuniQueue.Contracts.Models.AppTenantInfo", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_template_stage_assignments_app_tenant_info_tenant_id");
+
                     b.Navigation("Stage");
 
                     b.Navigation("TemplateVersion");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("CommuniQueue.Contracts.Models.TemplateVersion", b =>
@@ -541,7 +771,37 @@ namespace CommuniQueue.DataAccess.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_template_versions_templates_template_id");
 
+                    b.HasOne("CommuniQueue.Contracts.Models.AppTenantInfo", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_template_versions_app_tenant_info_tenant_id");
+
                     b.Navigation("Template");
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("CommuniQueue.Contracts.Models.UserTenantMembership", b =>
+                {
+                    b.HasOne("CommuniQueue.Contracts.Models.AppTenantInfo", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_user_tenant_memberships_app_tenant_info_tenant_id");
+
+                    b.HasOne("CommuniQueue.Contracts.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_user_tenant_memberships_users_user_id");
+
+                    b.Navigation("Tenant");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CommuniQueue.Contracts.Models.Container", b =>
