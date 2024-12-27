@@ -48,3 +48,7 @@ export * from './models/IUser'
 
 // Kpis
 export * from './Kpis/IProjectKpis'
+
+// generics
+export * from './generic/LayoutPageNavbarMenu'
+export * from './generic/LayoutPageNavbarMenuDropdownItem'
