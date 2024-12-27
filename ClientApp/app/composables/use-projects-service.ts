@@ -8,126 +8,126 @@ import type {
   IUpdateUserPermissionRequest,
   IAddStageToProjectRequest,
   IUpdateProjectStageRequest,
-  IProjectKpis
-} from '~/types';
+  IProjectKpis,
+} from '~/types'
 
 export default function useProjects() {
-  const config = useRuntimeConfig();
-  const { handleApiCall, createFetchOptions } = useApiUtils();
+  const config = useRuntimeConfig()
+  const { handleApiCall, createFetchOptions } = useApiUtils()
 
-  const baseUrl = `${config.public.apiBaseUrl}/api/v1/projects`;
+  const baseUrl = `${config.public.apiBaseUrl}/api/v1/projects`
 
   const createProject = (request: ICreateProjectRequest) => {
     return handleApiCall(
       $fetch<IApiResponse<IProject>>(`${baseUrl}`, {
         ...createFetchOptions<IApiResponse<IProject>>(),
         method: 'POST',
-        body: request
+        body: request,
       }),
-      'createProject'
-    );
-  };
+      'createProject',
+    )
+  }
 
   const getProjectKpis = (projectId: string) => {
-    return handleApiCall($fetch<IApiResponse<IProjectKpis>>(`${baseUrl}/kpis?${projectId}`, createFetchOptions<IApiResponse<IProjectKpis>>()), 'getProjectKpis');
-  };
+    return handleApiCall($fetch<IApiResponse<IProjectKpis>>(`${baseUrl}/kpis?${projectId}`, createFetchOptions<IApiResponse<IProjectKpis>>()), 'getProjectKpis')
+  }
 
   const getProjectById = (projectId: string) => {
-    return handleApiCall($fetch<IApiResponse<IProject>>(`${baseUrl}/${projectId}`, createFetchOptions<IApiResponse<IProject>>()), 'getProjectById');
-  };
+    return handleApiCall($fetch<IApiResponse<IProject>>(`${baseUrl}/${projectId}`, createFetchOptions<IApiResponse<IProject>>()), 'getProjectById')
+  }
 
   const getProjectsByUserId = (userId: string) => {
-    return handleApiCall($fetch<IApiResponse<IProject[]>>(`${baseUrl}/user/${userId}`, createFetchOptions<IApiResponse<IProject[]>>()), 'getProjectsByUserId');
-  };
+    return handleApiCall($fetch<IApiResponse<IProject[]>>(`${baseUrl}/user/${userId}`, createFetchOptions<IApiResponse<IProject[]>>()), 'getProjectsByUserId')
+  }
 
   const updateProject = (projectId: string, request: IUpdateProjectRequest) => {
     return handleApiCall(
       $fetch<IApiResponse<IProject>>(`${baseUrl}/${projectId}`, {
         ...createFetchOptions<IApiResponse<IProject>>(),
         method: 'PUT',
-        body: request
+        body: request,
       }),
-      'updateProject'
-    );
-  };
+      'updateProject',
+    )
+  }
 
   const deleteProject = (projectId: string) => {
     return handleApiCall(
       $fetch<IApiResponse<boolean>>(`${baseUrl}/${projectId}`, {
         ...createFetchOptions<IApiResponse<boolean>>(),
-        method: 'DELETE'
+        method: 'DELETE',
       }),
-      'deleteProject'
-    );
-  };
+      'deleteProject',
+    )
+  }
 
   const addUserToProject = (projectId: string, request: IAddUserToProjectRequest) => {
     return handleApiCall(
       $fetch<IApiResponse<boolean>>(`${baseUrl}/${projectId}/users`, {
         ...createFetchOptions<IApiResponse<boolean>>(),
         method: 'POST',
-        body: request
+        body: request,
       }),
-      'addUserToProject'
-    );
-  };
+      'addUserToProject',
+    )
+  }
 
   const removeUserFromProject = (projectId: string, userId: string) => {
     return handleApiCall(
       $fetch<IApiResponse<boolean>>(`${baseUrl}/${projectId}/users/${userId}`, {
         ...createFetchOptions<IApiResponse<boolean>>(),
-        method: 'DELETE'
+        method: 'DELETE',
       }),
-      'removeUserFromProject'
-    );
-  };
+      'removeUserFromProject',
+    )
+  }
 
   const updateUserPermissionInProject = (projectId: string, userId: string, request: IUpdateUserPermissionRequest) => {
     return handleApiCall(
       $fetch<IApiResponse<boolean>>(`${baseUrl}/${projectId}/users/${userId}/permission`, {
         ...createFetchOptions<IApiResponse<boolean>>(),
         method: 'PUT',
-        body: request
+        body: request,
       }),
-      'updateUserPermissionInProject'
-    );
-  };
+      'updateUserPermissionInProject',
+    )
+  }
 
   const getProjectStages = (projectId: string) => {
-    return handleApiCall($fetch<IApiResponse<IStage[]>>(`${baseUrl}/${projectId}/stages`, createFetchOptions<IApiResponse<IStage[]>>()), 'getProjectStages');
-  };
+    return handleApiCall($fetch<IApiResponse<IStage[]>>(`${baseUrl}/${projectId}/stages`, createFetchOptions<IApiResponse<IStage[]>>()), 'getProjectStages')
+  }
 
   const addStageToProject = (projectId: string, request: IAddStageToProjectRequest) => {
     return handleApiCall(
       $fetch<IApiResponse<IStage>>(`${baseUrl}/${projectId}/stages`, {
         ...createFetchOptions<IApiResponse<IStage>>(),
         method: 'POST',
-        body: request
+        body: request,
       }),
-      'addStageToProject'
-    );
-  };
+      'addStageToProject',
+    )
+  }
 
   const removeStageFromProject = (projectId: string, stageId: string) => {
     return handleApiCall(
       $fetch<IApiResponse<boolean>>(`${baseUrl}/${projectId}/stages/${stageId}`, {
         ...createFetchOptions<IApiResponse<boolean>>(),
-        method: 'DELETE'
+        method: 'DELETE',
       }),
-      'removeStageFromProject'
-    );
-  };
+      'removeStageFromProject',
+    )
+  }
 
   const updateProjectStage = (projectId: string, stageId: string, request: IUpdateProjectStageRequest) => {
     return handleApiCall(
       $fetch<IApiResponse<IStage>>(`${baseUrl}/${projectId}/stages/${stageId}`, {
         ...createFetchOptions<IApiResponse<IStage>>(),
         method: 'PUT',
-        body: request
+        body: request,
       }),
-      'updateProjectStage'
-    );
-  };
+      'updateProjectStage',
+    )
+  }
 
   return {
     createProject,
@@ -142,6 +142,6 @@ export default function useProjects() {
     getProjectStages,
     addStageToProject,
     removeStageFromProject,
-    updateProjectStage
-  };
+    updateProjectStage,
+  }
 }

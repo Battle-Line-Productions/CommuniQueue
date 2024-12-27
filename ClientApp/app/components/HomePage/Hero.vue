@@ -6,11 +6,26 @@
       class="absolute inset-0 -z-10 h-full w-full stroke-light-primary/10 dark:stroke-dark-primary/10 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]"
     >
       <defs>
-        <pattern id="983e3e4c-de6d-4c3f-8d64-b9761d1534cc" width="200" height="200" x="50%" y="-1" patternUnits="userSpaceOnUse">
-          <path d="M.5 200V.5H200" fill="none" />
+        <pattern
+          id="983e3e4c-de6d-4c3f-8d64-b9761d1534cc"
+          width="200"
+          height="200"
+          x="50%"
+          y="-1"
+          patternUnits="userSpaceOnUse"
+        >
+          <path
+            d="M.5 200V.5H200"
+            fill="none"
+          />
         </pattern>
       </defs>
-      <rect width="100%" height="100%" stroke-width="0" fill="url(#983e3e4c-de6d-4c3f-8d64-b9761d1534cc)" />
+      <rect
+        width="100%"
+        height="100%"
+        stroke-width="0"
+        fill="url(#983e3e4c-de6d-4c3f-8d64-b9761d1534cc)"
+      />
     </svg>
 
     <!-- Gradient blob -->
@@ -58,7 +73,10 @@
           >
             Get Started
           </NuxtLink>
-          <NuxtLink to="/features" class="text-sm font-semibold leading-6 text-light-textbase dark:text-dark-textbase">
+          <NuxtLink
+            to="/features"
+            class="text-sm font-semibold leading-6 text-light-textbase dark:text-dark-textbase"
+          >
             Learn more <span aria-hidden="true">→</span>
           </NuxtLink>
         </div>

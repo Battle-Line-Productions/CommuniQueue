@@ -5,7 +5,7 @@ export default createConfigForNuxt({
     stylistic: true,
   },
   rules: {
-    semi: ['error', 'always'],
+    'semi': ['error', 'always'],
     'vue/multi-word-component-names': 'off',
   },
 })

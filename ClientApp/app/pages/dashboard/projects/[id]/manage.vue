@@ -1,13 +1,21 @@
 <template>
   <div class="project-management p-6">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-light-textbase dark:text-dark-textbase">Project Management</h1>
+      <h1 class="text-2xl font-bold text-light-textbase dark:text-dark-textbase">
+        Project Management
+      </h1>
     </div>
 
-    <TabNavigation v-model="activeTab" :tabs="tabs" />
+    <TabNavigation
+      v-model="activeTab"
+      :tabs="tabs"
+    />
 
     <div class="mt-6">
-      <DashboardProjectDetails v-if="activeTab === 'general'" :project="project!" />
+      <DashboardProjectDetails
+        v-if="activeTab === 'general'"
+        :project="project!"
+      />
       <DashboardAccess
         v-else-if="activeTab === 'access'"
         :project="project!"
@@ -22,29 +30,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useQuery } from '@tanstack/vue-query';
-import useProjects from '~/composables/use-projects-service';
+import { ref } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
+import useProjects from '~/composables/use-projects-service'
 
-const route = useRoute();
-const projectId = route.params.id as string;
-const { getProjectById } = useProjects();
-const { toastRef } = useToast();
+const route = useRoute()
+const projectId = route.params.id as string
+const { getProjectById } = useProjects()
+const { toastRef } = useToast()
 
 const tabs = [
   { id: 'general', label: 'General' },
   { id: 'access', label: 'Access Control' },
-  { id: 'api', label: 'API Keys' }
-];
+  { id: 'api', label: 'API Keys' },
+]
 
-const activeTab = ref('general');
+const activeTab = ref('general')
 
 const { data: projectData } = useQuery({
   queryKey: ['project', projectId],
-  queryFn: () => getProjectById(projectId)
-});
+  queryFn: () => getProjectById(projectId),
+})
 
-const project = computed(() => projectData.value?.data);
+const project = computed(() => projectData.value?.data)
 
 // const handleProjectUpdated = () => {
 //   showToast({

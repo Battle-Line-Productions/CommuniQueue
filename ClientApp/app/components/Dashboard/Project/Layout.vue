@@ -1,7 +1,9 @@
 <template>
   <div class="dashboard-layout">
     <div class="flex justify-between items-center ml-4 mb-6 mr-4 mt-2">
-      <h1 class="text-2xl font-bold text-light-textbase dark:text-dark-textbase">Dashboard</h1>
+      <h1 class="text-2xl font-bold text-light-textbase dark:text-dark-textbase">
+        Dashboard
+      </h1>
       <button
         type="button"
         class="bg-light-primary dark:bg-dark-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
@@ -20,21 +22,24 @@
       </div>
     </div>
 
-    <DashboardProjectCreateModal v-if="showCreateProjectModal" @close="closeCreateProjectModal" />
+    <DashboardProjectCreateModal
+      v-if="showCreateProjectModal"
+      @close="closeCreateProjectModal"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref } from 'vue'
 
-const showCreateProjectModal = ref(false);
+const showCreateProjectModal = ref(false)
 
 const openCreateProjectModal = () => {
-  console.log('Attempting to open modal', showCreateProjectModal.value);
-  showCreateProjectModal.value = true;
-};
+  console.log('Attempting to open modal', showCreateProjectModal.value)
+  showCreateProjectModal.value = true
+}
 
 const closeCreateProjectModal = () => {
-  showCreateProjectModal.value = false;
-};
+  showCreateProjectModal.value = false
+}
 </script>

@@ -1,59 +1,59 @@
-import type { IPermission, IApiResponse, ICreatePermissionRequest, IUpdatePermissionRequest, EntityType } from '~/types';
+import type { IPermission, IApiResponse, ICreatePermissionRequest, IUpdatePermissionRequest, EntityType } from '~/types'
 
 export default function usePermissions() {
-  const config = useRuntimeConfig();
-  const baseUrl = `${config.public.apiBaseUrl}/api/v1/permissions`;
-  const { handleApiCall, createFetchOptions } = useApiUtils();
+  const config = useRuntimeConfig()
+  const baseUrl = `${config.public.apiBaseUrl}/api/v1/permissions`
+  const { handleApiCall, createFetchOptions } = useApiUtils()
 
   const createPermission = (request: ICreatePermissionRequest) => {
     return handleApiCall(
       $fetch<IApiResponse<IPermission>>(`${baseUrl}`, {
         ...createFetchOptions<IApiResponse<IPermission>>(),
         method: 'POST',
-        body: request
+        body: request,
       }),
-      'createPermission'
-    );
-  };
+      'createPermission',
+    )
+  }
 
   const getPermission = (userId: string, entityId: string, entityType: EntityType) => {
-    return handleApiCall($fetch<IApiResponse<IPermission>>(`${baseUrl}/${userId}/${entityId}/${entityType}`, createFetchOptions<IApiResponse<IPermission>>()), 'getPermission');
-  };
+    return handleApiCall($fetch<IApiResponse<IPermission>>(`${baseUrl}/${userId}/${entityId}/${entityType}`, createFetchOptions<IApiResponse<IPermission>>()), 'getPermission')
+  }
 
   const getPermissionsByEntity = (entityId: string, entityType: EntityType) => {
-    console.log('getPermissionsByEntity', entityId, entityType);
+    console.log('getPermissionsByEntity', entityId, entityType)
     return handleApiCall(
       $fetch<IApiResponse<IPermission[]>>(`${baseUrl}/entity/${entityId}/${entityType}`, createFetchOptions<IApiResponse<IPermission[]>>()),
-      'getPermissionsByEntity'
-    );
-  };
+      'getPermissionsByEntity',
+    )
+  }
 
   const updatePermission = (request: IUpdatePermissionRequest) => {
     return handleApiCall(
       $fetch<IApiResponse<IPermission>>(`${baseUrl}`, {
         ...createFetchOptions<IApiResponse<IPermission>>(),
         method: 'PUT',
-        body: request
+        body: request,
       }),
-      'updatePermission'
-    );
-  };
+      'updatePermission',
+    )
+  }
 
   const deletePermission = (userId: string, entityId: string, entityType: EntityType) => {
     return handleApiCall(
       $fetch<IApiResponse<boolean>>(`${baseUrl}/${userId}/${entityId}/${entityType}`, {
         ...createFetchOptions<IApiResponse<boolean>>(),
-        method: 'DELETE'
+        method: 'DELETE',
       }),
-      'deletePermission'
-    );
-  };
+      'deletePermission',
+    )
+  }
 
   return {
     createPermission,
     getPermission,
     getPermissionsByEntity,
     updatePermission,
-    deletePermission
-  };
+    deletePermission,
+  }
 }

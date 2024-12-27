@@ -36,61 +36,62 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue';
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { useToast } from '~/composables/use-toast-service';
-import useUsers from '~/composables/use-user-service';
-import type { IUser } from '~/types';
+import { ref, watchEffect } from 'vue'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { useToast } from '~/composables/use-toast-service'
+import useUsers from '~/composables/use-user-service'
+import type { IUser } from '~/types'
 
 const props = defineProps<{
-  user: IUser;
-}>();
+  user: IUser
+}>()
 
-const emit = defineEmits(['close', 'updated']);
+const emit = defineEmits(['close', 'updated'])
 
 // Copy the user prop into local state
-const localUser = ref({ ...props.user });
+const localUser = ref({ ...props.user })
 
 watchEffect(() => {
-  localUser.value = { ...props.user };
-});
+  localUser.value = { ...props.user }
+})
 
-const { updateUser } = useUsers();
-const { showToast } = useToast();
-const queryClient = useQueryClient();
+const { updateUser } = useUsers()
+const { showToast } = useToast()
+const queryClient = useQueryClient()
 
 const { mutate, isPending } = useMutation({
   mutationFn: async () => {
     // Pass the entire user object to your update method
-    return await updateUser(localUser.value.id, localUser.value);
+    return await updateUser(localUser.value.id, localUser.value)
   },
   onSuccess: (response) => {
     if (response.isSuccess && response.data) {
       showToast({
         type: 'success',
         title: 'User Updated',
-        message: 'User details have been saved.'
-      });
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-      emit('updated');
-    } else {
+        message: 'User details have been saved.',
+      })
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+      emit('updated')
+    }
+    else {
       showToast({
         type: 'error',
         title: 'Update Failed',
-        message: response.message || 'Could not update user.'
-      });
+        message: response.message || 'Could not update user.',
+      })
     }
   },
   onError: (error: Error) => {
     showToast({
       type: 'error',
       title: 'Update Failed',
-      message: error.message || 'Could not update user.'
-    });
-  }
-});
+      message: error.message || 'Could not update user.',
+    })
+  },
+})
 
 function submit() {
-  mutate();
+  mutate()
 }
 </script>
