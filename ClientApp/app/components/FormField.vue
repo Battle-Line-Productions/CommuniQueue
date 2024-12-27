@@ -189,14 +189,15 @@ const handleInput = (event: Event) => {
 
 <style scoped>
 .form-field {
-  @apply relative;
+  position: relative;
 }
 
 /* Focus styles */
 input:focus,
 textarea:focus,
 select:focus {
-  @apply outline-none ring-2 ring-opacity-50;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5);
 }
 
 /* Transition for all interactive states */
@@ -204,6 +205,6 @@ input,
 textarea,
 select,
 UButton {
-  @apply transition-all duration-200;
+  transition: all 0.2s;
 }
 </style>
