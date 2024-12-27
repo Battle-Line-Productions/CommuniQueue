@@ -15,14 +15,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - run: corepack enable
+
+      - name: Enable Corepack
+        run: corepack enable
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
 
       - name: Install dependencies
+        working-directory: ./ClientApp
         run: pnpm install
 
       - name: Lint files
+        working-directory: ./ClientApp
         run: pnpm run lint
