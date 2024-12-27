@@ -113,7 +113,6 @@
 import { ref } from 'vue'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import useUsers from '~/composables/use-user-service'
-import { useToast } from '~/composables/use-toast-service'
 import { type ICreateUserRequest, GlobalRoleType } from '~/types'
 
 const emit = defineEmits<{
@@ -135,7 +134,7 @@ const errors = ref({
 })
 
 const { createUser } = useUsers()
-const { showToast } = useToast()
+const { add } = useToast()
 const queryClient = useQueryClient()
 
 // The create user mutation
@@ -156,27 +155,27 @@ const { mutate, isPending } = useMutation({
   },
   onSuccess: (response) => {
     if (response.isSuccess && response.data) {
-      showToast({
-        type: 'success',
+      add({
+        color: 'success',
         title: 'User Created',
-        message: 'New user has been successfully created.',
+        description: 'New user has been successfully created.',
       })
       queryClient.invalidateQueries({ queryKey: ['users'] })
       emit('added')
     }
     else {
-      showToast({
-        type: 'error',
+      add({
+        color: 'error',
         title: 'Creation Failed',
-        message: response.message || 'Could not create user.',
+        description: response.message || 'Could not create user.',
       })
     }
   },
   onError: (error: Error) => {
-    showToast({
-      type: 'error',
+    add({
+      color: 'error',
       title: 'Creation Failed',
-      message: error.message || 'Could not create user.',
+      description: error.message || 'Could not create user.',
     })
   },
 })

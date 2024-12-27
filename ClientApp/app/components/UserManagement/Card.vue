@@ -86,7 +86,6 @@
 <script setup lang="ts">
 import { ref, computed, watchEffect } from 'vue'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import { useToast } from '~/composables/use-toast-service'
 import useUsers from '~/composables/use-user-service'
 
 import type { IUser } from '~/types'
@@ -102,7 +101,7 @@ defineEmits<{
 }>()
 
 const { updateUser } = useUsers()
-const { showToast } = useToast()
+const { add } = useToast()
 const queryClient = useQueryClient()
 
 // We copy the prop into a local user ref so we can toggle isActive, etc.
@@ -131,17 +130,17 @@ const { mutate: doUpdateUser, isPending: isUpdating } = useMutation({
   },
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['users'] })
-    showToast({
-      type: 'success',
+    add({
+      color: 'success',
       title: 'User Updated',
-      message: 'User changes have been saved.',
+      description: 'User changes have been saved.',
     })
   },
   onError: (error: Error) => {
-    showToast({
-      type: 'error',
+    add({
+      color: 'error',
       title: 'Update Failed',
-      message: error.message ?? 'Could not update user.',
+      description: error.message ?? 'Could not update user.',
     })
   },
 })

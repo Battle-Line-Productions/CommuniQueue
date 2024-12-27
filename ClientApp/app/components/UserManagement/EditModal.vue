@@ -38,7 +38,6 @@
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import { useToast } from '~/composables/use-toast-service'
 import useUsers from '~/composables/use-user-service'
 import type { IUser } from '~/types'
 
@@ -56,7 +55,7 @@ watchEffect(() => {
 })
 
 const { updateUser } = useUsers()
-const { showToast } = useToast()
+const { add } = useToast()
 const queryClient = useQueryClient()
 
 const { mutate, isPending } = useMutation({
@@ -66,27 +65,27 @@ const { mutate, isPending } = useMutation({
   },
   onSuccess: (response) => {
     if (response.isSuccess && response.data) {
-      showToast({
-        type: 'success',
+      add({
+        color: 'success',
         title: 'User Updated',
-        message: 'User details have been saved.',
+        description: 'User details have been saved.',
       })
       queryClient.invalidateQueries({ queryKey: ['users'] })
       emit('updated')
     }
     else {
-      showToast({
-        type: 'error',
+      add({
+        color: 'error',
         title: 'Update Failed',
-        message: response.message || 'Could not update user.',
+        description: response.message || 'Could not update user.',
       })
     }
   },
   onError: (error: Error) => {
-    showToast({
-      type: 'error',
+    add({
+      color: 'error',
       title: 'Update Failed',
-      message: error.message || 'Could not update user.',
+      description: error.message || 'Could not update user.',
     })
   },
 })

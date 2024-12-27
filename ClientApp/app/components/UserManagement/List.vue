@@ -80,14 +80,12 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
-import { useToast } from '~/composables/use-toast-service'
-
 import type { IUser } from '~/types'
 import useUsers from '~/composables/use-user-service'
 
 // Composition
 const { getAllUsers, deleteUser } = useUsers()
-const { showToast } = useToast()
+const { add } = useToast()
 const queryClient = useQueryClient()
 
 // Reactive state
@@ -118,19 +116,19 @@ const { mutate: removeUser, isPending: isRemoving } = useMutation({
   },
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['users'] })
-    showToast({
-      type: 'success',
+    add({
+      color: 'success',
       title: 'User Removed',
-      message: 'User has been removed successfully.',
+      description: 'User has been removed successfully.',
     })
     showRemoveConfirmation.value = false
     userToRemove.value = null
   },
   onError: (error: Error) => {
-    showToast({
-      type: 'error',
+    add({
+      color: 'error',
       title: 'Removal Failed',
-      message: error.message || 'Failed to remove user.',
+      description: error.message || 'Failed to remove user.',
     })
   },
 })

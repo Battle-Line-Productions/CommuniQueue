@@ -113,7 +113,7 @@
             </div>
           </div>
           <UButton
-            type="UButton"
+            type="button"
             class="text-light-error dark:text-dark-error hover:opacity-80"
             @click="clearSelectedUser"
           >
@@ -171,7 +171,7 @@
         <!-- Action UButtons -->
         <div class="flex justify-end space-x-4 pt-4">
           <UButton
-            type="UButton"
+            type="button"
             class="text-light-secondary dark:text-dark-secondary hover:underline px-4 py-2"
             :disabled="isPending"
             @click="$emit('close')"
@@ -179,7 +179,7 @@
             Cancel
           </UButton>
           <UButton
-            type="UButton"
+            type="button"
             :disabled="isPending || !isFormValid"
             class="bg-light-primary dark:bg-dark-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity disabled:opacity-50"
             @click="handleSubmit"
@@ -194,7 +194,6 @@
 
 <script setup lang="ts">
 import { useMutation, useQuery } from '@tanstack/vue-query'
-import { useToast } from '~/composables/use-toast-service'
 import useUsers from '~/composables/use-user-service'
 import useProjects from '~/composables/use-projects-service'
 import { PermissionLevel, type IUser } from '~/types'
@@ -210,7 +209,7 @@ const emit = defineEmits<{
 
 const { searchUsers } = useUsers()
 const { addUserToProject } = useProjects()
-const { showToast } = useToast()
+const { add } = useToast()
 
 // State management
 const searchTerm = ref('')
@@ -293,18 +292,18 @@ const { mutate, isPending } = useMutation({
     })
   },
   onSuccess: () => {
-    showToast({
-      type: 'success',
+    add({
+      color: 'success',
       title: 'Invitation Sent',
-      message: `An invitation has been sent to ${selectedUser.value?.email}`,
+      description: `An invitation has been sent to ${selectedUser.value?.email}`,
     })
     emit('invited')
   },
   onError: (error: Error) => {
-    showToast({
-      type: 'error',
+    add({
+      color: 'error',
       title: 'Invitation Failed',
-      message: error.message || 'Failed to send invitation',
+      description: error.message || 'Failed to send invitation',
     })
   },
 })
@@ -313,10 +312,10 @@ const { mutate, isPending } = useMutation({
 const handleSubmit = () => {
   // Validate form
   if (!isFormValid.value) {
-    showToast({
-      type: 'error',
+    add({
+      color: 'error',
       title: 'Incomplete Form',
-      message: 'Please select a user and permission level',
+      description: 'Please select a user and permission level',
     })
     return
   }

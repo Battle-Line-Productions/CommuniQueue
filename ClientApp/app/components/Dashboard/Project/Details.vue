@@ -87,7 +87,7 @@ const props = withDefaults(
 
 const { updateProject } = useProjects()
 const queryClient = useQueryClient()
-const { showToast } = useToast()
+const { add } = useToast()
 
 // Form state
 const initialForm = reactive({
@@ -172,18 +172,18 @@ const { mutate, isPending } = useMutation({
       description: data.description,
     })
 
-    showToast({
-      type: 'success',
+    add({
+      color: 'success',
       title: 'Project Updated',
-      message: 'Project details have been successfully updated.',
+      description: 'Project details have been successfully updated.',
     })
   },
   onError: (error: Error) => {
     console.error(error)
-    showToast({
-      type: 'error',
+    add({
+      color: 'error',
       title: 'Update Failed',
-      message: error.message || 'Failed to update project details.',
+      description: error.message || 'Failed to update project details.',
     })
   },
 })
@@ -191,10 +191,10 @@ const { mutate, isPending } = useMutation({
 // Form submission
 const handleSubmit = () => {
   if (!validateForm()) {
-    showToast({
-      type: 'error',
+    add({
+      color: 'error',
       title: 'Validation Error',
-      message: 'Please check the form for errors.',
+      description: 'Please check the form for errors.',
     })
     return
   }

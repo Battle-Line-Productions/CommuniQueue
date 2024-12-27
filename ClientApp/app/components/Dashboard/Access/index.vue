@@ -85,7 +85,7 @@ const projectId = computed(() => route.params.id as string)
 const { getUsersWithEntityPermissions } = useUsers()
 const { updatePermission: updatePermissionApi, deletePermission: deletePermissionApi } = usePermissions()
 const queryClient = useQueryClient()
-const { showToast } = useToast()
+const { add } = useToast()
 
 // State management
 const showInviteModal = ref(false)
@@ -138,17 +138,17 @@ const { mutate: updatePermission } = useMutation({
     queryClient.invalidateQueries({
       queryKey: ['entityUsers', projectId.value, EntityType.Project],
     })
-    showToast({
-      type: 'success',
+    add({
+      color: 'success',
       title: 'Permission Updated',
-      message: 'User permission has been updated successfully.',
+      description: 'User permission has been updated successfully.',
     })
   },
   onError: (error: Error) => {
-    showToast({
-      type: 'error',
+    add({
+      color: 'error',
       title: 'Update Failed',
-      message: error.message || 'Failed to update user permission.',
+      description: error.message || 'Failed to update user permission.',
     })
   },
 })
@@ -163,19 +163,19 @@ const { mutate: removeUser, isPending: isRemoving } = useMutation({
     queryClient.invalidateQueries({
       queryKey: ['entityUsers', projectId.value, EntityType.Project],
     })
-    showToast({
-      type: 'success',
+    add({
+      color: 'success',
       title: 'User Removed',
-      message: 'Team member has been removed from the project.',
+      description: 'Team member has been removed from the project.',
     })
     showRemoveConfirmation.value = false
     userToRemove.value = null
   },
   onError: (error: Error) => {
-    showToast({
-      type: 'error',
+    add({
+      color: 'error',
       title: 'Removal Failed',
-      message: error.message || 'Failed to remove team member.',
+      description: error.message || 'Failed to remove team member.',
     })
     showRemoveConfirmation.value = false
     userToRemove.value = null
