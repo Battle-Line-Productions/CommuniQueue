@@ -8,13 +8,13 @@
           User Management
         </h2>
 
-        <button
+        <UButton
           v-if="canManageUsers"
           class="bg-light-primary dark:bg-dark-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
           @click="showAddUserModal = true"
         >
           Add User
-        </button>
+        </UButton>
       </div>
 
       <!-- Loading State -->

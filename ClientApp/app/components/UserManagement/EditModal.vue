@@ -16,19 +16,19 @@
         <!-- Add more fields here as desired (firstName, lastName, etc.) -->
 
         <div class="flex justify-end space-x-2 mt-6">
-          <button
+          <UButton
             type="button"
             class="px-4 py-2 text-light-secondary dark:text-dark-secondary hover:underline"
             @click="$emit('close')"
           >
             Cancel
-          </button>
-          <button
+          </UButton>
+          <UButton
             :disabled="isPending"
             class="bg-light-primary dark:bg-dark-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {{ isPending ? 'Saving...' : 'Save Changes' }}
-          </button>
+          </UButton>
         </div>
       </form>
     </div>

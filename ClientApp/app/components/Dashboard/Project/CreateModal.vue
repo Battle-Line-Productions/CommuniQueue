@@ -31,20 +31,20 @@
           />
         </div>
         <div class="flex justify-end">
-          <button
+          <UButton
             type="button"
             class="mr-2 px-4 py-2 text-light-secondary dark:text-dark-secondary hover:underline"
             @click="$emit('close')"
           >
             Cancel
-          </button>
-          <button
+          </UButton>
+          <UButton
             type="submit"
             :disabled="isPending"
             class="bg-light-primary dark:bg-dark-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {{ isPending ? 'Creating...' : 'Create Project' }}
-          </button>
+          </UButton>
         </div>
       </form>
     </div>

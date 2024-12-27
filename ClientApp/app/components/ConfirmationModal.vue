@@ -34,14 +34,14 @@ defineEmits<{
         {{ message }}
       </p>
       <div class="flex justify-end space-x-2">
-        <button
+        <UButton
           class="px-4 py-2 text-light-secondary dark:text-dark-secondary hover:underline"
           :disabled="isProcessing"
           @click="$emit('cancel')"
         >
           {{ cancelText }}
-        </button>
-        <button
+        </UButton>
+        <UButton
           :disabled="isProcessing"
           :class="[
             'text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity disabled:opacity-50',
@@ -50,7 +50,7 @@ defineEmits<{
           @click="$emit('confirm')"
         >
           {{ isProcessing ? processingText : confirmText }}
-        </button>
+        </UButton>
       </div>
     </div>
   </div>

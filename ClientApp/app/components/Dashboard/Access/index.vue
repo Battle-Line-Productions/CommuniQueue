@@ -5,13 +5,13 @@
         <h2 class="text-xl font-semibold text-light-textbase dark:text-dark-textbase">
           Team Members
         </h2>
-        <button
+        <UButton
           v-if="canManageUsers"
           class="bg-light-primary dark:bg-dark-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
           @click="showInviteModal = true"
         >
           Invite Member
-        </button>
+        </UButton>
       </div>
 
       <div

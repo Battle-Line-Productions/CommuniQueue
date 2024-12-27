@@ -9,11 +9,13 @@
       aria-modal="true"
     >
       <!-- Header -->
-      <div class="flex justify-between items-center p-6 border-b border-light-secondary/10 dark:border-dark-secondary/10">
+      <div
+        class="flex justify-between items-center p-6 border-b border-light-secondary/10 dark:border-dark-secondary/10"
+      >
         <h2 class="text-xl font-semibold text-light-textbase dark:text-dark-textbase">
           Invite Team Member
         </h2>
-        <button
+        <UButton
           class="text-light-secondary dark:text-dark-secondary hover:text-light-textbase dark:hover:text-dark-textbase"
           @click="$emit('close')"
         >
@@ -21,14 +23,15 @@
             name="mdi:close"
             class="w-6 h-6"
           />
-        </button>
+        </UButton>
       </div>
 
       <!-- Content -->
       <div class="p-6 space-y-6">
         <!-- User Search Section (previously shown) -->
         <div>
-          <label class="block text-sm font-medium text-light-textbase dark:text-dark-textbase mb-1"> Search User </label>
+          <label class="block text-sm font-medium text-light-textbase dark:text-dark-textbase mb-1"> Search User
+          </label>
           <div class="relative">
             <FormField
               v-model="searchTerm"
@@ -109,8 +112,8 @@
               </div>
             </div>
           </div>
-          <button
-            type="button"
+          <UButton
+            type="UButton"
             class="text-light-error dark:text-dark-error hover:opacity-80"
             @click="clearSelectedUser"
           >
@@ -118,7 +121,7 @@
               name="mdi:close-circle"
               class="w-6 h-6"
             />
-          </button>
+          </UButton>
         </div>
 
         <!-- Permission Level Selection -->
@@ -165,24 +168,24 @@
           </div>
         </div>
 
-        <!-- Action Buttons -->
+        <!-- Action UButtons -->
         <div class="flex justify-end space-x-4 pt-4">
-          <button
-            type="button"
+          <UButton
+            type="UButton"
             class="text-light-secondary dark:text-dark-secondary hover:underline px-4 py-2"
             :disabled="isPending"
             @click="$emit('close')"
           >
             Cancel
-          </button>
-          <button
-            type="button"
+          </UButton>
+          <UButton
+            type="UButton"
             :disabled="isPending || !isFormValid"
             class="bg-light-primary dark:bg-dark-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity disabled:opacity-50"
             @click="handleSubmit"
           >
             {{ isPending ? 'Sending Invitation...' : 'Send Invitation' }}
-          </button>
+          </UButton>
         </div>
       </div>
     </div>

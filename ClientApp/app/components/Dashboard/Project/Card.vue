@@ -1,6 +1,8 @@
 <template>
-  <div class="project-card bg-light-surface dark:bg-dark-surface p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow relative">
-    <button
+  <div
+    class="project-card bg-light-surface dark:bg-dark-surface p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow relative"
+  >
+    <UButton
       class="absolute top-2 right-2 text-light-secondary dark:text-dark-secondary hover:text-light-error dark:hover:text-dark-error transition-colors z-10"
       aria-label="Delete Project"
       @click="openDeleteConfirmation"
@@ -9,13 +11,14 @@
         name="mdi:trash-can-outline"
         class="w-5 h-5"
       />
-    </button>
+    </UButton>
 
     <div class="flex justify-between items-center mb-2 pr-8">
       <h3 class="text-lg font-semibold text-light-textbase dark:text-dark-textbase">
         {{ project.name }}
       </h3>
-      <span class="text-xs text-light-secondary dark:text-dark-secondary"> Updated: {{ localTime.toLocalTime(project.updatedDateTime) }} </span>
+      <span class="text-xs text-light-secondary dark:text-dark-secondary"> Updated: {{
+        localTime.toLocalTime(project.updatedDateTime) }} </span>
     </div>
     <p class="text-sm text-light-secondary dark:text-dark-secondary mb-4 line-clamp-2">
       {{ project.description || 'No description provided' }}

@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script lang="ts" setup>
 // components
 const PageWrapper = resolveComponent('LayoutPageWrapper')
@@ -41,11 +42,11 @@ const error = computed(() => {
       <span class="font-bold text-8xl block">{{ error.code }}</span>
       <span class="block italic">{{ error.message }}</span>
     </h1>
-    <BLButton
+    <BLUButton
       to="/"
       size="sm"
     >
       Home
-    </BLButton>
+    </BLUButton>
   </component>
 </template>

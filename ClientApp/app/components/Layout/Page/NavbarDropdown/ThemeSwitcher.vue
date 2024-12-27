@@ -35,7 +35,7 @@ const availableThemes = [
       <HeadlessListboxLabel class="sr-only">
         Theme Selection
       </HeadlessListboxLabel>
-      <HeadlessListboxButton type="template">
+      <HeadlessListboxUButton type="template">
         <BLLink class="text-light-secondary dark:text-dark-secondary">
           <!-- Display sun icon for light theme, moon for dark -->
           <span class="flex justify-center items-center dark:hidden">
@@ -45,7 +45,7 @@ const availableThemes = [
             <Icon name="uil:moon" />
           </span>
         </BLLink>
-      </HeadlessListboxButton>
+      </HeadlessListboxUButton>
       <HeadlessListboxOptions
         class="p-1 absolute z-50 origin-top-right top-full right-0 outline-none bg-light-background dark:bg-dark-background rounded-lg ring-1 ring-light-secondary/10 shadow-lg overflow-hidden w-36 py-1 text-sm text-light-textbase dark:text-dark-textbase font-semibold"
       >

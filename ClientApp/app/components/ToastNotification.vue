@@ -99,7 +99,7 @@ defineExpose({ addToast })
             {{ toast.message }}
           </div>
         </div>
-        <button
+        <UButton
           class="ml-4 hover:opacity-80"
           @click="removeToast(toast.id)"
         >
@@ -107,7 +107,7 @@ defineExpose({ addToast })
             name="mdi:close"
             class="w-5 h-5"
           />
-        </button>
+        </UButton>
       </div>
     </TransitionGroup>
   </div>

@@ -101,12 +101,12 @@ const close = () => {
           </div>
         </div>
         <div>
-          <button
+          <UButton
             class="text-gray-600 hover:text-red-500 dark:text-gray-400 font-bold"
             @click="close"
           >
             <Icon name="clarity:times-line" />
-          </button>
+          </UButton>
         </div>
       </div>
     </TransitionChild>

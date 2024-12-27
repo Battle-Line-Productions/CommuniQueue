@@ -107,7 +107,8 @@ const handleSubmit = async () => {
           <label
             for="type"
             class="block text-sm font-medium text-light-textbase dark:text-dark-textbase"
-          >Request Type</label>
+          >Request
+            Type</label>
           <select
             id="type"
             v-model="formData.type"
@@ -140,12 +141,12 @@ const handleSubmit = async () => {
           />
         </div>
 
-        <button
+        <UButton
           type="submit"
           class="w-full bg-light-primary dark:bg-dark-primary text-white font-bold py-2 px-4 rounded-full hover:bg-light-accent dark:hover:bg-dark-accent transition-colors"
         >
           Submit
-        </button>
+        </UButton>
       </form>
     </div>
   </section>

@@ -53,6 +53,184 @@ export default <Partial<Config>>{
     },
   },
 }
+
+i've also included my nuxt config and package.json so you know what packages i have available to me.
+// https://nuxt.com/docs/api/configuration/nuxt-config
+export default defineNuxtConfig({
+
+  modules: [
+    '@nuxt/eslint',
+    '@nuxt/ui',
+    '@nuxt/icon',
+    '@nuxt/fonts',
+    '@logto/nuxt',
+    '@nuxtjs/color-mode',
+    'nuxt-headlessui',
+    '@hebilicious/vue-query-nuxt',
+    '@logto/nuxt',
+    '@nuxt/scripts',
+    '@nuxtjs/seo',
+    '@vueuse/nuxt',
+  ],
+
+  devtools: {
+    enabled: true,
+    timeline: {
+      enabled: true,
+    },
+  },
+
+  app: {
+    pageTransition: { name: 'page', mode: 'out-in' },
+    layoutTransition: { name: 'layout', mode: 'out-in' },
+    head: {
+      titleTemplate: '%s | CommuniQueue',
+      meta: [
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      ],
+    },
+  },
+
+  css: ['~/assets/css/main.css'],
+
+  site: {
+    url: process.env.NUXT_SITE_URL,
+    name: process.env.NUXT_SITE_NAME,
+    description:
+      'Streamline communication with template management and messaging API. Create and send personalized emails. Custom organization for businesses and individuals.',
+    defaultLocale: 'en',
+    debug: process.env.NUXT_SITE_ENV !== 'production',
+  },
+
+  colorMode: {
+    classSuffix: '',
+  },
+
+  runtimeConfig: {
+    public: {
+      scripts: {
+        cloudflareWebAnalytics: {
+          // NUXT_PUBLIC_SCRIPTS_CLOUDFLARE_WEB_ANALYTICS_TOKEN=<your-token>
+          token: '',
+        },
+        googleAnalytics: {
+          // NUXT_PUBLIC_SCRIPTS_GOOGLE_ANALYTICS_ID=<your-id>
+          id: '',
+        },
+        clarity: {
+          // NUXT_PUBLIC_SCRIPTS_CLARITY_ID=<your-id>
+          id: '',
+        },
+      },
+    },
+    logto: {
+      endpoint: 'https://LocalAuth.battlelineproductions.com/',
+      appId: '',
+      appSecret: '',
+      cookieEncryptionKey: '',
+    },
+  },
+
+  future: {
+    compatibilityVersion: 4,
+  },
+
+  compatibilityDate: '2024-11-01',
+
+  postcss: {
+    plugins: {
+      '@tailwindcss/postcss': {},
+    },
+  },
+
+  eslint: {
+    config: {
+      stylistic: true,
+    },
+  },
+
+  headlessui: {
+    prefix: 'Headless',
+  },
+
+  ogImage: {
+    enabled: false,
+  },
+
+  schemaOrg: {
+    identity: {
+      type: 'Organization',
+      name: 'Battleline Productions',
+      url: process.env.NUXT_SITE_URL,
+      logo: '/battle_logo_small.png',
+    },
+  },
+
+  scripts: {
+    registry: {
+      googleAnalytics: true,
+      clarity: true,
+    },
+  },
+
+  // for productioin only scripts
+  // $production: {
+  //   scripts: {
+  //     registry: {
+  //       cloudflareWebAnalytics: true,
+  //       googleAnalytics: true,
+  //       clarity: true,
+  //     },
+  //   },
+  // },
+})
+{
+  "name": "communiqueue",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix ."
+  },
+  "dependencies": {
+    "@headlessui/tailwindcss": "^0.2.1",
+    "@headlessui/vue": "^1.7.23",
+    "@hebilicious/vue-query-nuxt": "0.3.0",
+    "@logto/nuxt": "^1.1.5",
+    "@nuxt/eslint": "0.7.4",
+    "@nuxt/fonts": "0.10.3",
+    "@nuxt/icon": "1.10.3",
+    "@nuxt/scripts": "0.9.5",
+    "@nuxt/ui": "3.0.0-alpha.10",
+    "@nuxtjs/color-mode": "3.5.2",
+    "@nuxtjs/seo": "2.0.2",
+    "@tailwindcss/postcss": "4.0.0-beta.8",
+    "@tanstack/vue-query": "^5.62.9",
+    "@vueuse/nuxt": "12.2.0",
+    "nuxt": "^3.15.0",
+    "tailwindcss": "4.0.0-beta.8",
+    "vue": "latest"
+  },
+  "packageManager": "pnpm@9.15.1",
+  "devDependencies": {
+    "@nuxt/eslint-config": "^0.7.4",
+    "eslint": "^9.17.0",
+    "nuxt-headlessui": "^1.2.0",
+    "sass": "^1.83.0",
+    "sass-loader": "^16.0.4",
+    "serverless": "^4.4.18",
+    "serverless-cf-invalidate-proxy": "^1.0.1",
+    "serverless-domain-manager": "^8.0.0",
+    "serverless-plugin-common-excludes": "^4.0.0",
+    "serverless-s3-sync": "^3.4.0",
+    "typescript": "^5.7.2"
+  }
+}
 `.trim() + '\n\n' // Trim extra whitespace, then add two line breaks
 
 /**

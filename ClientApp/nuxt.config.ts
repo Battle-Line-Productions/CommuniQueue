@@ -47,6 +47,9 @@ export default defineNuxtConfig({
 
   colorMode: {
     classSuffix: '',
+    preference: 'system',
+    fallback: 'light',
+    dataValue: 'theme',
   },
 
   runtimeConfig: {

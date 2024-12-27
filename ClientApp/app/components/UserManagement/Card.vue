@@ -29,7 +29,8 @@
           <span
             v-if="isCurrentUser"
             class="px-2 py-0.5 bg-light-success/10 dark:bg-dark-success/10 text-light-success dark:text-dark-success rounded-full text-xs"
-          > You </span>
+          >
+            You </span>
 
           <!-- If you store a role in your user object, show a small role tag -->
           <span
@@ -66,8 +67,8 @@
         </span>
       </div>
 
-      <!-- Delete Button -->
-      <button
+      <!-- Delete UButton -->
+      <UButton
         v-if="canManage && !isCurrentUser"
         class="text-light-error dark:text-dark-error hover:opacity-80 transition-opacity"
         title="Remove User"
@@ -77,7 +78,7 @@
           name="mdi:trash-can-outline"
           class="w-5 h-5"
         />
-      </button>
+      </UButton>
     </div>
   </div>
 </template>

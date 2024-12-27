@@ -4,11 +4,11 @@ const emit = defineEmits<{
 }>()
 
 defineProps({
-  closeButton: {
+  closeUButton: {
     type: Boolean,
     default: true,
   },
-  closeButtonText: {
+  closeUButtonText: {
     type: String,
     default: 'Cancel',
   },
@@ -54,10 +54,10 @@ onMounted(() => {
       <div class="flex flex-col overflow-hidden relative">
         <div class="action-sheet-container flex-1 overflow-y-auto space-y-1 justify-end px-4 pb-2 pt-4">
           <slot />
-          <ActionSheetGroup v-if="closeButton">
-            <ActionSheetItemButton
+          <ActionSheetGroup v-if="closeUButton">
+            <ActionSheetItemUButton
               class="text-red-500 font-bold"
-              :text="closeButtonText"
+              :text="closeUButtonText"
               @click="close"
             />
           </ActionSheetGroup>

@@ -46,21 +46,21 @@
           />
 
           <div class="flex justify-end space-x-3">
-            <button
+            <UButton
               type="button"
               class="text-light-secondary dark:text-dark-secondary hover:underline px-4 py-2"
               :disabled="isPending"
               @click="resetForm"
             >
               Reset
-            </button>
-            <button
+            </UButton>
+            <UButton
               type="submit"
               :disabled="isPending || !isFormChanged"
               class="bg-light-primary dark:bg-dark-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               {{ isPending ? 'Saving...' : 'Save Changes' }}
-            </button>
+            </UButton>
           </div>
         </div>
       </form>

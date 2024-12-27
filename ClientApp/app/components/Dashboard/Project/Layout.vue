@@ -4,13 +4,13 @@
       <h1 class="text-2xl font-bold text-light-textbase dark:text-dark-textbase">
         Dashboard
       </h1>
-      <button
+      <UButton
         type="button"
         class="bg-light-primary dark:bg-dark-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
         @click.prevent="openCreateProjectModal"
       >
         Create New Project
-      </button>
+      </UButton>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">

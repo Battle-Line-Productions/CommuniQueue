@@ -17,7 +17,7 @@ defineEmits<{
 <template>
   <div class="border-b border-light-secondary/20 dark:border-dark-secondary/20">
     <nav class="flex space-x-8">
-      <button
+      <UButton
         v-for="tab in tabs"
         :key="tab.id"
         class="px-1 py-4 border-b-2 font-medium text-sm transition-colors"
@@ -29,7 +29,7 @@ defineEmits<{
         @click="$emit('update:modelValue', tab.id)"
       >
         {{ tab.label }}
-      </button>
+      </UButton>
     </nav>
   </div>
 </template>

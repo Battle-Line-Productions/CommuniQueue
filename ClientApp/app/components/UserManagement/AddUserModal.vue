@@ -67,7 +67,10 @@
           <p><strong>Owner</strong>: Automatically assigned to the account creator. Not selectable.</p>
           <p><strong>Super Admin</strong>: Full privileges across the entire application.</p>
           <p><strong>Contributor</strong>: Collaborates on tasks but does not have full admin rights.</p>
-          <p><strong>Read Only</strong>: Has no system access and only access to projects and templates when specifically granted.</p>
+          <p>
+            <strong>Read Only</strong>: Has no system access and only access to projects and templates when
+            specifically granted.
+          </p>
         </div>
 
         <!-- IsActive checkbox -->
@@ -81,24 +84,25 @@
           <label
             for="addUserIsActive"
             class="text-sm text-light-textbase dark:text-dark-textbase cursor-pointer"
-          > Active User </label>
+          >
+            Active User </label>
         </div>
 
-        <!-- Buttons -->
+        <!-- UButtons -->
         <div class="flex justify-end space-x-2 mt-6">
-          <button
+          <UButton
             type="button"
             class="px-4 py-2 text-light-secondary dark:text-dark-secondary hover:underline"
             @click="$emit('close')"
           >
             Cancel
-          </button>
-          <button
+          </UButton>
+          <UButton
             :disabled="isPending"
             class="bg-light-primary dark:bg-dark-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {{ isPending ? 'Adding...' : 'Add User' }}
-          </button>
+          </UButton>
         </div>
       </form>
     </div>

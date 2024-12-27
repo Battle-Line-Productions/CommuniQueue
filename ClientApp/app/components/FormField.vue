@@ -142,8 +142,8 @@ const handleInput = (event: Event) => {
           @input="handleInput"
         >
 
-        <!-- Password Toggle Button -->
-        <button
+        <!-- Password Toggle UButton -->
+        <UButton
           v-if="isPasswordType"
           type="button"
           class="absolute inset-y-0 right-0 flex items-center pr-3 text-light-secondary dark:text-dark-secondary hover:text-light-primary dark:hover:text-dark-primary"
@@ -153,7 +153,7 @@ const handleInput = (event: Event) => {
             :name="showPassword ? 'mdi:eye-off' : 'mdi:eye'"
             class="w-5 h-5"
           />
-        </button>
+        </UButton>
 
         <!-- Character Count -->
         <div
@@ -203,7 +203,7 @@ select:focus {
 input,
 textarea,
 select,
-button {
+UButton {
   @apply transition-all duration-200;
 }
 </style>
