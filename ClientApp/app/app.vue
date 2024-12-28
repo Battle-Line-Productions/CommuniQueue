@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-provideHeadlessUseId(() => useId())
 </script>
 
 <template>

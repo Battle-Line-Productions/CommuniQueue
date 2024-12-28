@@ -8,7 +8,6 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     '@logto/nuxt',
     '@nuxtjs/color-mode',
-    'nuxt-headlessui',
     '@hebilicious/vue-query-nuxt',
     '@logto/nuxt',
     '@nuxt/scripts',
@@ -93,10 +92,6 @@ export default defineNuxtConfig({
     config: {
       stylistic: true,
     },
-  },
-
-  headlessui: {
-    prefix: 'Headless',
   },
 
   ogImage: {

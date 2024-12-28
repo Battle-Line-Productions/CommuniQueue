@@ -12,8 +12,6 @@
     "lint:fix": "eslint --fix ."
   },
   "dependencies": {
-    "@headlessui/tailwindcss": "^0.2.1",
-    "@headlessui/vue": "^1.7.23",
     "@hebilicious/vue-query-nuxt": "0.3.0",
     "@logto/nuxt": "^1.2.0",
     "@nuxt/eslint": "0.7.4",
@@ -34,7 +32,6 @@
   "devDependencies": {
     "@nuxt/eslint-config": "^0.7.4",
     "eslint": "^9.17.0",
-    "nuxt-headlessui": "^1.2.0",
     "sass": "^1.83.0",
     "sass-loader": "^16.0.4",
     "serverless": "^4.4.18",

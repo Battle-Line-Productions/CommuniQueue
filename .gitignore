@@ -353,7 +353,6 @@ ASALocalRun/
 # used for local dev
 ssh-tunnel.ps1
 .ionide
-.vscode
 .serverless
 */appsettings.Development.json
 

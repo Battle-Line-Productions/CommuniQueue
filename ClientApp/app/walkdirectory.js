@@ -65,7 +65,6 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     '@logto/nuxt',
     '@nuxtjs/color-mode',
-    'nuxt-headlessui',
     '@hebilicious/vue-query-nuxt',
     '@logto/nuxt',
     '@nuxt/scripts',
@@ -149,10 +148,6 @@ export default defineNuxtConfig({
     },
   },
 
-  headlessui: {
-    prefix: 'Headless',
-  },
-
   ogImage: {
     enabled: false,
   },
@@ -198,8 +193,6 @@ export default defineNuxtConfig({
     "lint:fix": "eslint --fix ."
   },
   "dependencies": {
-    "@headlessui/tailwindcss": "^0.2.1",
-    "@headlessui/vue": "^1.7.23",
     "@hebilicious/vue-query-nuxt": "0.3.0",
     "@logto/nuxt": "^1.1.5",
     "@nuxt/eslint": "0.7.4",

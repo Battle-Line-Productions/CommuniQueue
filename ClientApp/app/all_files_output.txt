@@ -303,11 +303,11 @@ const emit = defineEmits<{
 }>()
 
 defineProps({
-  closeButton: {
+  closeUButton: {
     type: Boolean,
     default: true,
   },
-  closeButtonText: {
+  closeUButtonText: {
     type: String,
     default: 'Cancel',
   },
@@ -353,10 +353,10 @@ onMounted(() => {
       <div class="flex flex-col overflow-hidden relative">
         <div class="action-sheet-container flex-1 overflow-y-auto space-y-1 justify-end px-4 pb-2 pt-4">
           <slot />
-          <ActionSheetGroup v-if="closeButton">
-            <ActionSheetItemButton
+          <ActionSheetGroup v-if="closeUButton">
+            <ActionSheetItemUButton
               class="text-red-500 font-bold"
-              :text="closeButtonText"
+              :text="closeUButtonText"
               @click="close"
             />
           </ActionSheetGroup>
@@ -500,12 +500,12 @@ const close = () => {
           </div>
         </div>
         <div>
-          <button
+          <UButton
             class="text-gray-600 hover:text-red-500 dark:text-gray-400 font-bold"
             @click="close"
           >
             <Icon name="clarity:times-line" />
-          </button>
+          </UButton>
         </div>
       </div>
     </TransitionChild>
@@ -742,14 +742,14 @@ defineEmits<{
         {{ message }}
       </p>
       <div class="flex justify-end space-x-2">
-        <button
+        <UButton
           class="px-4 py-2 text-light-secondary dark:text-dark-secondary hover:underline"
           :disabled="isProcessing"
           @click="$emit('cancel')"
         >
           {{ cancelText }}
-        </button>
-        <button
+        </UButton>
+        <UButton
           :disabled="isProcessing"
           :class="[
             'text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity disabled:opacity-50',
@@ -758,7 +758,7 @@ defineEmits<{
           @click="$emit('confirm')"
         >
           {{ isProcessing ? processingText : confirmText }}
-        </button>
+        </UButton>
       </div>
     </div>
   </div>
@@ -773,13 +773,13 @@ defineEmits<{
         <h2 class="text-xl font-semibold text-light-textbase dark:text-dark-textbase">
           Team Members
         </h2>
-        <button
+        <UButton
           v-if="canManageUsers"
           class="bg-light-primary dark:bg-dark-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
           @click="showInviteModal = true"
         >
           Invite Member
-        </button>
+        </UButton>
       </div>
 
       <div
@@ -853,7 +853,7 @@ const projectId = computed(() => route.params.id as string)
 const { getUsersWithEntityPermissions } = useUsers()
 const { updatePermission: updatePermissionApi, deletePermission: deletePermissionApi } = usePermissions()
 const queryClient = useQueryClient()
-const { showToast } = useToast()
+const { add } = useToast()
 
 // State management
 const showInviteModal = ref(false)
@@ -906,17 +906,17 @@ const { mutate: updatePermission } = useMutation({
     queryClient.invalidateQueries({
       queryKey: ['entityUsers', projectId.value, EntityType.Project],
     })
-    showToast({
-      type: 'success',
+    add({
+      color: 'success',
       title: 'Permission Updated',
-      message: 'User permission has been updated successfully.',
+      description: 'User permission has been updated successfully.',
     })
   },
   onError: (error: Error) => {
-    showToast({
-      type: 'error',
+    add({
+      color: 'error',
       title: 'Update Failed',
-      message: error.message || 'Failed to update user permission.',
+      description: error.message || 'Failed to update user permission.',
     })
   },
 })
@@ -931,19 +931,19 @@ const { mutate: removeUser, isPending: isRemoving } = useMutation({
     queryClient.invalidateQueries({
       queryKey: ['entityUsers', projectId.value, EntityType.Project],
     })
-    showToast({
-      type: 'success',
+    add({
+      color: 'success',
       title: 'User Removed',
-      message: 'Team member has been removed from the project.',
+      description: 'Team member has been removed from the project.',
     })
     showRemoveConfirmation.value = false
     userToRemove.value = null
   },
   onError: (error: Error) => {
-    showToast({
-      type: 'error',
+    add({
+      color: 'error',
       title: 'Removal Failed',
-      message: error.message || 'Failed to remove team member.',
+      description: error.message || 'Failed to remove team member.',
     })
     showRemoveConfirmation.value = false
     userToRemove.value = null
@@ -993,11 +993,13 @@ const handleInvited = () => {
       aria-modal="true"
     >
       <!-- Header -->
-      <div class="flex justify-between items-center p-6 border-b border-light-secondary/10 dark:border-dark-secondary/10">
+      <div
+        class="flex justify-between items-center p-6 border-b border-light-secondary/10 dark:border-dark-secondary/10"
+      >
         <h2 class="text-xl font-semibold text-light-textbase dark:text-dark-textbase">
           Invite Team Member
         </h2>
-        <button
+        <UButton
           class="text-light-secondary dark:text-dark-secondary hover:text-light-textbase dark:hover:text-dark-textbase"
           @click="$emit('close')"
         >
@@ -1005,14 +1007,15 @@ const handleInvited = () => {
             name="mdi:close"
             class="w-6 h-6"
           />
-        </button>
+        </UButton>
       </div>
 
       <!-- Content -->
       <div class="p-6 space-y-6">
         <!-- User Search Section (previously shown) -->
         <div>
-          <label class="block text-sm font-medium text-light-textbase dark:text-dark-textbase mb-1"> Search User </label>
+          <label class="block text-sm font-medium text-light-textbase dark:text-dark-textbase mb-1"> Search User
+          </label>
           <div class="relative">
             <FormField
               v-model="searchTerm"
@@ -1093,7 +1096,7 @@ const handleInvited = () => {
               </div>
             </div>
           </div>
-          <button
+          <UButton
             type="button"
             class="text-light-error dark:text-dark-error hover:opacity-80"
             @click="clearSelectedUser"
@@ -1102,7 +1105,7 @@ const handleInvited = () => {
               name="mdi:close-circle"
               class="w-6 h-6"
             />
-          </button>
+          </UButton>
         </div>
 
         <!-- Permission Level Selection -->
@@ -1149,24 +1152,24 @@ const handleInvited = () => {
           </div>
         </div>
 
-        <!-- Action Buttons -->
+        <!-- Action UButtons -->
         <div class="flex justify-end space-x-4 pt-4">
-          <button
+          <UButton
             type="button"
             class="text-light-secondary dark:text-dark-secondary hover:underline px-4 py-2"
             :disabled="isPending"
             @click="$emit('close')"
           >
             Cancel
-          </button>
-          <button
+          </UButton>
+          <UButton
             type="button"
             :disabled="isPending || !isFormValid"
             class="bg-light-primary dark:bg-dark-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity disabled:opacity-50"
             @click="handleSubmit"
           >
             {{ isPending ? 'Sending Invitation...' : 'Send Invitation' }}
-          </button>
+          </UButton>
         </div>
       </div>
     </div>
@@ -1175,7 +1178,6 @@ const handleInvited = () => {
 
 <script setup lang="ts">
 import { useMutation, useQuery } from '@tanstack/vue-query'
-import { useToast } from '~/composables/use-toast-service'
 import useUsers from '~/composables/use-user-service'
 import useProjects from '~/composables/use-projects-service'
 import { PermissionLevel, type IUser } from '~/types'
@@ -1191,7 +1193,7 @@ const emit = defineEmits<{
 
 const { searchUsers } = useUsers()
 const { addUserToProject } = useProjects()
-const { showToast } = useToast()
+const { add } = useToast()
 
 // State management
 const searchTerm = ref('')
@@ -1274,18 +1276,18 @@ const { mutate, isPending } = useMutation({
     })
   },
   onSuccess: () => {
-    showToast({
-      type: 'success',
+    add({
+      color: 'success',
       title: 'Invitation Sent',
-      message: `An invitation has been sent to ${selectedUser.value?.email}`,
+      description: `An invitation has been sent to ${selectedUser.value?.email}`,
     })
     emit('invited')
   },
   onError: (error: Error) => {
-    showToast({
-      type: 'error',
+    add({
+      color: 'error',
       title: 'Invitation Failed',
-      message: error.message || 'Failed to send invitation',
+      description: error.message || 'Failed to send invitation',
     })
   },
 })
@@ -1294,10 +1296,10 @@ const { mutate, isPending } = useMutation({
 const handleSubmit = () => {
   // Validate form
   if (!isFormValid.value) {
-    showToast({
-      type: 'error',
+    add({
+      color: 'error',
       title: 'Incomplete Form',
-      message: 'Please select a user and permission level',
+      description: 'Please select a user and permission level',
     })
     return
   }
@@ -1361,7 +1363,8 @@ onUnmounted(() => {
           <span
             v-if="isCurrentUser"
             class="px-2 py-0.5 bg-light-success/10 dark:bg-dark-success/10 text-light-success dark:text-dark-success rounded-full text-xs"
-          > You </span>
+          >
+            You </span>
         </div>
       </div>
     </div>
@@ -1380,7 +1383,7 @@ onUnmounted(() => {
         {{ formatPermissionLevel(projectPermission?.permissionLevel || PermissionLevel.ReadOnly) }}
       </div>
 
-      <button
+      <UButton
         v-if="canManage && !isCurrentUser"
         class="text-light-error dark:text-dark-error hover:opacity-80 transition-opacity"
         @click="$emit('remove', user)"
@@ -1389,7 +1392,7 @@ onUnmounted(() => {
           name="mdi:trash-can-outline"
           class="w-5 h-5"
         />
-      </button>
+      </UButton>
     </div>
   </div>
 </template>
@@ -1484,8 +1487,10 @@ const formatPermissionLevel = (level: PermissionLevel): string => {
 
 === components\Dashboard\Project\Card.vue ===
 <template>
-  <div class="project-card bg-light-surface dark:bg-dark-surface p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow relative">
-    <button
+  <div
+    class="project-card bg-light-surface dark:bg-dark-surface p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow relative"
+  >
+    <UButton
       class="absolute top-2 right-2 text-light-secondary dark:text-dark-secondary hover:text-light-error dark:hover:text-dark-error transition-colors z-10"
       aria-label="Delete Project"
       @click="openDeleteConfirmation"
@@ -1494,13 +1499,14 @@ const formatPermissionLevel = (level: PermissionLevel): string => {
         name="mdi:trash-can-outline"
         class="w-5 h-5"
       />
-    </button>
+    </UButton>
 
     <div class="flex justify-between items-center mb-2 pr-8">
       <h3 class="text-lg font-semibold text-light-textbase dark:text-dark-textbase">
         {{ project.name }}
       </h3>
-      <span class="text-xs text-light-secondary dark:text-dark-secondary"> Updated: {{ localTime.toLocalTime(project.updatedDateTime) }} </span>
+      <span class="text-xs text-light-secondary dark:text-dark-secondary"> Updated: {{
+        localTime.toLocalTime(project.updatedDateTime) }} </span>
     </div>
     <p class="text-sm text-light-secondary dark:text-dark-secondary mb-4 line-clamp-2">
       {{ project.description || 'No description provided' }}
@@ -1688,20 +1694,20 @@ const handleDelete = () => {
           />
         </div>
         <div class="flex justify-end">
-          <button
+          <UButton
             type="button"
             class="mr-2 px-4 py-2 text-light-secondary dark:text-dark-secondary hover:underline"
             @click="$emit('close')"
           >
             Cancel
-          </button>
-          <button
+          </UButton>
+          <UButton
             type="submit"
             :disabled="isPending"
             class="bg-light-primary dark:bg-dark-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {{ isPending ? 'Creating...' : 'Create Project' }}
-          </button>
+          </UButton>
         </div>
       </form>
     </div>
@@ -1798,21 +1804,21 @@ const handleSubmit = () => {
           />
 
           <div class="flex justify-end space-x-3">
-            <button
+            <UButton
               type="button"
               class="text-light-secondary dark:text-dark-secondary hover:underline px-4 py-2"
               :disabled="isPending"
               @click="resetForm"
             >
               Reset
-            </button>
-            <button
+            </UButton>
+            <UButton
               type="submit"
               :disabled="isPending || !isFormChanged"
               class="bg-light-primary dark:bg-dark-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               {{ isPending ? 'Saving...' : 'Save Changes' }}
-            </button>
+            </UButton>
           </div>
         </div>
       </form>
@@ -1839,7 +1845,7 @@ const props = withDefaults(
 
 const { updateProject } = useProjects()
 const queryClient = useQueryClient()
-const { showToast } = useToast()
+const { add } = useToast()
 
 // Form state
 const initialForm = reactive({
@@ -1924,18 +1930,18 @@ const { mutate, isPending } = useMutation({
       description: data.description,
     })
 
-    showToast({
-      type: 'success',
+    add({
+      color: 'success',
       title: 'Project Updated',
-      message: 'Project details have been successfully updated.',
+      description: 'Project details have been successfully updated.',
     })
   },
   onError: (error: Error) => {
     console.error(error)
-    showToast({
-      type: 'error',
+    add({
+      color: 'error',
       title: 'Update Failed',
-      message: error.message || 'Failed to update project details.',
+      description: error.message || 'Failed to update project details.',
     })
   },
 })
@@ -1943,10 +1949,10 @@ const { mutate, isPending } = useMutation({
 // Form submission
 const handleSubmit = () => {
   if (!validateForm()) {
-    showToast({
-      type: 'error',
+    add({
+      color: 'error',
       title: 'Validation Error',
-      message: 'Please check the form for errors.',
+      description: 'Please check the form for errors.',
     })
     return
   }
@@ -1974,13 +1980,13 @@ const resetForm = () => {
       <h1 class="text-2xl font-bold text-light-textbase dark:text-dark-textbase">
         Dashboard
       </h1>
-      <button
+      <UButton
         type="button"
         class="bg-light-primary dark:bg-dark-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
         @click.prevent="openCreateProjectModal"
       >
         Create New Project
-      </button>
+      </UButton>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -2185,6 +2191,7 @@ const quickActions: QuickAction[] = [
 
 
 === components\Error.vue ===
+<!-- eslint-disable vue/multi-word-component-names -->
 <script lang="ts" setup>
 // components
 const PageWrapper = resolveComponent('LayoutPageWrapper')
@@ -2228,12 +2235,12 @@ const error = computed(() => {
       <span class="font-bold text-8xl block">{{ error.code }}</span>
       <span class="block italic">{{ error.message }}</span>
     </h1>
-    <BLButton
+    <BLUButton
       to="/"
       size="sm"
     >
       Home
-    </BLButton>
+    </BLUButton>
   </component>
 </template>
 
@@ -2391,8 +2398,8 @@ const handleInput = (event: Event) => {
           @input="handleInput"
         >
 
-        <!-- Password Toggle Button -->
-        <button
+        <!-- Password Toggle UButton -->
+        <UButton
           v-if="isPasswordType"
           type="button"
           class="absolute inset-y-0 right-0 flex items-center pr-3 text-light-secondary dark:text-dark-secondary hover:text-light-primary dark:hover:text-dark-primary"
@@ -2402,7 +2409,7 @@ const handleInput = (event: Event) => {
             :name="showPassword ? 'mdi:eye-off' : 'mdi:eye'"
             class="w-5 h-5"
           />
-        </button>
+        </UButton>
 
         <!-- Character Count -->
         <div
@@ -2438,22 +2445,23 @@ const handleInput = (event: Event) => {
 
 <style scoped>
 .form-field {
-  @apply relative;
+  position: relative;
 }
 
 /* Focus styles */
 input:focus,
 textarea:focus,
 select:focus {
-  @apply outline-none ring-2 ring-opacity-50;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5);
 }
 
 /* Transition for all interactive states */
 input,
 textarea,
 select,
-button {
-  @apply transition-all duration-200;
+UButton {
+  transition: all 0.2s;
 }
 </style>
 
@@ -2568,7 +2576,8 @@ const handleSubmit = async () => {
           <label
             for="type"
             class="block text-sm font-medium text-light-textbase dark:text-dark-textbase"
-          >Request Type</label>
+          >Request
+            Type</label>
           <select
             id="type"
             v-model="formData.type"
@@ -2601,12 +2610,12 @@ const handleSubmit = async () => {
           />
         </div>
 
-        <button
+        <UButton
           type="submit"
           class="w-full bg-light-primary dark:bg-dark-primary text-white font-bold py-2 px-4 rounded-full hover:bg-light-accent dark:hover:bg-dark-accent transition-colors"
         >
           Submit
-        </button>
+        </UButton>
       </form>
     </div>
   </section>
@@ -2915,7 +2924,7 @@ defineEmits(['update:modelValue'])
 </template>
 
 
-=== components\Layouts\Page\Content.vue ===
+=== components\Layout\Page\Content.vue ===
 <template>
   <div
     class="flex w-full pt-[64px]"
@@ -2926,7 +2935,7 @@ defineEmits(['update:modelValue'])
 </template>
 
 
-=== components\Layouts\Page\Footer.vue ===
+=== components\Layout\Page\Footer.vue ===
 <script lang="ts" setup>
 import { defineProps } from 'vue'
 
@@ -2961,7 +2970,7 @@ const props = defineProps<Props>()
 </template>
 
 
-=== components\Layouts\Page\Header.vue ===
+=== components\Layout\Page\Header.vue ===
 <template>
   <div class="mb-4">
     <slot />
@@ -2969,352 +2978,395 @@ const props = defineProps<Props>()
 </template>
 
 
-=== components\Layouts\Page\Infobar.vue ===
-<script lang="ts" setup>
-import { computed } from 'vue'
+=== components\Layout\Page\Navbar.vue ===
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import type { RouteLocationRaw } from 'vue-router'
 
-/**
- * Interface describing your social links.
- */
-interface SocialLink {
-  name: string
-  link: string
-  icon: string
+// Example auth tracking (replace with your logic)
+const isAuthenticated = ref(false)
+
+/** A sub-menu item or direct link item */
+interface NavbarItem {
+  label: string
+  to?: RouteLocationRaw
+  requiresAuth?: boolean
+  children?: NavbarItem[] // if it has sub-menu items
 }
 
-/**
- * Interface describing the infobar data.
- */
-interface NavbarInfobar {
+/** Optional info bar data */
+interface InfoBarData {
   email?: string
   phone?: string
-  socials?: SocialLink[]
+  socials?: {
+    name: string
+    link: string
+    icon: string
+  }[]
 }
 
-/**
- * Interface describing optional fields in the layout configuration
- * that this component needs.
- */
-interface NavbarConfig {
-  infobar?: NavbarInfobar
-}
-
-interface PageConfig {
-  navbar?: NavbarConfig
-}
-
-interface LayoutConfig {
-  page?: PageConfig
-}
-
-/**
- * Main app config interface for what this component depends on.
- */
-interface AppConfig {
-  layout?: LayoutConfig
-}
-
-/**
- * Define props for this component. We only need the `config` object here.
- */
 const props = defineProps<{
-  config: AppConfig
+  /**
+   * The brand or site name, e.g. "CommuniQueue"
+   */
+  brand: string
+
+  /**
+   * InfoBar data. Omit or provide an empty object to hide.
+   */
+  infoBar?: InfoBarData
+
+  /**
+   * Array of menu items
+   */
+  menuItems: NavbarItem[]
 }>()
 
-/**
- * Extract the information bar data using computed properties.
- * Defaults to an empty object if none is present.
- */
-const infoBarData = computed<NavbarInfobar>(() => {
-  return props.config?.layout?.page?.navbar?.infobar || {}
+/** Whether the mobile menu is open */
+const mobileMenuOpen = ref(false)
+/** Color mode composable (dark/light/system) */
+const colorMode = useColorMode()
+
+/** Decide if we show the top InfoBar */
+const showInfoBar = computed(() => {
+  const info = props.infoBar
+  if (!info) return false
+  return Boolean(info.email || info.phone || (info.socials && info.socials.length > 0))
 })
 
-/**
- * Compute a flag to determine if the info bar should be displayed.
- * It checks whether:
- *  - The object is not empty
- *  - There's at least one truthy property
- */
-const showInfoBar = computed<boolean>(() => {
-  const data = infoBarData.value
-  const keys = Object.keys(data)
-  if (keys.length === 0) return false
-
-  // Check if any key has a truthy value (e.g. non-empty string, array with length)
-  return Object.values(data).some(v => v)
-})
-</script>
-
-<template>
-  <div
-    v-if="showInfoBar"
-    class="bg-light-surface dark:bg-dark-surface shadow"
-  >
-    <div class="max-w-7xl mx-auto flex justify-between items-center py-2 px-6">
-      <!-- Email on the left -->
-      <div class="flex items-center space-x-2">
-        <Icon
-          name="ic:outline-email"
-          class="text-light-primary dark:text-dark-primary h-4 w-4"
-        />
-        <a
-          v-if="infoBarData.email"
-          :href="`mailto:${infoBarData.email}`"
-          class="text-sm text-light-textbase dark:text-dark-textbase hover:text-light-primary dark:hover:text-dark-primary"
-        >
-          {{ infoBarData.email }}
-        </a>
-      </div>
-      <!-- Phone and socials on the right -->
-      <div class="flex items-center space-x-4">
-        <!-- Phone -->
-        <div class="flex items-center space-x-2">
-          <Icon
-            name="ic:outline-settings-phone"
-            class="text-light-primary dark:text-dark-primary h-4 w-4"
-          />
-          <a
-            v-if="infoBarData.phone"
-            :href="`tel:${infoBarData.phone}`"
-            class="text-sm text-light-textbase dark:text-dark-textbase hover:text-light-primary dark:hover:text-dark-primary"
-          >
-            {{ infoBarData.phone }}
-          </a>
-        </div>
-        <!-- Divider -->
-        <span class="border-r border-light-secondary dark:border-dark-secondary h-6" />
-        <!-- Social Icons -->
-        <a
-          v-for="social in infoBarData.socials"
-          :key="social.name"
-          :href="social.link"
-          target="_blank"
-          class="text-light-textbase dark:text-dark-textbase hover:text-light-primary dark:hover:text-dark-primary"
-        >
-          <Icon
-            :name="social.icon"
-            class="h-4 w-4"
-          />
-        </a>
-      </div>
-    </div>
-  </div>
-</template>
-
-
-=== components\Layouts\Page\Navbar.vue ===
-<script lang="ts" setup>
-import { ref, computed, onMounted, provide } from 'vue'
-import type { LayoutPageNavbarMenu } from '~/types'
-
-/**
- * Interface describing the portion of 'config' that this component needs.
- * Adjust fields according to your actual data shape.
- */
-interface AppLayoutConfig {
-  page?: {
-    navbar?: {
-      menus?: LayoutPageNavbarMenu[]
-    }
-  }
-}
-
-interface AppProjectLinks {
-  links?: {
-    github?: string
-  }
-}
-
-interface AppConfig {
-  /**
-     * The display name of your application.
-     */
-  name: string
-
-  /**
-     * A nested object describing layout configs (menus, pages, etc.).
-     */
-  layout?: AppLayoutConfig
-
-  /**
-     * A nested object describing project-related links, e.g. GitHub link.
-     */
-  project?: AppProjectLinks
-}
-
-/**
- * Props definition for this component.
- */
-const props = defineProps<{
-  config: AppConfig
-}>()
-
-/**
- * Checks authentication status (using Logto).
- */
-const checkAuthenticationStatus = async (): Promise<boolean> => {
-  const client = useLogtoClient()
-
-  if (!client) {
-    throw new Error('Logto client is not available')
-  }
-
-  return await client.isAuthenticated()
-}
-
-/**
- * Example composable usage (like your original code).
- */
-const $screen = useScreen()
-
-/**
- * A computed array of menus, derived from the passed-in config prop.
- */
-const menus = computed(() => {
-  return (props.config?.layout?.page?.navbar?.menus || []) as LayoutPageNavbarMenu[]
-})
-
-// Drawer
-const showDrawer = ref<boolean>(false)
-
-/**
- * Provide a way to close the drawer from child components.
- */
-provide('closeDrawer', () => {
-  showDrawer.value = false
-})
-
-/**
- * Keep track of whether the user is authenticated.
- */
-const isAuthenticated = ref<boolean>(false)
-
-/**
- * When the component is mounted, check if the user is authenticated.
- */
-onMounted(async () => {
-  isAuthenticated.value = await checkAuthenticationStatus()
-})
-
-/**
- * Filter the menus so that items requiring auth are only shown if user is authenticated.
- */
-const filteredMenus = computed(() => {
-  return menus.value.filter((menu) => {
-    return !menu.shouldRequireAuth || (menu.shouldRequireAuth && isAuthenticated.value)
+/** Filter out items requiring auth if user isn't authenticated */
+const filteredMenuItems = computed<NavbarItem[]>(() => {
+  return props.menuItems.filter((item) => {
+    if (item.requiresAuth && !isAuthenticated.value) return false
+    return true
   })
 })
+
+onMounted(async () => {
+  // isAuthenticated.value = await checkAuthenticationStatus() or something
+})
+
+/** Toggle the mobile menu open/close */
+function toggleMobileMenu() {
+  mobileMenuOpen.value = !mobileMenuOpen.value
+}
+
+/** Rotate theme preference between dark/light/system */
+function toggleTheme() {
+  if (colorMode.preference === 'dark') {
+    colorMode.preference = 'light'
+  }
+  else if (colorMode.preference === 'light') {
+    colorMode.preference = 'system'
+  }
+  else {
+    colorMode.preference = 'dark'
+  }
+}
+
+/** Placeholder for a login function */
+function handleLogin() {
+  // TODO: Replace with your actual login code
+  console.log('User wants to log in...')
+}
 </script>
 
 <template>
-  <div class="fixed top-0 z-40 w-full transition-colors duration-300 lg:z-50">
-    <div class="bg-light-surface dark:bg-dark-surface shadow">
-      <!-- InfoBar Component - Placed at the very top -->
-      <LayoutPageInfobar class="py-1" />
-      <!-- Divider Line -->
-      <div class="h-px bg-light-surface dark:bg-dark-surface max-w-screen-2xl mx-auto" />
-
-      <!-- content -->
-      <div class="flex items-center justify-between max-w-screen-2xl mx-auto py-3 px-4">
-        <!-- title -->
-        <div>
-          <slot name="title">
-            <NuxtLink
-              to="/"
-              class="font-bold text-lg text-light-primary dark:text-dark-primary"
-            >
-              <Icon
-                name="simple-icons:nuxtdotjs"
-                class="font-black text-xl font-mono mr-2 inline-block"
-              />
-              <!-- Use config prop rather than app config -->
-              <span class="capitalize">{{ props.config.name }}</span>
-            </NuxtLink>
-          </slot>
-        </div>
-
-        <!-- menus -->
-        <div
-          v-if="$screen.higherThan('md', $screen.current.value)"
-          class="flex space-x-4 items-center"
-          :class="{ 'divide-x divide-light-secondary dark:divide-dark-secondary': menus.length > 0 }"
+  <!-- WRAPPER NAV ELEMENT -->
+  <nav class="w-full shadow bg-light-surface dark:bg-dark-surface text-light-textbase dark:text-dark-textbase">
+    <!-- TOP INFOBAR (optional) -->
+    <div
+      v-if="showInfoBar"
+      class="flex justify-between items-center px-4 py-2 text-sm"
+    >
+      <!-- Left side: email -->
+      <div class="flex items-center gap-2">
+        <Icon
+          name="ic:outline-email"
+          class="h-4 w-4 text-light-primary dark:text-dark-primary"
+        />
+        <a
+          v-if="props.infoBar?.email"
+          :href="`mailto:${props.infoBar?.email}`"
+          class="hover:text-light-primary dark:hover:text-dark-primary"
         >
-          <div class="flex space-x-4 text-sm items-center">
-            <!-- dynamic menus -->
-            <template
-              v-for="(item, i) in filteredMenus"
-              :key="i"
-            >
-              <LayoutPageNavbarMenuRecursiveMenuComponent :menu="item" />
-            </template>
-          </div>
-          <!-- others -->
-          <div class="pl-4 flex space-x-3 text-xl">
-            <LayoutPageNavbarDropdownThemeSwitcher />
-          </div>
-        </div>
-
-        <!-- drawer:btn -->
-        <div
-          v-else
-          class="flex space-x-4 items-center"
-          :class="{ 'divide-x divide-light-secondary dark:divide-dark-secondary': menus.length > 0 }"
-        >
-          <div class="pl-4 flex space-x-3 text-xl">
-            <!-- Example usage of config's GitHub link (if present) -->
-            <BLLink
-              v-if="props.config?.project?.links?.github"
-              class="text-light-textbase dark:text-dark-textbase hover:text-light-primary dark:hover:text-dark-primary"
-              @click.prevent="() => (showDrawer = !showDrawer)"
-            >
-              <Icon name="heroicons:bars-3-bottom-right-20-solid" />
-            </BLLink>
-          </div>
-        </div>
+          {{ props.infoBar?.email }}
+        </a>
       </div>
 
-      <!-- misc -->
-      <!-- drawer -->
-      <ActionSheet
-        v-if="!$screen.higherThan('md', $screen.current.value) && showDrawer"
-        @close="() => (showDrawer = false)"
-      >
-        <ActionSheetGroup>
-          <ActionSheetHeader>
-            <ActionSheetHeaderTitle text="Menu" />
-          </ActionSheetHeader>
-          <!-- dynamic menus -->
-          <ActionSheetItem>
-            <div
-              class="flex flex-col text-sm items-center divide-y divide-light-secondary dark:divide-dark-secondary text-center"
-            >
-              <template
-                v-for="(item, i) in filteredMenus"
-                :key="i"
-              >
-                <LayoutPageNavbarMenuRecursiveDrawerMenuComponent
-                  :menu="item"
-                  :index="i"
-                />
-              </template>
-            </div>
-          </ActionSheetItem>
-          <ActionSheetItem class="flex flex-col">
-            <div class="pb-2">
-              <div class="mt-2 mb-2 text-sm font-bold capitalize">
-                Change Theme
-              </div>
-              <LayoutPageNavbarDropdownThemeSwitcher type="select-box" />
-            </div>
-          </ActionSheetItem>
-        </ActionSheetGroup>
-      </ActionSheet>
+      <!-- Right side: phone & socials -->
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2">
+          <Icon
+            name="ic:outline-settings-phone"
+            class="h-4 w-4 text-light-primary dark:text-dark-primary"
+          />
+          <a
+            v-if="props.infoBar?.phone"
+            :href="`tel:${props.infoBar?.phone}`"
+            class="hover:text-light-primary dark:hover:text-dark-primary"
+          >
+            {{ props.infoBar?.phone }}
+          </a>
+        </div>
+
+        <!-- Social icons (if any) -->
+        <template
+          v-for="social in props.infoBar?.socials || []"
+          :key="social.name"
+        >
+          <a
+            :href="social.link"
+            target="_blank"
+            class="hover:text-light-primary dark:hover:text-dark-primary"
+          >
+            <Icon
+              :name="social.icon"
+              class="h-4 w-4"
+            />
+          </a>
+        </template>
+      </div>
     </div>
-  </div>
+
+    <!-- MAIN NAVBAR -->
+    <div class="flex items-center justify-between px-4 py-3">
+      <!-- Brand / Logo -->
+      <div>
+        <NuxtLink
+          to="/"
+          class="flex items-center space-x-2"
+        >
+          <!-- Could do an <img> if you have a logo. Or an icon. -->
+          <span class="font-bold text-xl text-light-primary dark:text-dark-primary">
+            {{ props.brand }}
+          </span>
+        </NuxtLink>
+      </div>
+
+      <!-- Desktop Menu (hidden on small screens) -->
+      <ul class="hidden md:flex items-center space-x-4">
+        <!-- Navigation Items -->
+        <li
+          v-for="(item, index) in filteredMenuItems"
+          :key="index"
+          class="relative group"
+        >
+          <!-- If the item has children => dropdown -->
+          <template v-if="item.children && item.children.length > 0">
+            <UUButton class="inline-flex items-center gap-1 hover:text-light-primary dark:hover:text-dark-primary">
+              {{ item.label }}
+              <Icon
+                name="mdi:chevron-down"
+                class="w-4 h-4"
+              />
+            </UUButton>
+
+            <!-- Sub-menu -->
+            <ul
+              class="absolute left-0 top-full bg-white dark:bg-gray-700 shadow rounded mt-1 w-48 py-2 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity"
+            >
+              <li
+                v-for="(child, idx) in item.children"
+                :key="idx"
+                class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+              >
+                <NuxtLink
+                  v-if="child.to"
+                  :to="child.to"
+                  class="block w-full"
+                >
+                  {{ child.label }}
+                </NuxtLink>
+                <span v-else>{{ child.label }}</span>
+              </li>
+            </ul>
+          </template>
+          <!-- If no sub-items => normal link -->
+          <template v-else>
+            <NuxtLink
+              v-if="item.to"
+              :to="item.to"
+              class="hover:text-light-primary dark:hover:text-dark-primary"
+            >
+              {{ item.label }}
+            </NuxtLink>
+            <span v-else>{{ item.label }}</span>
+          </template>
+        </li>
+
+        <!-- SEPARATOR BEFORE LOGIN & THEME -->
+        <li>
+          <span class="mx-1 text-gray-400 dark:text-gray-500 select-none">|</span>
+        </li>
+
+        <!-- LOGIN UUButton -->
+        <li>
+          <UUButton
+            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+            @click="handleLogin"
+          >
+            Login
+          </UUButton>
+        </li>
+
+        <!-- SEPARATOR BEFORE THEME SWITCHER -->
+        <li>
+          <span class="mx-1 text-gray-400 dark:text-gray-500 select-none">|</span>
+        </li>
+
+        <!-- THEME SWITCHER (Desktop) -->
+        <li>
+          <UUButton
+            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+            :title="'Rotate Theme (light/dark/system)'"
+            @click="toggleTheme"
+          >
+            <!-- Show icon based on preference -->
+            <Icon
+              v-if="colorMode.preference === 'dark'"
+              name="ph:sun-bold"
+              class="w-5 h-5"
+            />
+            <Icon
+              v-else-if="colorMode.preference === 'system'"
+              name="ph:desktop-tower-bold"
+              class="w-5 h-5"
+            />
+            <Icon
+              v-else
+              name="ph:moon-bold"
+              class="w-5 h-5"
+            />
+          </UUButton>
+        </li>
+      </ul>
+
+      <!-- MOBILE MENU UUButton -->
+      <UUButton
+        class="md:hidden p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+        @click="toggleMobileMenu"
+      >
+        <Icon
+          name="heroicons:bars-3-bottom-right"
+          class="w-6 h-6"
+        />
+      </UUButton>
+    </div>
+
+    <!-- MOBILE MENU (visible when mobileMenuOpen) -->
+    <transition name="fade">
+      <ul
+        v-if="mobileMenuOpen"
+        class="md:hidden flex flex-col space-y-1 px-4 pb-2"
+      >
+        <!-- Navigation Items -->
+        <li
+          v-for="(item, index) in filteredMenuItems"
+          :key="index"
+          class="border-b border-light-secondary/10 dark:border-dark-secondary/20 py-2"
+        >
+          <!-- Check if there's a sub-menu -->
+          <template v-if="item.children && item.children.length > 0">
+            <div class="flex items-center justify-between">
+              <span class="font-semibold">{{ item.label }}</span>
+              <!-- (Optional) Add a chevron or toggle for collapsible sub-menu -->
+            </div>
+            <!-- Sub-items (always open in this example) -->
+            <ul class="ml-4 mt-2 space-y-1">
+              <li
+                v-for="(child, idx) in item.children"
+                :key="idx"
+              >
+                <NuxtLink
+                  v-if="child.to"
+                  :to="child.to"
+                  class="block py-1 text-sm hover:underline"
+                  @click="mobileMenuOpen = false"
+                >
+                  {{ child.label }}
+                </NuxtLink>
+                <span
+                  v-else
+                  class="block py-1 text-sm"
+                >
+                  {{ child.label }}
+                </span>
+              </li>
+            </ul>
+          </template>
+          <!-- If no sub-items => simple link -->
+          <template v-else>
+            <NuxtLink
+              v-if="item.to"
+              :to="item.to"
+              class="hover:underline"
+              @click="mobileMenuOpen = false"
+            >
+              {{ item.label }}
+            </NuxtLink>
+            <span v-else>{{ item.label }}</span>
+          </template>
+        </li>
+
+        <!-- MOBILE SEPARATOR (above login & theme) -->
+        <li class="mt-2">
+          <hr class="border-light-secondary/20 dark:border-dark-secondary/20">
+        </li>
+
+        <!-- MOBILE LOGIN UUButton -->
+        <li class="flex items-center justify-start gap-2 py-2">
+          <UUButton
+            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+            @click="handleLogin"
+          >
+            Login
+          </UUButton>
+        </li>
+
+        <!-- MOBILE THEME SWITCHER -->
+        <li class="flex items-center justify-start gap-2 py-2">
+          <UUButton
+            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+            :title="'Rotate Theme (light/dark/system)'"
+            @click="toggleTheme"
+          >
+            <Icon
+              v-if="colorMode.preference === 'dark'"
+              name="ph:sun-bold"
+              class="w-5 h-5"
+            />
+            <Icon
+              v-else-if="colorMode.preference === 'system'"
+              name="ph:desktop-tower-bold"
+              class="w-5 h-5"
+            />
+            <Icon
+              v-else
+              name="ph:moon-bold"
+              class="w-5 h-5"
+            />
+          </UUButton>
+        </li>
+      </ul>
+    </transition>
+  </nav>
 </template>
 
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.15s ease;
+}
 
-=== components\Layouts\Page\NavbarDropdown\ThemeSwitcher.vue ===
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
+
+
+=== components\Layout\Page\NavbarDropdown\ThemeSwitcher.vue ===
 <script lang="ts" setup>
 const props = defineProps({
   type: {
@@ -3352,7 +3404,7 @@ const availableThemes = [
       <HeadlessListboxLabel class="sr-only">
         Theme Selection
       </HeadlessListboxLabel>
-      <HeadlessListboxButton type="template">
+      <HeadlessListboxUButton type="template">
         <BLLink class="text-light-secondary dark:text-dark-secondary">
           <!-- Display sun icon for light theme, moon for dark -->
           <span class="flex justify-center items-center dark:hidden">
@@ -3362,7 +3414,7 @@ const availableThemes = [
             <Icon name="uil:moon" />
           </span>
         </BLLink>
-      </HeadlessListboxButton>
+      </HeadlessListboxUButton>
       <HeadlessListboxOptions
         class="p-1 absolute z-50 origin-top-right top-full right-0 outline-none bg-light-background dark:bg-dark-background rounded-lg ring-1 ring-light-secondary/10 shadow-lg overflow-hidden w-36 py-1 text-sm text-light-textbase dark:text-dark-textbase font-semibold"
       >
@@ -3416,318 +3468,7 @@ const availableThemes = [
 </template>
 
 
-=== components\Layouts\Page\NavbarMenu\Item.vue ===
-<script lang="ts" setup>
-import type { RouteLocationRaw } from 'vue-router'
-
-const { parseMenuRoute, parseMenuTitle } = useNavbarParser()
-
-interface LayoutPageNavbarMenu {
-  type: 'link' | 'button'
-  to?: RouteLocationRaw | ((nuxt: any) => RouteLocationRaw)
-  title: string
-}
-
-interface LayoutPageNavbarMenuDropdownItem extends LayoutPageNavbarMenu { }
-
-const props = defineProps({
-  menu: {
-    type: Object as () => LayoutPageNavbarMenu | LayoutPageNavbarMenuDropdownItem,
-    required: true,
-  },
-  isDropdown: {
-    type: Boolean,
-    default: false,
-  },
-})
-
-const closeDropdown = inject<() => void>('closeDropdown')
-</script>
-
-<template>
-  <template v-if="menu?.type === 'link' && isDropdown">
-    <NuxtLink
-      :to="parseMenuRoute(menu?.to)"
-      #="{ isActive }"
-      @click="closeDropdown && closeDropdown()"
-    >
-      <div
-        :class="[
-          'transition-all duration-300 hover:bg-light-surface dark:hover:bg-dark-surface px-4 py-2 rounded-lg w-full',
-          isActive ? 'text-light-textbase dark:text-dark-textbase font-bold' : 'text-light-secondary dark:text-dark-secondary',
-        ]"
-      >
-        {{ parseMenuTitle(menu?.title) }}
-      </div>
-    </NuxtLink>
-  </template>
-  <template v-else-if="menu?.type === 'link'">
-    <NuxtLink
-      :to="parseMenuRoute(menu?.to)"
-      #="{ isActive }"
-    >
-      <span
-        :class="{ 'text-light-textbase dark:text-dark-textbase font-bold': isActive, 'text-light-secondary dark:text-dark-secondary': !isActive }"
-      >{{
-        parseMenuTitle(menu?.title)
-      }}</span>
-    </NuxtLink>
-  </template>
-  <template v-else-if="menu?.type === 'button'">
-    <BLButton
-      :text="parseMenuTitle(menu?.title)"
-      size="xs"
-      :to="parseMenuRoute(menu.to)"
-    />
-  </template>
-</template>
-
-
-=== components\Layouts\Page\NavbarMenu\RecursiveDrawerMenuComponent.vue ===
-<script lang="ts" setup>
-const { parseMenuRoute, parseMenuTitle } = useNavbarParser()
-
-const props = defineProps({
-  menu: {
-    type: Object as () => LayoutPageNavbarMenuDropdownItem | LayoutPageNavbarMenu,
-    required: true,
-  },
-  index: {
-    type: Number,
-    required: true,
-  },
-})
-
-const route = useRoute()
-
-const isActive = computed(() => {
-  if (!(props.menu as any)?.children) return false
-  const childs = ((props.menu as any)?.children || []) as LayoutPageNavbarMenu[]
-  for (const child of childs) {
-    const to = parseMenuRoute(child.to)
-    if (typeof to === 'string' && to === route.path) return true
-    if (route && route.name && route.name.toString().includes((to as any)?.name?.toString())) return true
-  }
-  return false
-})
-const closeDrawer = inject<() => void>('closeDrawer')
-</script>
-
-<template>
-  <div class="text-lg md:text-base">
-    <div v-if="menu?.type === 'link'">
-      <NuxtLink
-        :key="index"
-        :to="parseMenuRoute(menu.to)"
-        #="{ isActive }"
-        class="w-full py-2 underline"
-        @click="closeDrawer && closeDrawer()"
-      >
-        <span
-          :class="{
-            'text-light-textbase dark:text-dark-textbase font-bold': isActive,
-            'text-light-secondary dark:text-dark-secondary': !isActive,
-          }"
-        >{{ parseMenuTitle(menu?.title) }}</span>
-      </NuxtLink>
-    </div>
-    <div v-if="menu?.type === 'button'">
-      <BLButton
-        :key="index"
-        :text="parseMenuTitle(menu?.title)"
-        size="sm"
-        :to="parseMenuRoute(menu.to)"
-        class="w-full underline"
-      />
-    </div>
-    <div v-if="menu?.type === 'dropdown'">
-      <div
-        :key="index"
-        class="w-full"
-      >
-        <HeadlessDisclosure v-slot="{ open }">
-          <HeadlessDisclosureButton
-            :key="index"
-            :class="['text-light-secondary dark:text-dark-secondary w-full py-2 flex items-center justify-center duration-300 transition-all', open ? 'font-bold' : '']"
-          >
-            <span>{{ parseMenuTitle(menu?.title) }}</span>
-            <Icon
-              name="carbon:chevron-right"
-              class="ml-1"
-              :class="[open ? 'duration-300 transition-all transform rotate-90' : 'rotate-0']"
-            />
-          </HeadlessDisclosureButton>
-          <Transition
-            enter-active-class="transition duration-100 ease-out"
-            enter-from-class="transform scale-95 opacity-0"
-            enter-to-class="transform scale-100 opacity-100"
-            leave-active-class="transition duration-75 ease-out"
-            leave-from-class="transform scale-100 opacity-100"
-            leave-to-class="transform scale-95 opacity-0"
-          >
-            <HeadlessDisclosurePanel class="text-light-secondary dark:text-dark-secondary pb-2">
-              <template
-                v-for="(child, j) in menu?.children || []"
-                :key="j"
-              >
-                <LayoutPageNavbarMenuRecursiveDrawerMenuComponent
-                  :menu="child"
-                  :index="j"
-                  @click="showDrawer = false"
-                />
-              </template>
-            </HeadlessDisclosurePanel>
-          </Transition>
-        </HeadlessDisclosure>
-      </div>
-    </div>
-  </div>
-</template>
-
-
-=== components\Layouts\Page\NavbarMenu\RecursiveMenuComponent.vue ===
-<script lang="ts" setup>
-const { parseMenuRoute, parseMenuTitle } = useNavbarParser()
-
-const props = defineProps({
-  menu: {
-    type: Object as () => LayoutPageNavbarMenuDropdownItem | LayoutPageNavbarMenu,
-    required: true,
-  },
-})
-
-const route = useRoute()
-
-const isActive = computed(() => {
-  if (!(props.menu as any)?.children) return false
-  const childs = ((props.menu as any)?.children || []) as LayoutPageNavbarMenu[]
-  for (const child of childs) {
-    const to = parseMenuRoute(child.to)
-    if (typeof to === 'string' && to === route.path) return true
-    if (route && route.name && route.name.toString().includes((to as any)?.name?.toString())) return true
-  }
-  return false
-})
-
-provide('closeDropdown', close)
-</script>
-
-<template>
-  <template v-if="menu.type === 'button' || menu.type === 'link'">
-    <LayoutPageNavbarMenuItem :menu="menu" />
-  </template>
-  <template v-else-if="menu.children && menu.children.length > 0">
-    <HeadlessPopover v-slot="{ open }">
-      <HeadlessPopoverButton
-        class="flex items-center transition-all duration-300 rounded-md px-2 py-1 text-light-textbase dark:text-dark-textbase hover:bg-light-secondary/50 dark:hover:bg-dark-secondary/50"
-      >
-        <span :class="`font-medium ${isActive ? 'font-bold' : ''}`">{{ parseMenuTitle(menu.title) }}</span>
-        <Icon
-          name="carbon:chevron-down"
-          class="ml-1 w-4 h-4"
-          :class="{ 'transform rotate-180': open }"
-        />
-      </HeadlessPopoverButton>
-      <Transition
-        enter-active-class="transition ease-out duration-200"
-        enter-from-class="opacity-0 scale-95"
-        enter-to-class="opacity-100 scale-100"
-        leave-active-class="transition ease-in duration-150"
-        leave-from-class="opacity-100 scale-100"
-        leave-to-class="opacity-0 scale-95"
-      >
-        <HeadlessPopoverPanel
-          v-slot="{ close }"
-          class="absolute z-10 mt-1 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none bg-white dark:bg-gray-700"
-        >
-          <div class="py-1">
-            <template
-              v-for="(child, j) in menu.children"
-              :key="j"
-            >
-              <LayoutPageNavbarMenuRecursiveMenuComponent
-                :menu="child"
-                is-dropdown
-                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
-              />
-            </template>
-          </div>
-        </HeadlessPopoverPanel>
-      </Transition>
-    </HeadlessPopover>
-  </template>
-</template>
-
-
-=== components\Layouts\Page\NavbarMenu\Wrapper.vue ===
-<script lang="ts" setup>
-const route = useRoute()
-const { parseMenuRoute, parseMenuTitle } = useNavbarParser()
-
-const props = defineProps({
-  menu: {
-    type: Object as () => LayoutPageNavbarMenuDropdownItem | LayoutPageNavbarMenu,
-    required: true,
-  },
-})
-const isActive = computed(() => {
-  if (!(props.menu as any)?.children) return false
-  const childs = ((props.menu as any)?.children || []) as LayoutPageNavbarMenu[]
-  for (const child of childs) {
-    const to = parseMenuRoute(child.to)
-    if (typeof to === 'string' && to === route.path) return true
-    if (route.name?.toString().includes((to as any).name?.toString())) return true
-  }
-  return false
-})
-</script>
-
-<template>
-  <template v-if="menu.type !== 'dropdown'">
-    <LayoutPageNavbarMenuItem :menu="menu" />
-  </template>
-  <template v-else-if="menu.children && menu.children.length > 0">
-    <HeadlessPopover v-slot="{ open }">
-      <HeadlessPopoverButton
-        class="flex items-center transition-all duration-300 text-light-textbase dark:text-dark-textbase"
-      >
-        <span :class="[isActive ? 'font-bold' : '']">{{ parseMenuTitle(menu.title) }}</span>
-        <Icon
-          name="carbon:chevron-down"
-          class="ml-1"
-          :class="[open ? 'transform rotate-180' : '']"
-        />
-      </HeadlessPopoverButton>
-      <Transition
-        enter-active-class="transition duration-200 ease-out"
-        enter-from-class="translate-y-1 opacity-0"
-        enter-to-class="translate-y-0 opacity-100"
-        leave-active-class="transition duration-150 ease-in"
-        leave-from-class="translate-y-0 opacity-100"
-        leave-to-class="translate-y-1 opacity-0"
-      >
-        <HeadlessPopoverPanel
-          class="absolute z-10 px-2 py-2 rounded-lg min-w-[150px] bg-light-surface dark:bg-dark-surface border-light-secondary dark:border-dark-secondary border"
-        >
-          <div class="grid grid-cols-1">
-            <template
-              v-for="(child, j) in menu.children"
-              :key="j"
-            >
-              <LayoutPageNavbarMenuItem
-                :menu="child"
-                is-dropdown
-              />
-            </template>
-          </div>
-        </HeadlessPopoverPanel>
-      </Transition>
-    </HeadlessPopover>
-  </template>
-</template>
-
-
-=== components\Layouts\Page\Section\index.vue ===
+=== components\Layout\Page\Section\index.vue ===
 <template>
   <div class="pt-2 mb-6">
     <slot />
@@ -3735,7 +3476,7 @@ const isActive = computed(() => {
 </template>
 
 
-=== components\Layouts\Page\Section\Title.vue ===
+=== components\Layout\Page\Section\Title.vue ===
 <script lang="ts" setup>
 defineProps({
   text: {
@@ -3752,7 +3493,7 @@ defineProps({
 </template>
 
 
-=== components\Layouts\Page\Title.vue ===
+=== components\Layout\Page\Title.vue ===
 <script lang="ts" setup>
 defineProps({
   text: {
@@ -3769,7 +3510,7 @@ defineProps({
 </template>
 
 
-=== components\Layouts\Page\Wrapper.vue ===
+=== components\Layout\Page\Wrapper.vue ===
 <template>
   <div class="flex-1 py-4 max-w-screen-2xl w-full px-4 mx-auto">
     <slot />
@@ -3830,7 +3571,7 @@ defineEmits<{
 <template>
   <div class="border-b border-light-secondary/20 dark:border-dark-secondary/20">
     <nav class="flex space-x-8">
-      <button
+      <UButton
         v-for="tab in tabs"
         :key="tab.id"
         class="px-1 py-4 border-b-2 font-medium text-sm transition-colors"
@@ -3842,7 +3583,7 @@ defineEmits<{
         @click="$emit('update:modelValue', tab.id)"
       >
         {{ tab.label }}
-      </button>
+      </UButton>
     </nav>
   </div>
 </template>
@@ -3950,7 +3691,7 @@ defineExpose({ addToast })
             {{ toast.message }}
           </div>
         </div>
-        <button
+        <UButton
           class="ml-4 hover:opacity-80"
           @click="removeToast(toast.id)"
         >
@@ -3958,7 +3699,7 @@ defineExpose({ addToast })
             name="mdi:close"
             class="w-5 h-5"
           />
-        </button>
+        </UButton>
       </div>
     </TransitionGroup>
   </div>
@@ -4052,7 +3793,10 @@ defineExpose({ addToast })
           <p><strong>Owner</strong>: Automatically assigned to the account creator. Not selectable.</p>
           <p><strong>Super Admin</strong>: Full privileges across the entire application.</p>
           <p><strong>Contributor</strong>: Collaborates on tasks but does not have full admin rights.</p>
-          <p><strong>Read Only</strong>: Has no system access and only access to projects and templates when specifically granted.</p>
+          <p>
+            <strong>Read Only</strong>: Has no system access and only access to projects and templates when
+            specifically granted.
+          </p>
         </div>
 
         <!-- IsActive checkbox -->
@@ -4066,24 +3810,25 @@ defineExpose({ addToast })
           <label
             for="addUserIsActive"
             class="text-sm text-light-textbase dark:text-dark-textbase cursor-pointer"
-          > Active User </label>
+          >
+            Active User </label>
         </div>
 
-        <!-- Buttons -->
+        <!-- UButtons -->
         <div class="flex justify-end space-x-2 mt-6">
-          <button
+          <UButton
             type="button"
             class="px-4 py-2 text-light-secondary dark:text-dark-secondary hover:underline"
             @click="$emit('close')"
           >
             Cancel
-          </button>
-          <button
+          </UButton>
+          <UButton
             :disabled="isPending"
             class="bg-light-primary dark:bg-dark-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {{ isPending ? 'Adding...' : 'Add User' }}
-          </button>
+          </UButton>
         </div>
       </form>
     </div>
@@ -4094,7 +3839,6 @@ defineExpose({ addToast })
 import { ref } from 'vue'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import useUsers from '~/composables/use-user-service'
-import { useToast } from '~/composables/use-toast-service'
 import { type ICreateUserRequest, GlobalRoleType } from '~/types'
 
 const emit = defineEmits<{
@@ -4116,7 +3860,7 @@ const errors = ref({
 })
 
 const { createUser } = useUsers()
-const { showToast } = useToast()
+const { add } = useToast()
 const queryClient = useQueryClient()
 
 // The create user mutation
@@ -4137,27 +3881,27 @@ const { mutate, isPending } = useMutation({
   },
   onSuccess: (response) => {
     if (response.isSuccess && response.data) {
-      showToast({
-        type: 'success',
+      add({
+        color: 'success',
         title: 'User Created',
-        message: 'New user has been successfully created.',
+        description: 'New user has been successfully created.',
       })
       queryClient.invalidateQueries({ queryKey: ['users'] })
       emit('added')
     }
     else {
-      showToast({
-        type: 'error',
+      add({
+        color: 'error',
         title: 'Creation Failed',
-        message: response.message || 'Could not create user.',
+        description: response.message || 'Could not create user.',
       })
     }
   },
   onError: (error: Error) => {
-    showToast({
-      type: 'error',
+    add({
+      color: 'error',
       title: 'Creation Failed',
-      message: error.message || 'Could not create user.',
+      description: error.message || 'Could not create user.',
     })
   },
 })
@@ -4233,7 +3977,8 @@ function isValidEmail(value: string): boolean {
           <span
             v-if="isCurrentUser"
             class="px-2 py-0.5 bg-light-success/10 dark:bg-dark-success/10 text-light-success dark:text-dark-success rounded-full text-xs"
-          > You </span>
+          >
+            You </span>
 
           <!-- If you store a role in your user object, show a small role tag -->
           <span
@@ -4270,8 +4015,8 @@ function isValidEmail(value: string): boolean {
         </span>
       </div>
 
-      <!-- Delete Button -->
-      <button
+      <!-- Delete UButton -->
+      <UButton
         v-if="canManage && !isCurrentUser"
         class="text-light-error dark:text-dark-error hover:opacity-80 transition-opacity"
         title="Remove User"
@@ -4281,7 +4026,7 @@ function isValidEmail(value: string): boolean {
           name="mdi:trash-can-outline"
           class="w-5 h-5"
         />
-      </button>
+      </UButton>
     </div>
   </div>
 </template>
@@ -4289,7 +4034,6 @@ function isValidEmail(value: string): boolean {
 <script setup lang="ts">
 import { ref, computed, watchEffect } from 'vue'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import { useToast } from '~/composables/use-toast-service'
 import useUsers from '~/composables/use-user-service'
 
 import type { IUser } from '~/types'
@@ -4305,7 +4049,7 @@ defineEmits<{
 }>()
 
 const { updateUser } = useUsers()
-const { showToast } = useToast()
+const { add } = useToast()
 const queryClient = useQueryClient()
 
 // We copy the prop into a local user ref so we can toggle isActive, etc.
@@ -4334,17 +4078,17 @@ const { mutate: doUpdateUser, isPending: isUpdating } = useMutation({
   },
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['users'] })
-    showToast({
-      type: 'success',
+    add({
+      color: 'success',
       title: 'User Updated',
-      message: 'User changes have been saved.',
+      description: 'User changes have been saved.',
     })
   },
   onError: (error: Error) => {
-    showToast({
-      type: 'error',
+    add({
+      color: 'error',
       title: 'Update Failed',
-      message: error.message ?? 'Could not update user.',
+      description: error.message ?? 'Could not update user.',
     })
   },
 })
@@ -4380,19 +4124,19 @@ function handleIsActiveToggle(newVal: boolean) {
         <!-- Add more fields here as desired (firstName, lastName, etc.) -->
 
         <div class="flex justify-end space-x-2 mt-6">
-          <button
+          <UButton
             type="button"
             class="px-4 py-2 text-light-secondary dark:text-dark-secondary hover:underline"
             @click="$emit('close')"
           >
             Cancel
-          </button>
-          <button
+          </UButton>
+          <UButton
             :disabled="isPending"
             class="bg-light-primary dark:bg-dark-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {{ isPending ? 'Saving...' : 'Save Changes' }}
-          </button>
+          </UButton>
         </div>
       </form>
     </div>
@@ -4402,7 +4146,6 @@ function handleIsActiveToggle(newVal: boolean) {
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import { useToast } from '~/composables/use-toast-service'
 import useUsers from '~/composables/use-user-service'
 import type { IUser } from '~/types'
 
@@ -4420,7 +4163,7 @@ watchEffect(() => {
 })
 
 const { updateUser } = useUsers()
-const { showToast } = useToast()
+const { add } = useToast()
 const queryClient = useQueryClient()
 
 const { mutate, isPending } = useMutation({
@@ -4430,27 +4173,27 @@ const { mutate, isPending } = useMutation({
   },
   onSuccess: (response) => {
     if (response.isSuccess && response.data) {
-      showToast({
-        type: 'success',
+      add({
+        color: 'success',
         title: 'User Updated',
-        message: 'User details have been saved.',
+        description: 'User details have been saved.',
       })
       queryClient.invalidateQueries({ queryKey: ['users'] })
       emit('updated')
     }
     else {
-      showToast({
-        type: 'error',
+      add({
+        color: 'error',
         title: 'Update Failed',
-        message: response.message || 'Could not update user.',
+        description: response.message || 'Could not update user.',
       })
     }
   },
   onError: (error: Error) => {
-    showToast({
-      type: 'error',
+    add({
+      color: 'error',
       title: 'Update Failed',
-      message: error.message || 'Could not update user.',
+      description: error.message || 'Could not update user.',
     })
   },
 })
@@ -4490,13 +4233,13 @@ function submit() {
           User Management
         </h2>
 
-        <button
+        <UButton
           v-if="canManageUsers"
           class="bg-light-primary dark:bg-dark-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
           @click="showAddUserModal = true"
         >
           Add User
-        </button>
+        </UButton>
       </div>
 
       <!-- Loading State -->
@@ -4562,14 +4305,12 @@ function submit() {
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
-import { useToast } from '~/composables/use-toast-service'
-
 import type { IUser } from '~/types'
 import useUsers from '~/composables/use-user-service'
 
 // Composition
 const { getAllUsers, deleteUser } = useUsers()
-const { showToast } = useToast()
+const { add } = useToast()
 const queryClient = useQueryClient()
 
 // Reactive state
@@ -4600,19 +4341,19 @@ const { mutate: removeUser, isPending: isRemoving } = useMutation({
   },
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['users'] })
-    showToast({
-      type: 'success',
+    add({
+      color: 'success',
       title: 'User Removed',
-      message: 'User has been removed successfully.',
+      description: 'User has been removed successfully.',
     })
     showRemoveConfirmation.value = false
     userToRemove.value = null
   },
   onError: (error: Error) => {
-    showToast({
-      type: 'error',
+    add({
+      color: 'error',
       title: 'Removal Failed',
-      message: error.message || 'Failed to remove user.',
+      description: error.message || 'Failed to remove user.',
     })
   },
 })
@@ -5503,58 +5244,6 @@ export default function useTemplates() {
 }
 
 
-=== composables\use-toast-service.ts ===
-import { ref, type Ref } from 'vue'
-
-/**
- * Represents the supported options for displaying a toast.
- */
-export interface ToastOptions {
-  type: 'success' | 'error' | 'info' | 'warning'
-  title: string
-  message?: string
-}
-
-/**
- * Defines the shape of the toast component or object
- * that exposes an `addToast` method.
- */
-export interface ToastRef {
-  /**
-   * Displays a new toast message based on the given options.
-   */
-  addToast(options: ToastOptions): void
-}
-
-/**
- * A composable to manage toast notifications via a `toastRef`.
- */
-export function useToast() {
-  /**
-   * A reference to the toast component or object that can
-   * display new toast messages.
-   */
-  const toastRef: Ref<ToastRef | undefined> = ref()
-
-  /**
-   * Displays a toast using the provided options. If `toastRef`
-   * is set, it calls `addToast` on the underlying instance.
-   *
-   * @param options - An object containing information about the toast
-   */
-  const showToast = (options: ToastOptions): void => {
-    if (toastRef.value) {
-      toastRef.value.addToast(options)
-    }
-  }
-
-  return {
-    toastRef,
-    showToast,
-  }
-}
-
-
 === composables\use-user-service.ts ===
 import type { EntityType, IApiResponse, ICreateUserRequest, IPermission, IUpdateUserRequest, IUser } from '~/types'
 
@@ -5648,30 +5337,22 @@ export default function useUsers() {
 === layouts\Default.vue ===
 <script setup lang="ts">
 const currentYear = new Date().getFullYear()
+
+const navItems = [
+  { label: 'Home', to: '/', requiresAuth: false },
+  { label: 'Features', to: '/features', requiresAuth: false },
+  { label: 'Projects', to: '/dashboard/projects', requiresAuth: false },
+]
 </script>
 
 <template>
   <div class="flex flex-col min-h-screen bg-light-background dark:bg-dark-background text-light-textbase dark:text-dark-textbase">
     <!-- Sticky Navbar -->
-    <LayoutPageNavbar class="sticky top-0 z-30 flex-shrink-0 bg-light-surface dark:bg-dark-surface">
-      <template #title>
-        <NuxtLink
-          to="/"
-          class="flex items-center space-x-2"
-        >
-          <img
-            alt="CommuniQueue Logo"
-            src="/assets/images/communiqueueLogo.png"
-            class="h-10 w-auto object-contain"
-          >
-          <span
-            class="font-extrabold text-xl bg-gradient-to-r from-light-primary to-light-accent dark:from-dark-primary dark:to-dark-accent bg-clip-text text-transparent transition-colors duration-300 ease-in-out hover:from-light-accent hover:to-light-primary dark:hover:from-dark-accent dark:hover:to-dark-primary"
-          >
-            Communi<span class="text-light-accent dark:text-dark-accent">Queue</span>
-          </span>
-        </NuxtLink>
-      </template>
-    </LayoutPageNavbar>
+    <LayoutPageNavbar
+      :brand="'CommuniQueue'"
+      :menu-items="navItems"
+      class="sticky top-0 z-30 flex-shrink-0 bg-light-surface dark:bg-dark-surface"
+    />
 
     <!-- Main Content - now takes up full width -->
     <div class="flex-grow overflow-auto">
@@ -6002,33 +5683,6 @@ export interface IApiResponse<T> {
 }
 
 
-=== types\generic\LayoutPageNavbarMenu.ts ===
-import type { NuxtApp } from 'nuxt/schema'
-import type { RouteLocationRaw } from '#vue-router'
-import type { LayoutPageNavbarMenuDropdownItem } from '~/types'
-
-export interface LayoutPageNavbarMenu {
-  type?: 'link' | 'button' | 'dropdown'
-  shouldRequireAuth?: boolean
-  title?: string | ((nuxt: NuxtApp) => string)
-  to?: RouteLocationRaw | ((nuxt: NuxtApp) => RouteLocationRaw)
-  children?: LayoutPageNavbarMenuDropdownItem[]
-}
-
-
-=== types\generic\LayoutPageNavbarMenuDropdownItem.ts ===
-import type { NuxtApp } from 'nuxt/schema'
-import type { RouteLocationRaw } from '#vue-router'
-
-export interface LayoutPageNavbarMenuDropdownItem {
-  type?: 'link'
-  title?: string | ((nuxt: NuxtApp) => string)
-  shouldRequireAuth?: boolean
-  to?: RouteLocationRaw | ((nuxt: NuxtApp) => RouteLocationRaw)
-  children?: LayoutPageNavbarMenuDropdownItem[]
-}
-
-
 === types\index.ts ===
 // Enums
 export * from './enums/EntityType'
@@ -6080,10 +5734,6 @@ export * from './models/IUser'
 
 // Kpis
 export * from './Kpis/IProjectKpis'
-
-// generics
-export * from './generic/LayoutPageNavbarMenu'
-export * from './generic/LayoutPageNavbarMenuDropdownItem'
 
 
 === types\Kpis\IProjectKpis.ts ===
