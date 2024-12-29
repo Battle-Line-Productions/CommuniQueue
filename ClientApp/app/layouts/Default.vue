@@ -4,7 +4,7 @@ const currentYear = new Date().getFullYear()
 const navItems = [
   { label: 'Home', to: '/', requiresAuth: false },
   { label: 'Features', to: '/features', requiresAuth: false },
-  { label: 'Projects', to: '/dashboard/projects', requiresAuth: false },
+  { label: 'Projects', to: '/dashboard/projects', requiresAuth: true },
 ]
 </script>
 

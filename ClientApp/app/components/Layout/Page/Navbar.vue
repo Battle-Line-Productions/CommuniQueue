@@ -2,7 +2,9 @@
 import { ref, computed } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
-/** A sub-menu item or direct link item */
+/**
+ * A sub-menu item or direct link item
+ */
 interface NavbarItem {
   label: string
   to?: RouteLocationRaw
@@ -10,7 +12,9 @@ interface NavbarItem {
   children?: NavbarItem[] // if it has sub-menu items
 }
 
-/** Optional info bar data */
+/**
+ * Optional info bar data
+ */
 interface InfoBarData {
   email?: string
   phone?: string
@@ -40,21 +44,25 @@ const props = defineProps<{
 
 /** Whether the mobile menu is open */
 const mobileMenuOpen = ref(false)
+
 /** Color mode composable (dark/light/system) */
 const colorMode = useColorMode()
 
+/** Current user from authentication (Logto) */
 const user = useLogtoUser()
 
-console.log('User:', user)
-
-/** Decide if we show the top InfoBar */
+/**
+ * Decide if we show the top InfoBar
+ */
 const showInfoBar = computed(() => {
   const info = props.infoBar
   if (!info) return false
   return Boolean(info.email || info.phone || (info.socials && info.socials.length > 0))
 })
 
-/** Filter out items requiring auth if user isn't authenticated */
+/**
+ * Filter out items requiring auth if user isn't authenticated
+ */
 const filteredMenuItems = computed<NavbarItem[]>(() => {
   return props.menuItems.filter((item) => {
     if (item.requiresAuth && !user) return false
@@ -62,12 +70,16 @@ const filteredMenuItems = computed<NavbarItem[]>(() => {
   })
 })
 
-/** Toggle the mobile menu open/close */
+/**
+ * Toggle the mobile menu open/close
+ */
 function toggleMobileMenu() {
   mobileMenuOpen.value = !mobileMenuOpen.value
 }
 
-/** Rotate theme preference between dark/light/system */
+/**
+ * Rotate theme preference between dark/light/system
+ */
 function toggleTheme() {
   if (colorMode.preference === 'dark') {
     colorMode.preference = 'light'
@@ -79,11 +91,35 @@ function toggleTheme() {
     colorMode.preference = 'dark'
   }
 }
+
+/**
+ * Utility to check if the route is currently active.
+ * We highlight the link if it's the same as the current route's path.
+ */
+function isActiveRoute(routeOrPath?: RouteLocationRaw): boolean {
+  if (!routeOrPath) return false
+  const router = useRouter()
+  const currentPath = router.currentRoute.value.path
+
+  // If `to` is a string, compare directly
+  if (typeof routeOrPath === 'string') {
+    return currentPath === routeOrPath
+  }
+
+  // If `to` is an object with a path, compare that
+  if ('path' in routeOrPath && routeOrPath.path) {
+    return currentPath === routeOrPath.path
+  }
+
+  return false
+}
 </script>
 
 <template>
-  <!-- WRAPPER NAV ELEMENT -->
-  <nav class="w-full shadow bg-light-surface dark:bg-dark-surface text-light-textbase dark:text-dark-textbase">
+  <!-- NAV WRAPPER -->
+  <nav
+    class="w-full shadow bg-light-surface dark:bg-dark-surface text-light-textbase dark:text-dark-textbase transition-colors duration-300"
+  >
     <!-- TOP INFOBAR (optional) -->
     <div
       v-if="showInfoBar"
@@ -98,7 +134,7 @@ function toggleTheme() {
         <a
           v-if="props.infoBar?.email"
           :href="`mailto:${props.infoBar?.email}`"
-          class="hover:text-light-primary dark:hover:text-dark-primary"
+          class="hover:text-light-primary dark:hover:text-dark-primary transition-colors duration-200"
         >
           {{ props.infoBar?.email }}
         </a>
@@ -114,7 +150,7 @@ function toggleTheme() {
           <a
             v-if="props.infoBar?.phone"
             :href="`tel:${props.infoBar?.phone}`"
-            class="hover:text-light-primary dark:hover:text-dark-primary"
+            class="hover:text-light-primary dark:hover:text-dark-primary transition-colors duration-200"
           >
             {{ props.infoBar?.phone }}
           </a>
@@ -128,7 +164,7 @@ function toggleTheme() {
           <a
             :href="social.link"
             target="_blank"
-            class="hover:text-light-primary dark:hover:text-dark-primary"
+            class="hover:text-light-primary dark:hover:text-dark-primary transition-colors duration-200"
           >
             <Icon
               :name="social.icon"
@@ -142,13 +178,19 @@ function toggleTheme() {
     <!-- MAIN NAVBAR -->
     <div class="flex items-center justify-between px-4 py-3">
       <!-- Brand / Logo -->
-      <div>
-        <NuxtLink
-          to="/"
-          class="flex items-center space-x-2"
-        >
-          <!-- Could do an <img> if you have a logo. Or an icon. -->
-          <span class="font-bold text-xl text-light-primary dark:text-dark-primary">
+      <div class="flex items-center space-x-2">
+        <!-- Logo image -->
+        <NuxtLink to="/">
+          <img
+            src="/assets/images/communiqueueLogo.png"
+            alt="CommuniQueue Logo"
+            class="w-8 h-8 mr-2 object-contain"
+          >
+        </NuxtLink>
+
+        <!-- Brand text -->
+        <NuxtLink to="/">
+          <span class="font-bold text-xl text-light-primary dark:text-dark-primary transition-colors duration-200">
             {{ props.brand }}
           </span>
         </NuxtLink>
@@ -164,7 +206,13 @@ function toggleTheme() {
         >
           <!-- If the item has children => dropdown -->
           <template v-if="item.children && item.children.length > 0">
-            <UButton class="inline-flex items-center gap-1 hover:text-light-primary dark:hover:text-dark-primary">
+            <UButton
+              class="inline-flex items-center gap-1 transition-colors duration-200"
+              :class="{
+                'text-light-primary dark:text-dark-primary font-semibold':
+                  isActiveRoute(item.to),
+              }"
+            >
               {{ item.label }}
               <Icon
                 name="mdi:chevron-down"
@@ -179,7 +227,7 @@ function toggleTheme() {
               <li
                 v-for="(child, idx) in item.children"
                 :key="idx"
-                class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                class="px-4 py-2 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-600"
               >
                 <NuxtLink
                   v-if="child.to"
@@ -197,23 +245,34 @@ function toggleTheme() {
             <NuxtLink
               v-if="item.to"
               :to="item.to"
-              class="hover:text-light-primary dark:hover:text-dark-primary"
+              class="px-3 py-2 transition-colors duration-200 hover:text-light-primary dark:hover:text-dark-primary"
+              :class="{
+                'text-light-primary dark:text-dark-primary font-semibold':
+                  isActiveRoute(item.to),
+              }"
             >
               {{ item.label }}
             </NuxtLink>
-            <span v-else>{{ item.label }}</span>
+            <span
+              v-else
+              class="px-3 py-2 transition-colors duration-200 cursor-default"
+            >
+              {{ item.label }}
+            </span>
           </template>
         </li>
 
         <!-- SEPARATOR BEFORE LOGIN & THEME -->
         <li>
-          <span class="mx-1 text-gray-400 dark:text-gray-500 select-none">|</span>
+          <span class="mx-1 text-gray-400 dark:text-gray-500 select-none">
+            |
+          </span>
         </li>
 
-        <!-- LOGIN UButton -->
+        <!-- LOGIN / LOGOUT link -->
         <li>
           <a
-            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+            class="px-3 py-2 transition-colors duration-200 rounded hover:text-light-primary dark:hover:text-dark-primary"
             :href="`/sign-${user ? 'out' : 'in'}`"
           >
             Log {{ user ? 'out' : 'in' }}
@@ -222,17 +281,18 @@ function toggleTheme() {
 
         <!-- SEPARATOR BEFORE THEME SWITCHER -->
         <li>
-          <span class="mx-1 text-gray-400 dark:text-gray-500 select-none">|</span>
+          <span class="mx-1 text-gray-400 dark:text-gray-500 select-none">
+            |
+          </span>
         </li>
 
         <!-- THEME SWITCHER (Desktop) -->
         <li>
           <UButton
-            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+            class="flex items-center gap-1 px-3 py-2 transition-colors duration-200 rounded hover:text-light-primary dark:hover:text-dark-primary"
             :title="'Rotate Theme (light/dark/system)'"
             @click="toggleTheme"
           >
-            <!-- Show icon based on preference -->
             <Icon
               v-if="colorMode.preference === 'dark'"
               name="ph:sun-bold"
@@ -248,13 +308,14 @@ function toggleTheme() {
               name="ph:moon-bold"
               class="w-5 h-5"
             />
+            <span class="text-sm">Theme</span>
           </UButton>
         </li>
       </ul>
 
       <!-- MOBILE MENU UButton -->
       <UButton
-        class="md:hidden p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+        class="md:hidden p-2 rounded transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
         @click="toggleMobileMenu"
       >
         <Icon
@@ -268,7 +329,7 @@ function toggleTheme() {
     <transition name="fade">
       <ul
         v-if="mobileMenuOpen"
-        class="md:hidden flex flex-col space-y-1 px-4 pb-2"
+        class="md:hidden flex flex-col space-y-1 px-4 pb-4 bg-light-surface dark:bg-dark-surface shadow transition-colors duration-300"
       >
         <!-- Navigation Items -->
         <li
@@ -279,8 +340,16 @@ function toggleTheme() {
           <!-- Check if there's a sub-menu -->
           <template v-if="item.children && item.children.length > 0">
             <div class="flex items-center justify-between">
-              <span class="font-semibold">{{ item.label }}</span>
-              <!-- (Optional) Add a chevron or toggle for collapsible sub-menu -->
+              <span
+                class="font-semibold"
+                :class="{
+                  'text-light-primary dark:text-dark-primary':
+                    isActiveRoute(item.to),
+                }"
+              >
+                {{ item.label }}
+              </span>
+              <!-- (Optional) Could add a toggle icon for collapsible sub-menu -->
             </div>
             <!-- Sub-items (always open in this example) -->
             <ul class="ml-4 mt-2 space-y-1">
@@ -291,7 +360,7 @@ function toggleTheme() {
                 <NuxtLink
                   v-if="child.to"
                   :to="child.to"
-                  class="block py-1 text-sm hover:underline"
+                  class="block py-1 text-sm transition-colors duration-200 hover:underline"
                   @click="mobileMenuOpen = false"
                 >
                   {{ child.label }}
@@ -310,12 +379,21 @@ function toggleTheme() {
             <NuxtLink
               v-if="item.to"
               :to="item.to"
-              class="hover:underline"
+              class="block py-2 px-1 transition-colors duration-200 hover:text-light-primary dark:hover:text-dark-primary"
+              :class="{
+                'text-light-primary dark:text-dark-primary font-semibold':
+                  isActiveRoute(item.to),
+              }"
               @click="mobileMenuOpen = false"
             >
               {{ item.label }}
             </NuxtLink>
-            <span v-else>{{ item.label }}</span>
+            <span
+              v-else
+              class="block py-2 px-1 transition-colors duration-200"
+            >
+              {{ item.label }}
+            </span>
           </template>
         </li>
 
@@ -324,11 +402,12 @@ function toggleTheme() {
           <hr class="border-light-secondary/20 dark:border-dark-secondary/20">
         </li>
 
-        <!-- MOBILE LOGIN UButton -->
+        <!-- MOBILE LOGIN / LOGOUT -->
         <li class="flex items-center justify-start gap-2 py-2">
           <a
-            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
             :href="user ? '/sign-out' : '/sign-in'"
+            @click="mobileMenuOpen = false"
           >
             {{ user ? 'Logout' : 'Login' }}
           </a>
@@ -337,7 +416,7 @@ function toggleTheme() {
         <!-- MOBILE THEME SWITCHER -->
         <li class="flex items-center justify-start gap-2 py-2">
           <UButton
-            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+            class="flex items-center gap-1 p-2 rounded transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
             :title="'Rotate Theme (light/dark/system)'"
             @click="toggleTheme"
           >
@@ -356,6 +435,7 @@ function toggleTheme() {
               name="ph:moon-bold"
               class="w-5 h-5"
             />
+            <span class="text-sm">Theme</span>
           </UButton>
         </li>
       </ul>

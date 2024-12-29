@@ -50,15 +50,13 @@ i've also included my nuxt config and package.json so you know what packages i h
 export default defineNuxtConfig({
 
   modules: [
+    '@logto/nuxt',
     '@nuxt/eslint',
     '@nuxt/ui',
     '@nuxt/icon',
     '@nuxt/fonts',
-    '@logto/nuxt',
     '@nuxtjs/color-mode',
-    'nuxt-headlessui',
     '@hebilicious/vue-query-nuxt',
-    '@logto/nuxt',
     '@nuxt/scripts',
     '@nuxtjs/seo',
     '@vueuse/nuxt',
@@ -95,6 +93,9 @@ export default defineNuxtConfig({
 
   colorMode: {
     classSuffix: '',
+    preference: 'system',
+    fallback: 'light',
+    dataValue: 'theme',
   },
 
   runtimeConfig: {
@@ -113,9 +114,11 @@ export default defineNuxtConfig({
           id: '',
         },
       },
+      // NUXT_PUBLIC_API_BASE_URL=<your-url>
+      apiBaseUrl: '',
     },
     logto: {
-      endpoint: 'https://LocalAuth.battlelineproductions.com/',
+      endpoint: 't7eamt.logto.app',
       appId: '',
       appSecret: '',
       cookieEncryptionKey: '',
@@ -140,8 +143,20 @@ export default defineNuxtConfig({
     },
   },
 
-  headlessui: {
-    prefix: 'Headless',
+  // logto: {
+  //   pathnames: {
+  //     signIn: '/login',
+  //     signOut: '/logout',
+  //     callback: '/auth/callback',
+  //   },
+  // },
+
+  logto: {
+    postCallbackRedirectUri: '/dashboard/projects',
+    postLogoutRedirectUri: '/',
+    fetchUserInfo: true,
+    scopes: ['openid', 'profile', 'email', 'organizations', 'custom_data', 'phone', 'write:resource'],
+    // resources: [process.env.NUXT_TENANT_LOGTO_RESOURCE as string]
   },
 
   ogImage: {
@@ -186,13 +201,12 @@ export default defineNuxtConfig({
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "lint:fix": "eslint --fix .",
+    "lighthouse": "npx unlighthouse --site localhost:3000"
   },
   "dependencies": {
-    "@headlessui/tailwindcss": "^0.2.1",
-    "@headlessui/vue": "^1.7.23",
     "@hebilicious/vue-query-nuxt": "0.3.0",
-    "@logto/nuxt": "^1.1.5",
+    "@logto/nuxt": "^1.2.0",
     "@nuxt/eslint": "0.7.4",
     "@nuxt/fonts": "0.10.3",
     "@nuxt/icon": "1.10.3",
@@ -211,7 +225,7 @@ export default defineNuxtConfig({
   "devDependencies": {
     "@nuxt/eslint-config": "^0.7.4",
     "eslint": "^9.17.0",
-    "nuxt-headlessui": "^1.2.0",
+    "eslint-plugin-vue-composable": "^1.0.0",
     "sass": "^1.83.0",
     "sass-loader": "^16.0.4",
     "serverless": "^4.4.18",
@@ -225,7 +239,6 @@ export default defineNuxtConfig({
 
 === app.vue ===
 <script lang="ts" setup>
-provideHeadlessUseId(() => useId())
 </script>
 
 <template>
@@ -237,279 +250,6 @@ provideHeadlessUseId(() => useId())
       </NuxtLayout>
     </Body>
   </UApp>
-</template>
-
-
-=== components\ActionSheet\Group.vue ===
-<template>
-  <div
-    class="rounded-lg backdrop-blur-lg bg-gray-400/[0.5] dark:bg-gray-700/[0.5] flex flex-col divide-y divide-gray-400 dark:divide-gray-700"
-  >
-    <slot />
-  </div>
-</template>
-
-
-=== components\ActionSheet\Header.vue ===
-<template>
-  <div class="py-2">
-    <slot />
-  </div>
-</template>
-
-
-=== components\ActionSheet\HeaderMessage.vue ===
-<script lang="ts" setup>
-defineProps({
-  text: {
-    type: String,
-    default: '',
-  },
-})
-</script>
-
-<template>
-  <div class="text-xs text-center text-gray-700 dark:text-gray-500">
-    <slot>
-      <span>{{ text }}</span>
-    </slot>
-  </div>
-</template>
-
-
-=== components\ActionSheet\HeaderTitle.vue ===
-<script lang="ts" setup>
-defineProps({
-  text: {
-    type: String,
-    default: '',
-  },
-})
-</script>
-
-<template>
-  <div class="text-xs font-bold text-center text-gray-800 dark:text-gray-400">
-    <slot>
-      <span>{{ text }}</span>
-    </slot>
-  </div>
-</template>
-
-
-=== components\ActionSheet\index.vue ===
-<script lang="ts" setup>
-const emit = defineEmits<{
-  (e: 'close', event: MouseEvent): void
-}>()
-
-defineProps({
-  closeUButton: {
-    type: Boolean,
-    default: true,
-  },
-  closeUButtonText: {
-    type: String,
-    default: 'Cancel',
-  },
-})
-
-const isShow = ref(false)
-
-const close = (e: MouseEvent) => {
-  isShow.value = false
-  setTimeout(() => emit('close', e), 300)
-}
-
-const onCloseComponentClick = (e: MouseEvent) => {
-  const acceptedClasses = ['action-sheet', 'action-sheet-container']
-  const target = e.target as HTMLElement
-  const targetClassList = target.classList
-  for (const acceptedClass of acceptedClasses) {
-    if (targetClassList.contains(acceptedClass)) {
-      close(e)
-      break
-    }
-  }
-}
-
-onMounted(() => {
-  isShow.value = true
-})
-</script>
-
-<template>
-  <Teleport to="body">
-    <HeadlessTransitionRoot
-      :show="isShow"
-      class="action-sheet fixed z-50 top-0 left-0 w-screen h-screen max-h-screen max-w-full flex flex-col justify-end bg-black/[0.5]"
-      enter="transition-opacity duration-300"
-      enter-from="opacity-0"
-      enter-to="opacity-100"
-      leave="transition-opacity duration-300"
-      leave-from="opacity-100"
-      leave-to="opacity-0"
-      @click="onCloseComponentClick"
-    >
-      <div class="flex flex-col overflow-hidden relative">
-        <div class="action-sheet-container flex-1 overflow-y-auto space-y-1 justify-end px-4 pb-2 pt-4">
-          <slot />
-          <ActionSheetGroup v-if="closeUButton">
-            <ActionSheetItemUButton
-              class="text-red-500 font-bold"
-              :text="closeUButtonText"
-              @click="close"
-            />
-          </ActionSheetGroup>
-        </div>
-      </div>
-    </HeadlessTransitionRoot>
-  </Teleport>
-</template>
-
-
-=== components\ActionSheet\Item.vue ===
-<template>
-  <div class="px-4 py-2">
-    <slot />
-  </div>
-</template>
-
-
-=== components\ActionSheet\ItemButton.vue ===
-<script lang="ts" setup>
-defineProps({
-  text: {
-    type: String,
-    default: '',
-  },
-})
-</script>
-
-<template>
-  <div
-    class="px-4 py-2 text-center flex items-center justify-center active:bg-gray-700/[0.5] hover:bg-gray-700/[0.5]"
-  >
-    <slot>
-      <span>{{ text }}</span>
-    </slot>
-  </div>
-</template>
-
-
-=== components\AlertBanner.vue ===
-<script lang="ts" setup>
-import { TransitionRoot, TransitionChild } from '@headlessui/vue'
-
-export type IStyles = 'primary' | 'success' | 'warning' | 'danger'
-
-// props
-const props = defineProps({
-  title: {
-    type: String,
-    default: undefined,
-  },
-  text: {
-    type: String,
-    default: undefined,
-  },
-  type: {
-    type: String,
-    default: 'primary',
-  },
-})
-
-// styles
-const styles = reactive<{
-  [key: string]: string
-}>({
-  primary: '',
-  success: 'dark:from-green-500/50 via-gray-200 to-gray-200 dark:via-gray-900 dark:to-gray-900',
-  warning: 'dark:from-yellow-500/50 via-gray-200 to-gray-200 dark:via-gray-900 dark:to-gray-900',
-  danger: 'dark:from-red-500/50 via-gray-200 to-gray-200 dark:via-gray-900 dark:to-gray-900',
-})
-const textStyles = reactive<{
-  [key: string]: string
-}>({
-  primary: 'text-black dark:text-white',
-  success: 'text-green-500',
-  warning: 'text-orange-500',
-  danger: 'text-red-500',
-})
-
-// selected
-const isDestroyed = ref<boolean>(false)
-const selectedType = computed<IStyles>((): IStyles => {
-  if (['primary', 'success', 'warning', 'danger'].includes(props.type)) return props.type as IStyles
-  return 'primary'
-})
-const selectedStyle = computed(() => styles[selectedType.value])
-const selectedTextStyle = computed(() => textStyles[selectedType.value])
-
-// actions
-const close = () => {
-  isDestroyed.value = true
-}
-</script>
-
-<template>
-  <TransitionRoot
-    :show="!isDestroyed"
-    appear
-  >
-    <TransitionChild
-      as="template"
-      enter="duration-300 ease-out"
-      enter-from="opacity-0"
-      enter-to="opacity-100"
-      leave="duration-300 ease-in"
-      leave-from="opacity-100"
-      leave-to="opacity-0"
-    >
-      <div
-        :class="`bg-gray-200 dark:bg-gray-800 bg-gradient-to-r shadow-white/50 dark:shadow-gray-950/50 px-6 py-6 rounded-md shadow-lg flex space-x-6 ${selectedStyle}`"
-      >
-        <div class="flex items-center justify-center">
-          <slot name="icon">
-            <Icon
-              v-if="selectedType === 'success'"
-              name="mdi:check-circle"
-              :class="`text-2xl ${selectedTextStyle}`"
-            />
-            <Icon
-              v-if="selectedType === 'danger'"
-              name="icon-clarity:times-circle-solid"
-              :class="`text-2xl ${selectedTextStyle}`"
-            />
-            <Icon
-              v-if="selectedType === 'warning'"
-              name="icon-bi:exclamation-circle-fill"
-              :class="`text-2xl ${selectedTextStyle}`"
-            />
-          </slot>
-        </div>
-        <div class="flex-1">
-          <div :class="`font-bold text-lg mb-0.5 ${selectedTextStyle}`">
-            <slot name="title">
-              {{ props.title }}
-            </slot>
-          </div>
-          <div class="text-gray-700 dark:text-gray-100">
-            <slot name="title">
-              {{ props.text }}
-            </slot>
-          </div>
-        </div>
-        <div>
-          <UButton
-            class="text-gray-600 hover:text-red-500 dark:text-gray-400 font-bold"
-            @click="close"
-          >
-            <Icon name="clarity:times-line" />
-          </UButton>
-        </div>
-      </div>
-    </TransitionChild>
-  </TransitionRoot>
 </template>
 
 
@@ -2980,13 +2720,12 @@ const props = defineProps<Props>()
 
 === components\Layout\Page\Navbar.vue ===
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
-// Example auth tracking (replace with your logic)
-const isAuthenticated = ref(false)
-
-/** A sub-menu item or direct link item */
+/**
+ * A sub-menu item or direct link item
+ */
 interface NavbarItem {
   label: string
   to?: RouteLocationRaw
@@ -2994,7 +2733,9 @@ interface NavbarItem {
   children?: NavbarItem[] // if it has sub-menu items
 }
 
-/** Optional info bar data */
+/**
+ * Optional info bar data
+ */
 interface InfoBarData {
   email?: string
   phone?: string
@@ -3024,34 +2765,42 @@ const props = defineProps<{
 
 /** Whether the mobile menu is open */
 const mobileMenuOpen = ref(false)
+
 /** Color mode composable (dark/light/system) */
 const colorMode = useColorMode()
 
-/** Decide if we show the top InfoBar */
+/** Current user from authentication (Logto) */
+const user = useLogtoUser()
+
+/**
+ * Decide if we show the top InfoBar
+ */
 const showInfoBar = computed(() => {
   const info = props.infoBar
   if (!info) return false
   return Boolean(info.email || info.phone || (info.socials && info.socials.length > 0))
 })
 
-/** Filter out items requiring auth if user isn't authenticated */
+/**
+ * Filter out items requiring auth if user isn't authenticated
+ */
 const filteredMenuItems = computed<NavbarItem[]>(() => {
   return props.menuItems.filter((item) => {
-    if (item.requiresAuth && !isAuthenticated.value) return false
+    if (item.requiresAuth && !user) return false
     return true
   })
 })
 
-onMounted(async () => {
-  // isAuthenticated.value = await checkAuthenticationStatus() or something
-})
-
-/** Toggle the mobile menu open/close */
+/**
+ * Toggle the mobile menu open/close
+ */
 function toggleMobileMenu() {
   mobileMenuOpen.value = !mobileMenuOpen.value
 }
 
-/** Rotate theme preference between dark/light/system */
+/**
+ * Rotate theme preference between dark/light/system
+ */
 function toggleTheme() {
   if (colorMode.preference === 'dark') {
     colorMode.preference = 'light'
@@ -3064,16 +2813,34 @@ function toggleTheme() {
   }
 }
 
-/** Placeholder for a login function */
-function handleLogin() {
-  // TODO: Replace with your actual login code
-  console.log('User wants to log in...')
+/**
+ * Utility to check if the route is currently active.
+ * We highlight the link if it's the same as the current route's path.
+ */
+function isActiveRoute(routeOrPath?: RouteLocationRaw): boolean {
+  if (!routeOrPath) return false
+  const router = useRouter()
+  const currentPath = router.currentRoute.value.path
+
+  // If `to` is a string, compare directly
+  if (typeof routeOrPath === 'string') {
+    return currentPath === routeOrPath
+  }
+
+  // If `to` is an object with a path, compare that
+  if ('path' in routeOrPath && routeOrPath.path) {
+    return currentPath === routeOrPath.path
+  }
+
+  return false
 }
 </script>
 
 <template>
-  <!-- WRAPPER NAV ELEMENT -->
-  <nav class="w-full shadow bg-light-surface dark:bg-dark-surface text-light-textbase dark:text-dark-textbase">
+  <!-- NAV WRAPPER -->
+  <nav
+    class="w-full shadow bg-light-surface dark:bg-dark-surface text-light-textbase dark:text-dark-textbase transition-colors duration-300"
+  >
     <!-- TOP INFOBAR (optional) -->
     <div
       v-if="showInfoBar"
@@ -3088,7 +2855,7 @@ function handleLogin() {
         <a
           v-if="props.infoBar?.email"
           :href="`mailto:${props.infoBar?.email}`"
-          class="hover:text-light-primary dark:hover:text-dark-primary"
+          class="hover:text-light-primary dark:hover:text-dark-primary transition-colors duration-200"
         >
           {{ props.infoBar?.email }}
         </a>
@@ -3104,7 +2871,7 @@ function handleLogin() {
           <a
             v-if="props.infoBar?.phone"
             :href="`tel:${props.infoBar?.phone}`"
-            class="hover:text-light-primary dark:hover:text-dark-primary"
+            class="hover:text-light-primary dark:hover:text-dark-primary transition-colors duration-200"
           >
             {{ props.infoBar?.phone }}
           </a>
@@ -3118,7 +2885,7 @@ function handleLogin() {
           <a
             :href="social.link"
             target="_blank"
-            class="hover:text-light-primary dark:hover:text-dark-primary"
+            class="hover:text-light-primary dark:hover:text-dark-primary transition-colors duration-200"
           >
             <Icon
               :name="social.icon"
@@ -3132,13 +2899,19 @@ function handleLogin() {
     <!-- MAIN NAVBAR -->
     <div class="flex items-center justify-between px-4 py-3">
       <!-- Brand / Logo -->
-      <div>
-        <NuxtLink
-          to="/"
-          class="flex items-center space-x-2"
-        >
-          <!-- Could do an <img> if you have a logo. Or an icon. -->
-          <span class="font-bold text-xl text-light-primary dark:text-dark-primary">
+      <div class="flex items-center space-x-2">
+        <!-- Logo image -->
+        <NuxtLink to="/">
+          <img
+            src="/assets/images/communiqueueLogo.png"
+            alt="CommuniQueue Logo"
+            class="w-8 h-8 mr-2 object-contain"
+          >
+        </NuxtLink>
+
+        <!-- Brand text -->
+        <NuxtLink to="/">
+          <span class="font-bold text-xl text-light-primary dark:text-dark-primary transition-colors duration-200">
             {{ props.brand }}
           </span>
         </NuxtLink>
@@ -3154,13 +2927,19 @@ function handleLogin() {
         >
           <!-- If the item has children => dropdown -->
           <template v-if="item.children && item.children.length > 0">
-            <UUButton class="inline-flex items-center gap-1 hover:text-light-primary dark:hover:text-dark-primary">
+            <UButton
+              class="inline-flex items-center gap-1 transition-colors duration-200"
+              :class="{
+                'text-light-primary dark:text-dark-primary font-semibold':
+                  isActiveRoute(item.to),
+              }"
+            >
               {{ item.label }}
               <Icon
                 name="mdi:chevron-down"
                 class="w-4 h-4"
               />
-            </UUButton>
+            </UButton>
 
             <!-- Sub-menu -->
             <ul
@@ -3169,7 +2948,7 @@ function handleLogin() {
               <li
                 v-for="(child, idx) in item.children"
                 :key="idx"
-                class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                class="px-4 py-2 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-600"
               >
                 <NuxtLink
                   v-if="child.to"
@@ -3187,42 +2966,54 @@ function handleLogin() {
             <NuxtLink
               v-if="item.to"
               :to="item.to"
-              class="hover:text-light-primary dark:hover:text-dark-primary"
+              class="px-3 py-2 transition-colors duration-200 hover:text-light-primary dark:hover:text-dark-primary"
+              :class="{
+                'text-light-primary dark:text-dark-primary font-semibold':
+                  isActiveRoute(item.to),
+              }"
             >
               {{ item.label }}
             </NuxtLink>
-            <span v-else>{{ item.label }}</span>
+            <span
+              v-else
+              class="px-3 py-2 transition-colors duration-200 cursor-default"
+            >
+              {{ item.label }}
+            </span>
           </template>
         </li>
 
         <!-- SEPARATOR BEFORE LOGIN & THEME -->
         <li>
-          <span class="mx-1 text-gray-400 dark:text-gray-500 select-none">|</span>
+          <span class="mx-1 text-gray-400 dark:text-gray-500 select-none">
+            |
+          </span>
         </li>
 
-        <!-- LOGIN UUButton -->
+        <!-- LOGIN / LOGOUT link -->
         <li>
-          <UUButton
-            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
-            @click="handleLogin"
+          <a
+            class="px-3 py-2 transition-colors duration-200 rounded hover:text-light-primary dark:hover:text-dark-primary"
+            :href="`/sign-${user ? 'out' : 'in'}`"
           >
-            Login
-          </UUButton>
+            Log {{ user ? 'out' : 'in' }}
+          </a>
         </li>
 
         <!-- SEPARATOR BEFORE THEME SWITCHER -->
         <li>
-          <span class="mx-1 text-gray-400 dark:text-gray-500 select-none">|</span>
+          <span class="mx-1 text-gray-400 dark:text-gray-500 select-none">
+            |
+          </span>
         </li>
 
         <!-- THEME SWITCHER (Desktop) -->
         <li>
-          <UUButton
-            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+          <UButton
+            class="flex items-center gap-1 px-3 py-2 transition-colors duration-200 rounded hover:text-light-primary dark:hover:text-dark-primary"
             :title="'Rotate Theme (light/dark/system)'"
             @click="toggleTheme"
           >
-            <!-- Show icon based on preference -->
             <Icon
               v-if="colorMode.preference === 'dark'"
               name="ph:sun-bold"
@@ -3238,27 +3029,28 @@ function handleLogin() {
               name="ph:moon-bold"
               class="w-5 h-5"
             />
-          </UUButton>
+            <span class="text-sm">Theme</span>
+          </UButton>
         </li>
       </ul>
 
-      <!-- MOBILE MENU UUButton -->
-      <UUButton
-        class="md:hidden p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+      <!-- MOBILE MENU UButton -->
+      <UButton
+        class="md:hidden p-2 rounded transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
         @click="toggleMobileMenu"
       >
         <Icon
           name="heroicons:bars-3-bottom-right"
           class="w-6 h-6"
         />
-      </UUButton>
+      </UButton>
     </div>
 
     <!-- MOBILE MENU (visible when mobileMenuOpen) -->
     <transition name="fade">
       <ul
         v-if="mobileMenuOpen"
-        class="md:hidden flex flex-col space-y-1 px-4 pb-2"
+        class="md:hidden flex flex-col space-y-1 px-4 pb-4 bg-light-surface dark:bg-dark-surface shadow transition-colors duration-300"
       >
         <!-- Navigation Items -->
         <li
@@ -3269,8 +3061,16 @@ function handleLogin() {
           <!-- Check if there's a sub-menu -->
           <template v-if="item.children && item.children.length > 0">
             <div class="flex items-center justify-between">
-              <span class="font-semibold">{{ item.label }}</span>
-              <!-- (Optional) Add a chevron or toggle for collapsible sub-menu -->
+              <span
+                class="font-semibold"
+                :class="{
+                  'text-light-primary dark:text-dark-primary':
+                    isActiveRoute(item.to),
+                }"
+              >
+                {{ item.label }}
+              </span>
+              <!-- (Optional) Could add a toggle icon for collapsible sub-menu -->
             </div>
             <!-- Sub-items (always open in this example) -->
             <ul class="ml-4 mt-2 space-y-1">
@@ -3281,7 +3081,7 @@ function handleLogin() {
                 <NuxtLink
                   v-if="child.to"
                   :to="child.to"
-                  class="block py-1 text-sm hover:underline"
+                  class="block py-1 text-sm transition-colors duration-200 hover:underline"
                   @click="mobileMenuOpen = false"
                 >
                   {{ child.label }}
@@ -3300,12 +3100,21 @@ function handleLogin() {
             <NuxtLink
               v-if="item.to"
               :to="item.to"
-              class="hover:underline"
+              class="block py-2 px-1 transition-colors duration-200 hover:text-light-primary dark:hover:text-dark-primary"
+              :class="{
+                'text-light-primary dark:text-dark-primary font-semibold':
+                  isActiveRoute(item.to),
+              }"
               @click="mobileMenuOpen = false"
             >
               {{ item.label }}
             </NuxtLink>
-            <span v-else>{{ item.label }}</span>
+            <span
+              v-else
+              class="block py-2 px-1 transition-colors duration-200"
+            >
+              {{ item.label }}
+            </span>
           </template>
         </li>
 
@@ -3314,20 +3123,21 @@ function handleLogin() {
           <hr class="border-light-secondary/20 dark:border-dark-secondary/20">
         </li>
 
-        <!-- MOBILE LOGIN UUButton -->
+        <!-- MOBILE LOGIN / LOGOUT -->
         <li class="flex items-center justify-start gap-2 py-2">
-          <UUButton
-            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
-            @click="handleLogin"
+          <a
+            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+            :href="user ? '/sign-out' : '/sign-in'"
+            @click="mobileMenuOpen = false"
           >
-            Login
-          </UUButton>
+            {{ user ? 'Logout' : 'Login' }}
+          </a>
         </li>
 
         <!-- MOBILE THEME SWITCHER -->
         <li class="flex items-center justify-start gap-2 py-2">
-          <UUButton
-            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+          <UButton
+            class="flex items-center gap-1 p-2 rounded transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
             :title="'Rotate Theme (light/dark/system)'"
             @click="toggleTheme"
           >
@@ -3346,7 +3156,8 @@ function handleLogin() {
               name="ph:moon-bold"
               class="w-5 h-5"
             />
-          </UUButton>
+            <span class="text-sm">Theme</span>
+          </UButton>
         </li>
       </ul>
     </transition>
@@ -3364,108 +3175,6 @@ function handleLogin() {
   opacity: 0;
 }
 </style>
-
-
-=== components\Layout\Page\NavbarDropdown\ThemeSwitcher.vue ===
-<script lang="ts" setup>
-const props = defineProps({
-  type: {
-    type: String,
-    default: 'dropdown-right-top',
-  },
-})
-const currentStyle = toRef(props, 'type')
-
-const availableThemes = [
-  {
-    key: 'light',
-    text: 'Light',
-  },
-  {
-    key: 'dark',
-    text: 'Dark',
-  },
-  {
-    key: 'system',
-    text: 'System',
-  },
-]
-</script>
-
-<template>
-  <div class="flex items-center">
-    <!-- Headless UI Dropdown for theme selection -->
-    <HeadlessListbox
-      v-if="currentStyle === 'dropdown-right-top'"
-      v-model="$colorMode.preference"
-      as="div"
-      class="relative flex items-center"
-    >
-      <HeadlessListboxLabel class="sr-only">
-        Theme Selection
-      </HeadlessListboxLabel>
-      <HeadlessListboxUButton type="template">
-        <BLLink class="text-light-secondary dark:text-dark-secondary">
-          <!-- Display sun icon for light theme, moon for dark -->
-          <span class="flex justify-center items-center dark:hidden">
-            <Icon name="uil:sun" />
-          </span>
-          <span class="flex justify-center items-center dark:flex">
-            <Icon name="uil:moon" />
-          </span>
-        </BLLink>
-      </HeadlessListboxUButton>
-      <HeadlessListboxOptions
-        class="p-1 absolute z-50 origin-top-right top-full right-0 outline-none bg-light-background dark:bg-dark-background rounded-lg ring-1 ring-light-secondary/10 shadow-lg overflow-hidden w-36 py-1 text-sm text-light-textbase dark:text-dark-textbase font-semibold"
-      >
-        <!-- Options for changing themes -->
-        <HeadlessListboxOption
-          v-for="theme in availableThemes"
-          :key="theme.key"
-          :value="theme.key"
-          :class="{
-            'py-2 px-2 flex items-center cursor-pointer': true,
-            'text-light-primary bg-light-surface dark:bg-dark-surface/30': $colorMode.preference === theme.key,
-            'hover:bg-light-surface dark:hover:bg-dark-surface/30': $colorMode.preference !== theme.key,
-          }"
-        >
-          <!-- Icons corresponding to the theme options -->
-          <span class="flex items-center mr-2">
-            <Icon
-              v-if="theme.key === 'light'"
-              name="uil:sun"
-            />
-            <Icon
-              v-else-if="theme.key === 'dark'"
-              name="uil:moon"
-            />
-            <Icon
-              v-else
-              name="uil:laptop"
-            />
-            <!-- Icon for system default -->
-          </span>
-          {{ theme.text }}
-        </HeadlessListboxOption>
-      </HeadlessListboxOptions>
-    </HeadlessListbox>
-    <!-- Standard select box for non-dropdown style -->
-    <select
-      v-if="currentStyle === 'select-box'"
-      v-model="$colorMode.preference"
-      class="w-full px-2 py-1 pr-3 outline-none rounded border bg-light-background dark:bg-dark-background text-light-textbase dark:text-dark-textbase border-light-secondary/10 dark:border-dark-secondary/20"
-    >
-      <option
-        v-for="theme in availableThemes"
-        :key="theme.key"
-        :value="theme.key"
-        class="bg-light-background dark:bg-dark-background text-light-textbase dark:text-dark-textbase"
-      >
-        {{ theme.text }}
-      </option>
-    </select>
-  </div>
-</template>
 
 
 === components\Layout\Page\Section\index.vue ===
@@ -5341,7 +5050,7 @@ const currentYear = new Date().getFullYear()
 const navItems = [
   { label: 'Home', to: '/', requiresAuth: false },
   { label: 'Features', to: '/features', requiresAuth: false },
-  { label: 'Projects', to: '/dashboard/projects', requiresAuth: false },
+  { label: 'Projects', to: '/dashboard/projects', requiresAuth: true },
 ]
 </script>
 

@@ -95,19 +95,14 @@ export default defineNuxtConfig({
     },
   },
 
-  // logto: {
-  //   pathnames: {
-  //     signIn: '/login',
-  //     signOut: '/logout',
-  //     callback: '/auth/callback',
-  //   },
-  // },
-
   logto: {
     postCallbackRedirectUri: '/dashboard/projects',
     postLogoutRedirectUri: '/',
     fetchUserInfo: true,
     scopes: ['openid', 'profile', 'email', 'organizations', 'custom_data', 'phone', 'write:resource'],
+    pathnames: {
+      callback: '/auth/logging-in',
+    },
     // resources: [process.env.NUXT_TENANT_LOGTO_RESOURCE as string]
   },
 

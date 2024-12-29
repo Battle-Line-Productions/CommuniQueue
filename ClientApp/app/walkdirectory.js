@@ -59,14 +59,13 @@ i've also included my nuxt config and package.json so you know what packages i h
 export default defineNuxtConfig({
 
   modules: [
+    '@logto/nuxt',
     '@nuxt/eslint',
     '@nuxt/ui',
     '@nuxt/icon',
     '@nuxt/fonts',
-    '@logto/nuxt',
     '@nuxtjs/color-mode',
     '@hebilicious/vue-query-nuxt',
-    '@logto/nuxt',
     '@nuxt/scripts',
     '@nuxtjs/seo',
     '@vueuse/nuxt',
@@ -103,6 +102,9 @@ export default defineNuxtConfig({
 
   colorMode: {
     classSuffix: '',
+    preference: 'system',
+    fallback: 'light',
+    dataValue: 'theme',
   },
 
   runtimeConfig: {
@@ -121,9 +123,11 @@ export default defineNuxtConfig({
           id: '',
         },
       },
+      // NUXT_PUBLIC_API_BASE_URL=<your-url>
+      apiBaseUrl: '',
     },
     logto: {
-      endpoint: 'https://LocalAuth.battlelineproductions.com/',
+      endpoint: 't7eamt.logto.app',
       appId: '',
       appSecret: '',
       cookieEncryptionKey: '',
@@ -146,6 +150,22 @@ export default defineNuxtConfig({
     config: {
       stylistic: true,
     },
+  },
+
+  // logto: {
+  //   pathnames: {
+  //     signIn: '/login',
+  //     signOut: '/logout',
+  //     callback: '/auth/callback',
+  //   },
+  // },
+
+  logto: {
+    postCallbackRedirectUri: '/dashboard/projects',
+    postLogoutRedirectUri: '/',
+    fetchUserInfo: true,
+    scopes: ['openid', 'profile', 'email', 'organizations', 'custom_data', 'phone', 'write:resource'],
+    // resources: [process.env.NUXT_TENANT_LOGTO_RESOURCE as string]
   },
 
   ogImage: {
@@ -190,11 +210,12 @@ export default defineNuxtConfig({
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "lint:fix": "eslint --fix .",
+    "lighthouse": "npx unlighthouse --site localhost:3000"
   },
   "dependencies": {
     "@hebilicious/vue-query-nuxt": "0.3.0",
-    "@logto/nuxt": "^1.1.5",
+    "@logto/nuxt": "^1.2.0",
     "@nuxt/eslint": "0.7.4",
     "@nuxt/fonts": "0.10.3",
     "@nuxt/icon": "1.10.3",
@@ -213,7 +234,7 @@ export default defineNuxtConfig({
   "devDependencies": {
     "@nuxt/eslint-config": "^0.7.4",
     "eslint": "^9.17.0",
-    "nuxt-headlessui": "^1.2.0",
+    "eslint-plugin-vue-composable": "^1.0.0",
     "sass": "^1.83.0",
     "sass-loader": "^16.0.4",
     "serverless": "^4.4.18",
