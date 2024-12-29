@@ -9,7 +9,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "lint:fix": "eslint --fix .",
+    "lighthouse": "npx unlighthouse --site localhost:3000"
   },
   "dependencies": {
     "@hebilicious/vue-query-nuxt": "0.3.0",
@@ -32,6 +33,7 @@
   "devDependencies": {
     "@nuxt/eslint-config": "^0.7.4",
     "eslint": "^9.17.0",
+    "eslint-plugin-vue-composable": "^1.0.0",
     "sass": "^1.83.0",
     "sass-loader": "^16.0.4",
     "serverless": "^4.4.18",

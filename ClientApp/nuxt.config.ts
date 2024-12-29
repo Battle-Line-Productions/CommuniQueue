@@ -2,14 +2,13 @@
 export default defineNuxtConfig({
 
   modules: [
+    '@logto/nuxt',
     '@nuxt/eslint',
     '@nuxt/ui',
     '@nuxt/icon',
     '@nuxt/fonts',
-    '@logto/nuxt',
     '@nuxtjs/color-mode',
     '@hebilicious/vue-query-nuxt',
-    '@logto/nuxt',
     '@nuxt/scripts',
     '@nuxtjs/seo',
     '@vueuse/nuxt',
@@ -67,9 +66,11 @@ export default defineNuxtConfig({
           id: '',
         },
       },
+      // NUXT_PUBLIC_API_BASE_URL=<your-url>
+      apiBaseUrl: '',
     },
     logto: {
-      endpoint: 'https://LocalAuth.battlelineproductions.com/',
+      endpoint: 't7eamt.logto.app',
       appId: '',
       appSecret: '',
       cookieEncryptionKey: '',
@@ -92,6 +93,22 @@ export default defineNuxtConfig({
     config: {
       stylistic: true,
     },
+  },
+
+  // logto: {
+  //   pathnames: {
+  //     signIn: '/login',
+  //     signOut: '/logout',
+  //     callback: '/auth/callback',
+  //   },
+  // },
+
+  logto: {
+    postCallbackRedirectUri: '/dashboard/projects',
+    postLogoutRedirectUri: '/',
+    fetchUserInfo: true,
+    scopes: ['openid', 'profile', 'email', 'organizations', 'custom_data', 'phone', 'write:resource'],
+    // resources: [process.env.NUXT_TENANT_LOGTO_RESOURCE as string]
   },
 
   ogImage: {

@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
-
-// Example auth tracking (replace with your logic)
-const isAuthenticated = ref(false)
 
 /** A sub-menu item or direct link item */
 interface NavbarItem {
@@ -46,6 +43,10 @@ const mobileMenuOpen = ref(false)
 /** Color mode composable (dark/light/system) */
 const colorMode = useColorMode()
 
+const user = useLogtoUser()
+
+console.log('User:', user)
+
 /** Decide if we show the top InfoBar */
 const showInfoBar = computed(() => {
   const info = props.infoBar
@@ -56,13 +57,9 @@ const showInfoBar = computed(() => {
 /** Filter out items requiring auth if user isn't authenticated */
 const filteredMenuItems = computed<NavbarItem[]>(() => {
   return props.menuItems.filter((item) => {
-    if (item.requiresAuth && !isAuthenticated.value) return false
+    if (item.requiresAuth && !user) return false
     return true
   })
-})
-
-onMounted(async () => {
-  // isAuthenticated.value = await checkAuthenticationStatus() or something
 })
 
 /** Toggle the mobile menu open/close */
@@ -81,12 +78,6 @@ function toggleTheme() {
   else {
     colorMode.preference = 'dark'
   }
-}
-
-/** Placeholder for a login function */
-function handleLogin() {
-  // TODO: Replace with your actual login code
-  console.log('User wants to log in...')
 }
 </script>
 
@@ -173,13 +164,13 @@ function handleLogin() {
         >
           <!-- If the item has children => dropdown -->
           <template v-if="item.children && item.children.length > 0">
-            <UUButton class="inline-flex items-center gap-1 hover:text-light-primary dark:hover:text-dark-primary">
+            <UButton class="inline-flex items-center gap-1 hover:text-light-primary dark:hover:text-dark-primary">
               {{ item.label }}
               <Icon
                 name="mdi:chevron-down"
                 class="w-4 h-4"
               />
-            </UUButton>
+            </UButton>
 
             <!-- Sub-menu -->
             <ul
@@ -219,14 +210,14 @@ function handleLogin() {
           <span class="mx-1 text-gray-400 dark:text-gray-500 select-none">|</span>
         </li>
 
-        <!-- LOGIN UUButton -->
+        <!-- LOGIN UButton -->
         <li>
-          <UUButton
+          <a
             class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
-            @click="handleLogin"
+            :href="`/sign-${user ? 'out' : 'in'}`"
           >
-            Login
-          </UUButton>
+            Log {{ user ? 'out' : 'in' }}
+          </a>
         </li>
 
         <!-- SEPARATOR BEFORE THEME SWITCHER -->
@@ -236,7 +227,7 @@ function handleLogin() {
 
         <!-- THEME SWITCHER (Desktop) -->
         <li>
-          <UUButton
+          <UButton
             class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
             :title="'Rotate Theme (light/dark/system)'"
             @click="toggleTheme"
@@ -257,12 +248,12 @@ function handleLogin() {
               name="ph:moon-bold"
               class="w-5 h-5"
             />
-          </UUButton>
+          </UButton>
         </li>
       </ul>
 
-      <!-- MOBILE MENU UUButton -->
-      <UUButton
+      <!-- MOBILE MENU UButton -->
+      <UButton
         class="md:hidden p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
         @click="toggleMobileMenu"
       >
@@ -270,7 +261,7 @@ function handleLogin() {
           name="heroicons:bars-3-bottom-right"
           class="w-6 h-6"
         />
-      </UUButton>
+      </UButton>
     </div>
 
     <!-- MOBILE MENU (visible when mobileMenuOpen) -->
@@ -333,19 +324,19 @@ function handleLogin() {
           <hr class="border-light-secondary/20 dark:border-dark-secondary/20">
         </li>
 
-        <!-- MOBILE LOGIN UUButton -->
+        <!-- MOBILE LOGIN UButton -->
         <li class="flex items-center justify-start gap-2 py-2">
-          <UUButton
+          <a
             class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
-            @click="handleLogin"
+            :href="user ? '/sign-out' : '/sign-in'"
           >
-            Login
-          </UUButton>
+            {{ user ? 'Logout' : 'Login' }}
+          </a>
         </li>
 
         <!-- MOBILE THEME SWITCHER -->
         <li class="flex items-center justify-start gap-2 py-2">
-          <UUButton
+          <UButton
             class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
             :title="'Rotate Theme (light/dark/system)'"
             @click="toggleTheme"
@@ -365,7 +356,7 @@ function handleLogin() {
               name="ph:moon-bold"
               class="w-5 h-5"
             />
-          </UUButton>
+          </UButton>
         </li>
       </ul>
     </transition>
