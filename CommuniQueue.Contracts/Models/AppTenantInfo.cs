@@ -15,8 +15,6 @@
 // ---------------------------------------------------------------------------
 #endregion
 
-using System.ComponentModel.DataAnnotations.Schema;
-using BattlelineExtras.Contracts.Interfaces;
 using Finbuckle.MultiTenant.Abstractions;
 
 namespace CommuniQueue.Contracts.Models;
@@ -28,6 +26,9 @@ public class AppTenantInfo : ITenantInfo
     public string? Id { get; set; }
     public string? Identifier { get; set; }
     public string? Name { get; set; }
+    public string? Description { get; set; }
     public DateTime CreatedDateTime { get; set; }
     public DateTime UpdatedDateTime { get; set; }
+
+    public virtual ICollection<UserTenantMembership> UserTenantMemberships { get; set; }
 }
