@@ -110,7 +110,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import useUsers from '~/composables/use-user-service'
 import { type ICreateUserRequest, GlobalRoleType } from '~/types'

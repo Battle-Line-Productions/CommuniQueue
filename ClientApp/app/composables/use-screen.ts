@@ -1,4 +1,4 @@
-import { ref, reactive, onMounted, onUnmounted, type Ref } from 'vue'
+import type { Ref } from 'vue'
 
 /**
  * A type representing valid screen size labels.

@@ -36,7 +36,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import useUsers from '~/composables/use-user-service'
 import type { IUser } from '~/types'

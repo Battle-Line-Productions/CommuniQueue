@@ -30,14 +30,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import useProjects from '~/composables/use-projects-service'
 
 const route = useRoute()
 const projectId = route.params.id as string
 const { getProjectById } = useProjects()
-const { toastRef } = useToast()
+// const { add } = useToast()
 
 const tabs = [
   { id: 'general', label: 'General' },

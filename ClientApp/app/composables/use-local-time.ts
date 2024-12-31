@@ -1,4 +1,4 @@
-import { ref, type Ref } from 'vue'
+import type { Ref } from 'vue'
 
 /**
  * A composable for converting UTC dates/times into local time strings.

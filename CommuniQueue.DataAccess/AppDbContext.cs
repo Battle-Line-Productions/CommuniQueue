@@ -52,20 +52,9 @@ public class AppDbContext(IMultiTenantContextAccessor multiTenantContextAccessor
     public DbSet<TemplateStageAssignment> TemplateStageAssignments => Set<TemplateStageAssignment>();
     public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        base.OnConfiguring(optionsBuilder);
-
-        var tenant = multiTenantContextAccessor.MultiTenantContext;
-
-        Console.WriteLine("shit");
-    }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
-        var tenant = multiTenantContextAccessor.MultiTenantContext;
 
         modelBuilder.Entity<AppTenantInfo>(entity =>
         {

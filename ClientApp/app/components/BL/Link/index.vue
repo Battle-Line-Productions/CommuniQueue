@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { toRef } from 'vue'
-
 // micro compiler
 const props = defineProps({
   text: {

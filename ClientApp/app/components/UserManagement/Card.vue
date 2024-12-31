@@ -84,7 +84,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watchEffect } from 'vue'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import useUsers from '~/composables/use-user-service'
 

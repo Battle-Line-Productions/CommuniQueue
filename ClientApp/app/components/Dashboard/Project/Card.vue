@@ -86,7 +86,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
 import { useMutation, useQueryClient, useQuery } from '@tanstack/vue-query'
 import useProjects from '~/composables/use-projects-service'
 import type { IApiResponse, IProject, IProjectKpis } from '~/types'

@@ -52,7 +52,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import useProjects from '~/composables/use-projects-service'
 import type { ICreateProjectRequest } from '~/types'

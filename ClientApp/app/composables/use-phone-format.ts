@@ -1,5 +1,5 @@
 // usePhoneFormat.ts
-import { ref, watch, type Ref } from 'vue'
+import type { Ref } from 'vue'
 
 /**
  * A composable that formats a phone number string in the format:

@@ -23,6 +23,8 @@ namespace CommuniQueue.DataAccess.Services;
 
 public class ProjectRepository(AppDbContext context) : BaseRepository<Project>(context), IProjectRepository
 {
+    private readonly AppDbContext _context = context;
+
     public async Task<IEnumerable<Project>> GetByUserIdAsync(Guid userId)
     {
         if (userId == Guid.Empty)
@@ -30,29 +32,21 @@ public class ProjectRepository(AppDbContext context) : BaseRepository<Project>(c
             return [];
         }
 
-        try
-        {
-            var test = await context.Permissions.ToListAsync();
+        var matchingPermissions = await _context.Permissions
+            .Where(x => x.EntityType == EntityType.Project && x.UserId == userId)
+            .ToListAsync();
 
-            var permissions1 = context.Permissions
-                .Include(permission => permission.Project)
-                .Where(permission => permission.UserId == userId && permission.EntityType == EntityType.Project);
-            var sql = permissions1.ToQueryString();
-            var permissions = await permissions1.ToListAsync();
+        var entityIdsFromPermissions = matchingPermissions.Select(x => x.EntityId).ToList();
 
-            if (permissions.Count == 0)
-            {
-                return [];
-            }
-
-            var projects = permissions.Select(permission => permission.Project).ToList();
-
-            return projects;
-        }
-        catch (Exception ex)
+        if (entityIdsFromPermissions.Count == 0)
         {
             return [];
         }
-    }
 
+        var projects = await _context.Projects
+            .Where(x => entityIdsFromPermissions.Contains(x.Id))
+            .ToListAsync();
+
+        return projects;
+    }
 }

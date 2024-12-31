@@ -1,21 +1,22 @@
 <script setup lang="ts">
+import { ref, computed, watch } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
 import type { UserInfoResponse } from '@logto/nuxt'
-import { ref, computed } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
+import { useRouter } from 'vue-router'
+import useUsers from '~/composables/use-user-service'
+import useTenants from '~/composables/use-tenant-service'
+import type { IUser, IAppTenantInfo } from '~/types'
 
-/**
- * A sub-menu item or direct link item
- */
+// ----------- Existing imports & declarations -----------
 interface NavbarItem {
   label: string
   to?: RouteLocationRaw
   requiresAuth?: boolean
-  children?: NavbarItem[] // if it has sub-menu items
+  isTenantSpecific?: boolean
+  children?: NavbarItem[]
 }
 
-/**
- * Optional info bar data
- */
 interface InfoBarData {
   email?: string
   phone?: string
@@ -27,30 +28,76 @@ interface InfoBarData {
 }
 
 const props = defineProps<{
-  /**
-   * The brand or site name, e.g. "CommuniQueue"
-   */
   brand: string
-
-  /**
-   * InfoBar data. Omit or provide an empty object to hide.
-   */
   infoBar?: InfoBarData
-
-  /**
-   * Array of menu items
-   */
   menuItems: NavbarItem[]
 }>()
 
-/** Whether the mobile menu is open */
 const mobileMenuOpen = ref(false)
-
-/** Color mode composable (dark/light/system) */
 const colorMode = useColorMode()
-
-/** Current user from authentication (Logto) */
 const user: UserInfoResponse = useLogtoUser()
+
+const router = useRouter()
+
+/**
+ * Composable for tenant selection
+ */
+const { currentTenantId, setTenant } = useTenant()
+
+/**
+ * We'll fetch user+tenant data via Vue Query
+ */
+interface IUserTenantsResult {
+  user: IUser
+  tenants: IAppTenantInfo[]
+}
+
+const { getOrCreateUser } = useUsers()
+const { getTenantsByUser } = useTenants()
+
+/**
+ * Query to create or get user => fetch tenants => return them
+ */
+const {
+  data: userTenantsResult,
+  error,
+} = useQuery<IUserTenantsResult, Error>({
+  // Use the same query key you've used elsewhere:
+  queryKey: ['userTenants', user?.sub],
+  enabled: !!user?.sub, // only run if we have a user ID
+  queryFn: async (): Promise<IUserTenantsResult> => {
+    // 1) Create or get the user in the backend
+    const fullNameSplit = user.name?.split(' ') || []
+    const userResp = await getOrCreateUser({
+      email: user.email ?? '',
+      ssoId: user.sub ?? '',
+      isActive: true,
+      firstName: fullNameSplit[0] ?? '',
+      lastName: fullNameSplit[1] ?? '',
+    })
+
+    if (!userResp?.data) {
+      throw new Error('Failed to create/find user')
+    }
+    const backendUser = userResp.data
+
+    // 2) Fetch tenants for that user by their SSO ID
+    const tenantsResp = await getTenantsByUser(backendUser.ssoId)
+    if (!tenantsResp?.data) {
+      throw new Error('Failed to load tenants')
+    }
+
+    return { user: backendUser, tenants: tenantsResp.data }
+  },
+})
+
+/**
+ * userTenants computed
+ * We can use the query's data, which is cached across the app.
+ */
+const userTenants = computed<IAppTenantInfo[]>(() => {
+  return userTenantsResult.value?.tenants ?? []
+})
 
 /**
  * Decide if we show the top InfoBar
@@ -65,10 +112,20 @@ const showInfoBar = computed(() => {
  * Filter out items requiring auth if user isn't authenticated
  */
 const filteredMenuItems = computed<NavbarItem[]>(() => {
-  return props.menuItems.filter((item) => {
-    if (item.requiresAuth && !user) return false
-    return true
-  })
+  return props.menuItems
+    .map((item) => {
+      if (item.requiresAuth && !user) {
+        return null
+      }
+      if (item.isTenantSpecific && user && !currentTenantId.value) {
+        return {
+          ...item,
+          to: '/auth/logging-in',
+        }
+      }
+      return item
+    })
+    .filter(Boolean) as NavbarItem[]
 })
 
 /**
@@ -95,25 +152,35 @@ function toggleTheme() {
 
 /**
  * Utility to check if the route is currently active.
- * We highlight the link if it's the same as the current route's path.
  */
 function isActiveRoute(routeOrPath?: RouteLocationRaw): boolean {
   if (!routeOrPath) return false
-  const router = useRouter()
   const currentPath = router.currentRoute.value.path
 
-  // If `to` is a string, compare directly
   if (typeof routeOrPath === 'string') {
     return currentPath === routeOrPath
   }
-
-  // If `to` is an object with a path, compare that
   if ('path' in routeOrPath && routeOrPath.path) {
     return currentPath === routeOrPath.path
   }
-
   return false
 }
+
+/**
+ * Handle the user picking a tenant in the dropdown
+ */
+function onTenantSelected(tenantId: string) {
+  setTenant(tenantId)
+  // If you want to close the mobile menu after selection:
+  mobileMenuOpen.value = false
+}
+
+// Optionally watch for errors (for debugging or UI)
+watch(error, (err) => {
+  if (err) {
+    console.error('Navbar tenants query error:', err.message)
+  }
+})
 </script>
 
 <template>
@@ -197,7 +264,7 @@ function isActiveRoute(routeOrPath?: RouteLocationRaw): boolean {
         </NuxtLink>
       </div>
 
-      <!-- Desktop Menu (hidden on small screens) -->
+      <!-- DESKTOP MENU (hidden on small screens) -->
       <ul class="hidden md:flex items-center space-x-4">
         <!-- Navigation Items -->
         <li
@@ -261,6 +328,15 @@ function isActiveRoute(routeOrPath?: RouteLocationRaw): boolean {
               {{ item.label }}
             </span>
           </template>
+        </li>
+
+        <!-- DESKTOP TENANT SWITCHER -->
+        <li v-if="user">
+          <LayoutPageTenantDropdown
+            :tenants="userTenants"
+            :current-tenant-id="currentTenantId"
+            @select-tenant="onTenantSelected"
+          />
         </li>
 
         <!-- SEPARATOR BEFORE LOGIN & THEME -->
@@ -332,6 +408,18 @@ function isActiveRoute(routeOrPath?: RouteLocationRaw): boolean {
         v-if="mobileMenuOpen"
         class="md:hidden flex flex-col space-y-1 px-4 pb-4 bg-light-surface dark:bg-dark-surface shadow transition-colors duration-300"
       >
+        <!-- MOBILE TENANT SWITCHER -->
+        <li
+          v-if="user"
+          class="py-2 border-b border-light-secondary/10 dark:border-dark-secondary/20"
+        >
+          <LayoutPageTenantDropdown
+            :tenants="userTenants"
+            :current-tenant-id="currentTenantId"
+            @select-tenant="onTenantSelected"
+          />
+        </li>
+
         <!-- Navigation Items -->
         <li
           v-for="(item, index) in filteredMenuItems"
@@ -344,8 +432,7 @@ function isActiveRoute(routeOrPath?: RouteLocationRaw): boolean {
               <span
                 class="font-semibold"
                 :class="{
-                  'text-light-primary dark:text-dark-primary':
-                    isActiveRoute(item.to),
+                  'text-light-primary dark:text-dark-primary': isActiveRoute(item.to),
                 }"
               >
                 {{ item.label }}
@@ -382,8 +469,7 @@ function isActiveRoute(routeOrPath?: RouteLocationRaw): boolean {
               :to="item.to"
               class="block py-2 px-1 transition-colors duration-200 hover:text-light-primary dark:hover:text-dark-primary"
               :class="{
-                'text-light-primary dark:text-dark-primary font-semibold':
-                  isActiveRoute(item.to),
+                'text-light-primary dark:text-dark-primary font-semibold': isActiveRoute(item.to),
               }"
               @click="mobileMenuOpen = false"
             >
