@@ -1,4 +1,5 @@
 #region Copyright
+
 // ---------------------------------------------------------------------------
 // Copyright (c) 2024 Battleline Productions LLC. All rights reserved.
 //
@@ -10,21 +11,19 @@
 // Date: 12/29/2024
 // Solution Name: CommuniQueue
 // Project Name: CommuniQueue.Contracts
-// File: ITenantRepository.cs
-// File Path: C:\git\battleline\CommuniQueue\CommuniQueue.Contracts\Interfaces\Repositories\ITenantRepository.cs
+// File: ITenantUserManagementService.cs
+// File Path: C:\git\battleline\CommuniQueue\CommuniQueue.Contracts\Interfaces\ITenantUserManagementService.cs
 // ---------------------------------------------------------------------------
+
 #endregion
 
+using BattlelineExtras.Contracts.Models;
 using CommuniQueue.Contracts.Models;
 
-namespace CommuniQueue.Contracts.Interfaces.Repositories;
+namespace CommuniQueue.Contracts.Interfaces;
 
-public interface ITenantRepository
+public interface ITenantUserManagementService
 {
-    Task<List<AppTenantInfo>> GetTenantsByUserId(Guid userId);
-    Task<AppTenantInfo?> GetTenantById(string id);
-    Task<AppTenantInfo?> GetTenantByIdentifier(string identifier);
-    Task<AppTenantInfo?> GetTenantByName(string name);
-    Task<AppTenantInfo> CreateTenant(AppTenantInfo tenant);
-    Task<AppTenantInfo> UpdateTenant(AppTenantInfo tenant);
+    Task<ResponseDetail<AppTenantInfo>> AddUserToTenant(Guid userId, string tenantId);
+    Task<ResponseDetail<AppTenantInfo>> RemoveUserFromTenant(Guid userId, string tenantId);
 }

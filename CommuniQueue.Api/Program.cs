@@ -25,6 +25,7 @@ using BattlelineExtras.Http.Extensions;
 using CommuniQueue;
 using CommuniQueue.Api.Extensions;
 using CommuniQueue.Api.Handlers;
+using CommuniQueue.Api.Middleware;
 using CommuniQueue.Contracts.Models;
 using CommuniQueue.DataAccess;
 using CommuniQueue.ServiceDefaults;
@@ -40,6 +41,8 @@ builder.Services.AddCustomLogger(builder.Configuration);
 
 builder.AddServiceDefaults();
 
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
@@ -52,7 +55,8 @@ builder.AddNpgsqlDbContext<AppDbContext>("communiqueuedb", null,
 builder.AddNpgsqlDbContext<TenantStoreDbContext>("communiqueuedb", null,
     options => { options.UseSnakeCaseNamingConvention(); });
 
-builder.Services.AddMultiTenant<AppTenantInfo>().WithEFCoreStore<TenantStoreDbContext, AppTenantInfo>()
+builder.Services.AddMultiTenant<AppTenantInfo>()
+    .WithEFCoreStore<TenantStoreDbContext, AppTenantInfo>()
     .WithRouteStrategy("tenantId");
 
 builder.Services.AddEndpointsApiExplorer();
@@ -99,11 +103,15 @@ app.UseRequestResponseLogging();
 
 await app.MigrateDatabaseAsync();
 
+app.UseMiddleware<TenantResolutionMiddleware>();
+
 app.MapProjectEndpoints();
 app.MapContainerEndpoints();
 app.MapTemplateEndpoints();
 app.MapApiKeyEndpoints();
 app.MapPermissionEndpoints();
 app.MapUserEndpoints();
+app.MapTenantEndpoints();
+app.MapTenantUserManagementEndpoints();
 
 await app.RunAsync();

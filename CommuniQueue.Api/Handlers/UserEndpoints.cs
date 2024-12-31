@@ -1,10 +1,10 @@
 #region Copyright
 // ---------------------------------------------------------------------------
 // Copyright (c) 2024 Battleline Productions LLC. All rights reserved.
-// 
+//
 // Licensed under the Battleline Productions LLC license agreement.
 // See LICENSE file in the project root for full license information.
-// 
+//
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
 // Date: 11/24/2024
@@ -34,6 +34,18 @@ public static class UserEndpoints
             .HasApiVersion(new ApiVersion(1, 0))
             .ReportApiVersions()
             .Build();
+
+        app.MapPost($"{BaseRoute}/initial", GetOrCreateUser)
+            .Produces<ResponseDetail<User>>()
+            .Produces<ResponseDetail<User>>(StatusCodes.Status201Created)
+            .Produces<ResponseDetail<User>>(StatusCodes.Status409Conflict)
+            .WithApiVersionSet(versionSet)
+            .MapToApiVersion(1.0)
+            .WithOpenApi(operation => new(operation)
+            {
+                Summary = "Requests a user, if one is not found, creates the user from the body",
+                Description = "Requests a user, if one is not found, creates the user from the body"
+            });
 
         app.MapPost(BaseRoute, CreateUser)
             .Produces<ResponseDetail<User>>(StatusCodes.Status201Created)
@@ -144,6 +156,14 @@ public static class UserEndpoints
             });
     }
 
+    private static async Task<IResult> GetOrCreateUser(
+        [FromServices] IUserService userService,
+        [FromBody] CreateUserRequest request)
+    {
+        var result = await userService.GetOrCreateUserAsync(request.Email, request.SsoId, request.FirstName, request.LastName);
+        return ApiResponse.GetActionResult(result);
+    }
+
     private static async Task<IResult> GetUserById(
         [FromServices] IUserService userService,
         Guid userId)
@@ -212,7 +232,7 @@ public static class UserEndpoints
         [FromServices] IUserService userService,
         [FromBody] CreateUserRequest request)
     {
-        var result = await userService.CreateUserAsync(request.Email, request.SsoId, request.GlobalRole);
+        var result = await userService.CreateUserAsync(request.Email, request.SsoId, request.FirstName, request.LastName);
         return ApiResponse.GetActionResult(result);
     }
 
@@ -221,10 +241,10 @@ public static class UserEndpoints
         Guid userId,
         [FromBody] UpdateUserRequest request)
     {
-        var result = await userService.UpdateUserAsync(userId, request.Email, request.GlobalRole, request.IsActive);
+        var result = await userService.UpdateUserAsync(userId, request.Email, request.IsActive, request.FirstName, request.LastName);
         return ApiResponse.GetActionResult(result);
     }
 }
 
-public record CreateUserRequest(string Email, string SsoId, string GlobalRole);
-public record UpdateUserRequest(string Email, string GlobalRole, bool IsActive);
+public record CreateUserRequest(string Email, string SsoId, string FirstName, string LastName);
+public record UpdateUserRequest(string Email, bool IsActive, string FirstName, string LastName);

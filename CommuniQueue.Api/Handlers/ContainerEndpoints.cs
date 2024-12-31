@@ -26,7 +26,7 @@ namespace CommuniQueue.Api.Handlers;
 
 public static class ContainerEndpoints
 {
-    private const string BaseRoute = "api/v{version:apiVersion}/containers";
+    private const string BaseRoute = "api/v{version:apiVersion}/tenant/{tenantId}/containers";
 
     public static void MapContainerEndpoints(this IEndpointRouteBuilder app)
     {

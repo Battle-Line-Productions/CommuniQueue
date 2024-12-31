@@ -1,4 +1,4 @@
-import type { GlobalRoleType, IPermission } from '~/types'
+import type { IPermission } from '~/types'
 
 export interface IUser {
   id: string // Guid in C#
@@ -9,6 +9,5 @@ export interface IUser {
   firstName: string
   lastName: string
   isActive: boolean
-  globalRole: GlobalRoleType
   permissions?: IPermission[]
 }

@@ -19,6 +19,7 @@
 
 #region Usings
 
+using System.Reflection.Metadata;
 using System.Text.Json;
 using BattlelineExtras.Contracts.Interfaces;
 using CommuniQueue.Contracts.Models;
@@ -51,14 +52,26 @@ public class AppDbContext(IMultiTenantContextAccessor multiTenantContextAccessor
     public DbSet<TemplateStageAssignment> TemplateStageAssignments => Set<TemplateStageAssignment>();
     public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+
+        var tenant = multiTenantContextAccessor.MultiTenantContext;
+
+        Console.WriteLine("shit");
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        var tenant = multiTenantContextAccessor.MultiTenantContext;
 
         modelBuilder.Entity<AppTenantInfo>(entity =>
         {
             entity.HasKey(t => t.Id);
             entity.HasIndex(t => t.OwnerUserId);
+            entity.HasIndex(t => t.Name).IsUnique();
         });
 
         modelBuilder.Entity<UserTenantMembership>(entity =>
@@ -100,7 +113,7 @@ public class AppDbContext(IMultiTenantContextAccessor multiTenantContextAccessor
                 .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
             entity.HasOne(p => p.Project)
-                .WithMany()
+                .WithMany(pr => pr.Permissions)
                 .HasForeignKey(p => p.EntityId)
                 .HasPrincipalKey(pr => pr.Id)
                 .IsRequired(false)
@@ -110,7 +123,11 @@ public class AppDbContext(IMultiTenantContextAccessor multiTenantContextAccessor
                 .WithMany()
                 .HasForeignKey(p => p.TenantId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.IsMultiTenant();
         });
+        //var permissionKey = modelBuilder.Entity<Permission>().Metadata.GetKeys().First();
+        //modelBuilder.Entity<Permission>().IsMultiTenant().AdjustKey(permissionKey, modelBuilder).AdjustIndexes();
 
         modelBuilder.Entity<Container>(entity =>
         {
@@ -131,7 +148,11 @@ public class AppDbContext(IMultiTenantContextAccessor multiTenantContextAccessor
                 .WithMany()
                 .HasForeignKey(p => p.TenantId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.IsMultiTenant();
         });
+        //var containerKey = modelBuilder.Entity<Container>().Metadata.GetKeys().First();
+        //modelBuilder.Entity<Container>().IsMultiTenant().AdjustKey(containerKey, modelBuilder).AdjustIndexes();
 
         modelBuilder.Entity<Template>(entity =>
         {
@@ -151,7 +172,11 @@ public class AppDbContext(IMultiTenantContextAccessor multiTenantContextAccessor
                 .WithMany()
                 .HasForeignKey(p => p.TenantId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.IsMultiTenant();
         });
+        //var templateKey = modelBuilder.Entity<Template>().Metadata.GetKeys().First();
+        //modelBuilder.Entity<Template>().IsMultiTenant().AdjustKey(templateKey, modelBuilder).AdjustIndexes();
 
         modelBuilder.Entity<TemplateVersion>(entity =>
         {
@@ -166,7 +191,11 @@ public class AppDbContext(IMultiTenantContextAccessor multiTenantContextAccessor
                 .WithMany()
                 .HasForeignKey(p => p.TenantId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.IsMultiTenant();
         });
+        //var templateVersionKey = modelBuilder.Entity<TemplateVersion>().Metadata.GetKeys().First();
+        //modelBuilder.Entity<TemplateVersion>().IsMultiTenant().AdjustKey(templateVersionKey, modelBuilder).AdjustIndexes();
 
         modelBuilder.Entity<TemplateStageAssignment>(entity =>
         {
@@ -188,7 +217,11 @@ public class AppDbContext(IMultiTenantContextAccessor multiTenantContextAccessor
                 .WithMany()
                 .HasForeignKey(p => p.TenantId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.IsMultiTenant();
         });
+        //var templateStageAssignmentKey = modelBuilder.Entity<TemplateStageAssignment>().Metadata.GetKeys().First();
+        //modelBuilder.Entity<TemplateStageAssignment>().IsMultiTenant().AdjustKey(templateStageAssignmentKey, modelBuilder).AdjustIndexes();
 
         modelBuilder.Entity<Stage>(entity =>
         {
@@ -205,7 +238,11 @@ public class AppDbContext(IMultiTenantContextAccessor multiTenantContextAccessor
                 .WithMany()
                 .HasForeignKey(p => p.TenantId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.IsMultiTenant();
         });
+        //var stageKey = modelBuilder.Entity<Stage>().Metadata.GetKeys().First();
+        //modelBuilder.Entity<Stage>().IsMultiTenant().AdjustKey(stageKey, modelBuilder).AdjustIndexes();
 
         modelBuilder.Entity<Project>(entity =>
         {
@@ -215,7 +252,11 @@ public class AppDbContext(IMultiTenantContextAccessor multiTenantContextAccessor
                 .WithMany()
                 .HasForeignKey(p => p.TenantId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.IsMultiTenant();
         });
+        //var projectKey = modelBuilder.Entity<Project>().Metadata.GetKeys().First();
+        //modelBuilder.Entity<Project>().IsMultiTenant().AdjustKey(projectKey, modelBuilder).AdjustIndexes();
 
         modelBuilder.Entity<ApiKey>(entity =>
         {
@@ -237,7 +278,11 @@ public class AppDbContext(IMultiTenantContextAccessor multiTenantContextAccessor
                 .WithMany()
                 .HasForeignKey(p => p.TenantId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.IsMultiTenant();
         });
+        //var apiKeyKey = modelBuilder.Entity<ApiKey>().Metadata.GetKeys().First();
+        //modelBuilder.Entity<ApiKey>().IsMultiTenant().AdjustKey(apiKeyKey, modelBuilder).AdjustIndexes();
     }
 
     public override int SaveChanges()
@@ -283,6 +328,8 @@ public class AppDbContext(IMultiTenantContextAccessor multiTenantContextAccessor
             }
         }
 
+        this.EnforceMultiTenant();
+
         return base.SaveChanges();
     }
 
@@ -327,6 +374,8 @@ public class AppDbContext(IMultiTenantContextAccessor multiTenantContextAccessor
                 }
             }
         }
+
+        this.EnforceMultiTenant();
 
         return await base.SaveChangesAsync(cancellationToken);
     }

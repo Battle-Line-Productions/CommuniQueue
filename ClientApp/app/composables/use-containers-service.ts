@@ -2,7 +2,9 @@ import type { IApiResponse, IContainer, ICreateContainerRequest, IUpdateContaine
 
 export default function useContainers() {
   const config = useRuntimeConfig()
-  const baseUrl = `${config.public.apiBaseUrl}/api/v1/containers`
+  const tenant = useTenant()
+
+  const baseUrl = `${config.public.apiBaseUrl}/api/v1/tenant/${tenant.currentTenantId.value}containers`
   const { handleApiCall, createFetchOptions } = useApiUtils()
 
   const createContainer = (request: ICreateContainerRequest) => {

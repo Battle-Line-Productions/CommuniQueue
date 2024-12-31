@@ -13,4 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CommuniQueue.Contracts\CommuniQueue.Contracts.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Extensions\" />
+  </ItemGroup>
 </Project>

@@ -22,5 +22,5 @@ namespace CommuniQueue.Contracts.Interfaces.Repositories;
 public interface IProjectRepository : IBaseRepository<Project>
 {
     Task<List<Project>> GetAllAsync();
-    Task<IEnumerable<Project?>> GetByUserIdAsync(Guid userId);
+    Task<IEnumerable<Project>> GetByUserIdAsync(Guid userId);
 }

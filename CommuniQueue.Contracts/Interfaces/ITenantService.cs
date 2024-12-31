@@ -10,21 +10,19 @@
 // Date: 12/29/2024
 // Solution Name: CommuniQueue
 // Project Name: CommuniQueue.Contracts
-// File: ITenantRepository.cs
-// File Path: C:\git\battleline\CommuniQueue\CommuniQueue.Contracts\Interfaces\Repositories\ITenantRepository.cs
+// File: ITenantService.cs
+// File Path: C:\git\battleline\CommuniQueue\CommuniQueue.Contracts\Interfaces\ITenantService.cs
 // ---------------------------------------------------------------------------
 #endregion
 
+using BattlelineExtras.Contracts.Models;
 using CommuniQueue.Contracts.Models;
 
-namespace CommuniQueue.Contracts.Interfaces.Repositories;
+namespace CommuniQueue.Contracts.Interfaces;
 
-public interface ITenantRepository
+public interface ITenantService
 {
-    Task<List<AppTenantInfo>> GetTenantsByUserId(Guid userId);
-    Task<AppTenantInfo?> GetTenantById(string id);
-    Task<AppTenantInfo?> GetTenantByIdentifier(string identifier);
-    Task<AppTenantInfo?> GetTenantByName(string name);
-    Task<AppTenantInfo> CreateTenant(AppTenantInfo tenant);
-    Task<AppTenantInfo> UpdateTenant(AppTenantInfo tenant);
+    Task<ResponseDetail<AppTenantInfo>> CreateTenantAsync(string tenantName, string tenantDescription, string ssoUserId);
+    Task<ResponseDetail<List<AppTenantInfo>>> ListTenantsByUser(string ssoUserId);
+    Task<ResponseDetail<AppTenantInfo>> UpdateTenantAsync(string tenantId, string tenantName, string tenantDescription);
 }

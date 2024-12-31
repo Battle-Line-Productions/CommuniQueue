@@ -2,10 +2,10 @@
 
 // ---------------------------------------------------------------------------
 // Copyright (c) 2024 Battleline Productions LLC. All rights reserved.
-// 
+//
 // Licensed under the Battleline Productions LLC license agreement.
 // See LICENSE file in the project root for full license information.
-// 
+//
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
 // Date: 11/03/2024
@@ -23,6 +23,7 @@ using System.Linq.Expressions;
 using BattlelineExtras.Contracts.Extensions;
 using BattlelineExtras.Contracts.Models;
 using CommuniQueue.Contracts.Interfaces.Repositories;
+using CommuniQueue.Contracts.Models;
 using CommuniQueue.Contracts.Models.Filters;
 using CommuniQueue.Predicate;
 
@@ -36,7 +37,8 @@ public class ProjectService(
     IStageRepository stageRepository,
     IContainerRepository containerRepository,
     ITemplateRepository templateRepository,
-    IKpiQueryService<Project> projectKpiService)
+    IKpiQueryService<Project> projectKpiService,
+    IUserRepository userRepository)
     : IProjectService
 {
     private const string SubCode = "ProjectService";
@@ -133,11 +135,18 @@ public class ProjectService(
         }
     }
 
-    public async Task<ResponseDetail<List<Project?>>> GetProjectsByUserIdAsync(Guid userId)
+    public async Task<ResponseDetail<List<Project?>>> GetProjectsByUserIdAsync(string ssoUserId)
     {
         try
         {
-            var projects = await projectRepository.GetByUserIdAsync(userId);
+            var user = await userRepository.GetBySsoIdAsync(ssoUserId);
+            if (user == null)
+            {
+                return ((List<Project>?)null).BuildResponseDetail(ResultStatus.NotFound404, "Get Projects by User ID", SubCode)
+                    .AddErrorDetail("GetProjectsByUserId", $"User with SSOID {ssoUserId} not found");
+            }
+
+            var projects = await projectRepository.GetByUserIdAsync(user.Id);
             return projects.ToList().BuildResponseDetail(ResultStatus.Ok200, "Get Projects by User ID", SubCode);
         }
         catch (Exception ex)

@@ -17,9 +17,9 @@ namespace CommuniQueue.DataAccess.Migrations
                 {
                     id = table.Column<string>(type: "text", nullable: false),
                     owner_user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    display_name = table.Column<string>(type: "text", nullable: true),
-                    identifier = table.Column<string>(type: "text", nullable: true),
-                    name = table.Column<string>(type: "text", nullable: true),
+                    identifier = table.Column<string>(type: "text", nullable: false),
+                    name = table.Column<string>(type: "text", nullable: false),
+                    description = table.Column<string>(type: "text", nullable: true),
                     created_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -39,8 +39,7 @@ namespace CommuniQueue.DataAccess.Migrations
                     sso_id = table.Column<string>(type: "text", nullable: false),
                     first_name = table.Column<string>(type: "text", nullable: false),
                     last_name = table.Column<string>(type: "text", nullable: false),
-                    is_active = table.Column<bool>(type: "boolean", nullable: false),
-                    global_role = table.Column<int>(type: "integer", nullable: false)
+                    is_active = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -77,12 +76,19 @@ namespace CommuniQueue.DataAccess.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     tenant_id = table.Column<string>(type: "text", nullable: false),
+                    global_role = table.Column<int>(type: "integer", nullable: false),
                     created_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    app_tenant_info_id = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_user_tenant_memberships", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_user_tenant_memberships_app_tenant_info_app_tenant_info_id",
+                        column: x => x.app_tenant_info_id,
+                        principalTable: "app_tenant_info",
+                        principalColumn: "id");
                     table.ForeignKey(
                         name: "fk_user_tenant_memberships_app_tenant_info_tenant_id",
                         column: x => x.tenant_id,
@@ -177,8 +183,7 @@ namespace CommuniQueue.DataAccess.Migrations
                     permission_level = table.Column<int>(type: "integer", nullable: false),
                     created_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    tenant_id = table.Column<string>(type: "text", nullable: false),
-                    project_id = table.Column<Guid>(type: "uuid", nullable: true)
+                    tenant_id = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -195,11 +200,6 @@ namespace CommuniQueue.DataAccess.Migrations
                         principalTable: "projects",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "fk_permissions_projects_project_id",
-                        column: x => x.project_id,
-                        principalTable: "projects",
-                        principalColumn: "id");
                     table.ForeignKey(
                         name: "fk_permissions_users_user_id",
                         column: x => x.user_id,
@@ -347,6 +347,12 @@ namespace CommuniQueue.DataAccess.Migrations
                 column: "tenant_id");
 
             migrationBuilder.CreateIndex(
+                name: "ix_app_tenant_info_name",
+                table: "app_tenant_info",
+                column: "name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "ix_app_tenant_info_owner_user_id",
                 table: "app_tenant_info",
                 column: "owner_user_id");
@@ -370,11 +376,6 @@ namespace CommuniQueue.DataAccess.Migrations
                 name: "ix_permissions_entity_id",
                 table: "permissions",
                 column: "entity_id");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_permissions_project_id",
-                table: "permissions",
-                column: "project_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_permissions_tenant_id",
@@ -443,6 +444,11 @@ namespace CommuniQueue.DataAccess.Migrations
                 name: "ix_templates_tenant_id",
                 table: "templates",
                 column: "tenant_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_user_tenant_memberships_app_tenant_info_id",
+                table: "user_tenant_memberships",
+                column: "app_tenant_info_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_user_tenant_memberships_tenant_id",

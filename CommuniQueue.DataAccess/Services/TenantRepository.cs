@@ -33,7 +33,7 @@ public class TenantRepository(AppDbContext context) : ITenantRepository
 
     public async Task<AppTenantInfo?> GetTenantById(string id)
     {
-        return await context.AppTenantInfo.SingleOrDefaultAsync(x => x.Id == id);
+        return await context.AppTenantInfo.Include(x => x.UserTenantMemberships).SingleOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<AppTenantInfo?> GetTenantByIdentifier(string identifier)
@@ -49,6 +49,14 @@ public class TenantRepository(AppDbContext context) : ITenantRepository
     public async Task<AppTenantInfo> CreateTenant(AppTenantInfo tenant)
     {
         await context.AppTenantInfo.AddAsync(tenant);
+        await context.SaveChangesAsync();
+
+        return tenant;
+    }
+
+    public async Task<AppTenantInfo> UpdateTenant(AppTenantInfo tenant)
+    {
+        context.AppTenantInfo.Update(tenant);
         await context.SaveChangesAsync();
 
         return tenant;

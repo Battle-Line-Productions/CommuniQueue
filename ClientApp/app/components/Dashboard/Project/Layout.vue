@@ -6,7 +6,14 @@
       </h1>
       <UButton
         type="button"
-        class="bg-light-primary dark:bg-dark-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
+        color="primary"
+        variant="solid"
+        class="px-4 py-2 rounded-md
+         text-white
+         bg-light-primary dark:bg-dark-primary
+         hover:bg-light-primary/90 dark:hover:bg-dark-primary/90
+         focus:ring-2 focus:ring-light-primary/50 dark:focus:ring-dark-primary/50
+         transition-all duration-300"
         @click.prevent="openCreateProjectModal"
       >
         Create New Project

@@ -1,7 +1,15 @@
 import type { Config } from 'tailwindcss'
 
 export default <Partial<Config>>{
-  content: [],
+  content: [
+    './app/**/*.{vue,js,ts,jsx,tsx}',
+    // Scan Nuxt specific directories
+    './components/**/*.{vue,js,ts,jsx,tsx}',
+    './layouts/**/*.{vue,js,ts,jsx,tsx}',
+    './pages/**/*.{vue,js,ts,jsx,tsx}',
+    './plugins/**/*.{js,ts}',
+    './app.vue',
+  ],
   darkMode: 'class',
   theme: {
     extend: {

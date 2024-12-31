@@ -26,7 +26,7 @@ namespace CommuniQueue.Api.Handlers;
 
 public static class TemplateEndpoints
 {
-    private const string BaseRoute = "api/v{version:apiVersion}/templates";
+    private const string BaseRoute = "api/v{version:apiVersion}/tenant/{tenantId}/templates";
 
     public static void MapTemplateEndpoints(this IEndpointRouteBuilder app)
     {

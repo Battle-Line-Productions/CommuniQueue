@@ -2,7 +2,9 @@ import type { IApiKey, IApiResponse, IGenerateApiKeyRequest, IValidateApiKeyRequ
 
 export default function useApiKeys() {
   const config = useRuntimeConfig()
-  const baseUrl = `${config.public.apiBaseUrl}/api/v1/apikeys`
+  const tenant = useTenant()
+
+  const baseUrl = `${config.public.apiBaseUrl}/api/v1/tenant/${tenant.currentTenantId.value}apikeys`
   const { handleApiCall, createFetchOptions } = useApiUtils()
 
   const generateApiKey = (request: IGenerateApiKeyRequest) => {

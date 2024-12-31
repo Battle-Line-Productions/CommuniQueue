@@ -26,7 +26,7 @@ namespace CommuniQueue.Api.Handlers;
 
 public static class PermissionEndpoints
 {
-    private const string BaseRoute = "api/v{version:apiVersion}/permissions";
+    private const string BaseRoute = "api/v{version:apiVersion}/tenant/{tenantId}/permissions";
 
     public static void MapPermissionEndpoints(this IEndpointRouteBuilder app)
     {

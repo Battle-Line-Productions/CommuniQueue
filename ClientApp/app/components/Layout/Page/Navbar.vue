@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { UserInfoResponse } from '@logto/nuxt'
 import { ref, computed } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
@@ -49,7 +50,7 @@ const mobileMenuOpen = ref(false)
 const colorMode = useColorMode()
 
 /** Current user from authentication (Logto) */
-const user = useLogtoUser()
+const user: UserInfoResponse = useLogtoUser()
 
 /**
  * Decide if we show the top InfoBar

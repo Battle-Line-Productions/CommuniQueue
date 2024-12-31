@@ -1,10 +1,10 @@
 #region Copyright
 // ---------------------------------------------------------------------------
 // Copyright (c) 2024 Battleline Productions LLC. All rights reserved.
-// 
+//
 // Licensed under the Battleline Productions LLC license agreement.
 // See LICENSE file in the project root for full license information.
-// 
+//
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
 // Date: 11/09/2024
@@ -26,7 +26,7 @@ namespace CommuniQueue.Api.Handlers;
 
 public static class ApiKeyEndpoints
 {
-    private const string BaseRoute = "api/v{version:apiVersion}/apikeys";
+    private const string BaseRoute = "api/v{version:apiVersion}/tenant/{tenantId}/apikeys";
 
     public static void MapApiKeyEndpoints(this IEndpointRouteBuilder app)
     {

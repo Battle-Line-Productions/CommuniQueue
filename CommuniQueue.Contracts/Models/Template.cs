@@ -19,15 +19,12 @@
 
 #region Usings
 
-using BattlelineExtras.Contracts.Interfaces;
 using CommuniQueue.Contracts.Interfaces;
-using Finbuckle.MultiTenant;
 
 #endregion
 
 namespace CommuniQueue.Contracts.Models;
 
-[MultiTenant]
 public class Template : IMultiTenantEntity
 {
     public string Name { get; set; }

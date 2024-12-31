@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CommuniQueue.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241225041818_InitialMigration")]
+    [Migration("20241231012537_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -96,15 +96,17 @@ namespace CommuniQueue.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_date_time");
 
-                    b.Property<string>("DisplayName")
+                    b.Property<string>("Description")
                         .HasColumnType("text")
-                        .HasColumnName("display_name");
+                        .HasColumnName("description");
 
                     b.Property<string>("Identifier")
+                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("identifier");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("name");
 
@@ -118,6 +120,10 @@ namespace CommuniQueue.DataAccess.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_app_tenant_info");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_app_tenant_info_name");
 
                     b.HasIndex("OwnerUserId")
                         .HasDatabaseName("ix_app_tenant_info_owner_user_id");
@@ -207,13 +213,10 @@ namespace CommuniQueue.DataAccess.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("permission_level");
 
-                    b.Property<Guid?>("ProjectId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("project_id");
-
                     b.Property<string>("TenantId")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
                         .HasColumnName("tenant_id");
 
                     b.Property<DateTime>("UpdatedDateTime")
@@ -230,9 +233,6 @@ namespace CommuniQueue.DataAccess.Migrations
                     b.HasIndex("EntityId")
                         .HasDatabaseName("ix_permissions_entity_id");
 
-                    b.HasIndex("ProjectId")
-                        .HasDatabaseName("ix_permissions_project_id");
-
                     b.HasIndex("TenantId")
                         .HasDatabaseName("ix_permissions_tenant_id");
 
@@ -241,6 +241,8 @@ namespace CommuniQueue.DataAccess.Migrations
                         .HasDatabaseName("ix_permissions_user_id_entity_id_entity_type");
 
                     b.ToTable("permissions", (string)null);
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("CommuniQueue.Contracts.Models.Project", b =>
@@ -509,10 +511,6 @@ namespace CommuniQueue.DataAccess.Migrations
                         .HasColumnType("text")
                         .HasColumnName("first_name");
 
-                    b.Property<int>("GlobalRole")
-                        .HasColumnType("integer")
-                        .HasColumnName("global_role");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean")
                         .HasColumnName("is_active");
@@ -552,9 +550,17 @@ namespace CommuniQueue.DataAccess.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<string>("AppTenantInfoId")
+                        .HasColumnType("text")
+                        .HasColumnName("app_tenant_info_id");
+
                     b.Property<DateTime>("CreatedDateTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_date_time");
+
+                    b.Property<int>("GlobalRole")
+                        .HasColumnType("integer")
+                        .HasColumnName("global_role");
 
                     b.Property<string>("TenantId")
                         .IsRequired()
@@ -571,6 +577,9 @@ namespace CommuniQueue.DataAccess.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_user_tenant_memberships");
+
+                    b.HasIndex("AppTenantInfoId")
+                        .HasDatabaseName("ix_user_tenant_memberships_app_tenant_info_id");
 
                     b.HasIndex("TenantId")
                         .HasDatabaseName("ix_user_tenant_memberships_tenant_id");
@@ -638,15 +647,10 @@ namespace CommuniQueue.DataAccess.Migrations
             modelBuilder.Entity("CommuniQueue.Contracts.Models.Permission", b =>
                 {
                     b.HasOne("CommuniQueue.Contracts.Models.Project", "Project")
-                        .WithMany()
+                        .WithMany("Permissions")
                         .HasForeignKey("EntityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("fk_permissions_projects_entity_id");
-
-                    b.HasOne("CommuniQueue.Contracts.Models.Project", null)
-                        .WithMany("Permissions")
-                        .HasForeignKey("ProjectId")
-                        .HasConstraintName("fk_permissions_projects_project_id");
 
                     b.HasOne("CommuniQueue.Contracts.Models.AppTenantInfo", "Tenant")
                         .WithMany()
@@ -785,6 +789,11 @@ namespace CommuniQueue.DataAccess.Migrations
 
             modelBuilder.Entity("CommuniQueue.Contracts.Models.UserTenantMembership", b =>
                 {
+                    b.HasOne("CommuniQueue.Contracts.Models.AppTenantInfo", null)
+                        .WithMany("UserTenantMemberships")
+                        .HasForeignKey("AppTenantInfoId")
+                        .HasConstraintName("fk_user_tenant_memberships_app_tenant_info_app_tenant_info_id");
+
                     b.HasOne("CommuniQueue.Contracts.Models.AppTenantInfo", "Tenant")
                         .WithMany()
                         .HasForeignKey("TenantId")
@@ -802,6 +811,11 @@ namespace CommuniQueue.DataAccess.Migrations
                     b.Navigation("Tenant");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CommuniQueue.Contracts.Models.AppTenantInfo", b =>
+                {
+                    b.Navigation("UserTenantMemberships");
                 });
 
             modelBuilder.Entity("CommuniQueue.Contracts.Models.Container", b =>

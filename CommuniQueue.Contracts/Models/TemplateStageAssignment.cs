@@ -16,11 +16,9 @@
 #endregion
 
 using CommuniQueue.Contracts.Interfaces;
-using Finbuckle.MultiTenant;
 
 namespace CommuniQueue.Contracts.Models;
 
-[MultiTenant]
 public class TemplateStageAssignment : IMultiTenantEntity
 {
     public Guid Id { get; set; }

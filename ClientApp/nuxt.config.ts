@@ -81,6 +81,10 @@ export default defineNuxtConfig({
     compatibilityVersion: 4,
   },
 
+  experimental: {
+    componentIslands: true,
+  },
+
   compatibilityDate: '2024-11-01',
 
   postcss: {
@@ -96,13 +100,10 @@ export default defineNuxtConfig({
   },
 
   logto: {
-    postCallbackRedirectUri: '/dashboard/projects',
+    postCallbackRedirectUri: '/auth/logging-in',
     postLogoutRedirectUri: '/',
     fetchUserInfo: true,
     scopes: ['openid', 'profile', 'email', 'organizations', 'custom_data', 'phone', 'write:resource'],
-    pathnames: {
-      callback: '/auth/logging-in',
-    },
     // resources: [process.env.NUXT_TENANT_LOGTO_RESOURCE as string]
   },
 

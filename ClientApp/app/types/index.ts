@@ -34,6 +34,10 @@ export * from './requests/permission/IUpdatePermissionRequest'
 export * from './requests/user/ICreateUserRequest'
 export * from './requests/user/IUpdateUserRequest'
 
+// Tenant Request
+export * from './requests/tenant/ICreateTenantRequest'
+export * from './requests/tenant/IUpdateTenantRequest'
+
 // Models
 export * from './models/IApiKey'
 export * from './generic/IApiResponse'
@@ -45,6 +49,8 @@ export * from './models/ITemplate'
 export * from './models/ITemplateStageAssignment'
 export * from './models/ITemplateVersion'
 export * from './models/IUser'
+export * from './models/IUserTenantMembership'
+export * from './models/IAppTenantInfo'
 
 // Kpis
 export * from './Kpis/IProjectKpis'

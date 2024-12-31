@@ -2,10 +2,10 @@
 
 // ---------------------------------------------------------------------------
 // Copyright (c) 2024 Battleline Productions LLC. All rights reserved.
-// 
+//
 // Licensed under the Battleline Productions LLC license agreement.
 // See LICENSE file in the project root for full license information.
-// 
+//
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
 // Date: 11/03/2024
@@ -31,7 +31,7 @@ public interface IProjectService
 {
     Task<ResponseDetail<Project>> CreateProjectAsync(string name, string description, Guid ownerId);
     Task<ResponseDetail<Project>> GetProjectByIdAsync(Guid projectId);
-    Task<ResponseDetail<List<Project?>>> GetProjectsByUserIdAsync(Guid userId);
+    Task<ResponseDetail<List<Project?>>> GetProjectsByUserIdAsync(string ssoUserId);
     Task<ResponseDetail<Project>> UpdateProjectAsync(Guid projectId, string name, string description);
     Task<ResponseDetail<bool>> DeleteProjectAsync(Guid projectId);
     Task<ResponseDetail<bool>> AddUserToProjectAsync(Guid projectId, Guid userId, PermissionLevel permissionLevel);

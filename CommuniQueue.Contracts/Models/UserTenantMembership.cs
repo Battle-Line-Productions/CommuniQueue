@@ -26,6 +26,7 @@ public class UserTenantMembership : IEntity
     public string TenantId { get; set; }
     public User? User { get; set; }
     public AppTenantInfo? Tenant { get; set; }
+    public GlobalRoleType GlobalRole { get; set; } = GlobalRoleType.Contributor;
     public DateTime CreatedDateTime { get; set; }
     public DateTime UpdatedDateTime { get; set; }
 }

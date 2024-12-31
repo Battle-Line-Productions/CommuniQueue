@@ -6,6 +6,17 @@ export default function useUsers() {
 
   const baseUrl = `${config.public.apiBaseUrl}/api/v1/users`
 
+  const getOrCreateUser = (request: ICreateUserRequest) => {
+    return handleApiCall(
+      $fetch<IApiResponse<IUser>>(`${baseUrl}/initial`, {
+        ...createFetchOptions<IApiResponse<IUser>>(),
+        method: 'POST',
+        body: request,
+      }),
+      'getorCreateUser',
+    )
+  }
+
   const createUser = (request: ICreateUserRequest) => {
     return handleApiCall(
       $fetch<IApiResponse<IUser>>(`${baseUrl}`, {
@@ -73,6 +84,7 @@ export default function useUsers() {
   }
 
   return {
+    getOrCreateUser,
     createUser,
     getUserById,
     getUserBySsoId,

@@ -1,10 +1,26 @@
 <script setup lang="ts">
 const currentYear = new Date().getFullYear()
 
+const tenant = useTenant()
+
+// Reactive reference for project route
+const projectRoute = ref('/auth/logging-in')
+
+// Watch for changes in currentTenantId
+watch(() => tenant.currentTenantId.value, (newTenantId) => {
+  // Update projectRoute when currentTenantId changes
+  projectRoute.value = newTenantId
+    ? `/tenant/${newTenantId}/dashboard/projects`
+    : '/auth/logging-in'
+}, {
+  // Immediate will trigger the watch on initial load
+  immediate: true,
+})
+
 const navItems = [
   { label: 'Home', to: '/', requiresAuth: false },
   { label: 'Features', to: '/features', requiresAuth: false },
-  { label: 'Projects', to: '/dashboard/projects', requiresAuth: true },
+  { label: 'Projects', to: projectRoute, requiresAuth: true },
 ]
 </script>
 

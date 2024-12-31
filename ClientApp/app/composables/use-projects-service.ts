@@ -15,7 +15,9 @@ export default function useProjects() {
   const config = useRuntimeConfig()
   const { handleApiCall, createFetchOptions } = useApiUtils()
 
-  const baseUrl = `${config.public.apiBaseUrl}/api/v1/projects`
+  const tenant = useTenant()
+
+  const baseUrl = `${config.public.apiBaseUrl}/api/v1/tenant/${tenant.currentTenantId.value}/projects`
 
   const createProject = (request: ICreateProjectRequest) => {
     return handleApiCall(

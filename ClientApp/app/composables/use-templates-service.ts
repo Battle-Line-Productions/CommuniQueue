@@ -10,7 +10,9 @@ import type {
 
 export default function useTemplates() {
   const config = useRuntimeConfig()
-  const baseUrl = `${config.public.apiBaseUrl}/api/v1/templates`
+  const tenant = useTenant()
+
+  const baseUrl = `${config.public.apiBaseUrl}/api/v1/tenant/${tenant.currentTenantId.value}templates`
   const { handleApiCall, createFetchOptions } = useApiUtils()
 
   const createTemplate = (request: ICreateTemplateRequest) => {

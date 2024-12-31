@@ -26,7 +26,34 @@ public class UserService(IUserRepository userRepository, IPermissionRepository p
 {
     private const string SubCode = "UserService";
 
-    public async Task<ResponseDetail<User>> CreateUserAsync(string email, string ssoId, string globalRole)
+    public async Task<ResponseDetail<User>> GetOrCreateUserAsync(string email, string ssoId, string firstName, string lastName)
+    {
+        try
+        {
+            var user = await userRepository.GetBySsoIdAsync(ssoId);
+            if (user != null)
+                return user.BuildResponseDetail(ResultStatus.Ok200, "Get or Create User: Found User", SubCode);
+
+            user = new User
+            {
+                Email = email,
+                SsoId = ssoId,
+                IsActive = true,
+                FirstName = firstName,
+                LastName = lastName
+            };
+
+            user = await userRepository.CreateAsync(user);
+            return user.BuildResponseDetail(ResultStatus.Created201, "Get or Create User: Created User", SubCode);
+        }
+        catch (Exception ex)
+        {
+            return ((User?)null).BuildResponseDetail(ResultStatus.Fatal500, "Get or Create User", SubCode)
+                .AddErrorDetail("GetUserBySsoId", ex.Message);
+        }
+    }
+
+    public async Task<ResponseDetail<User>> CreateUserAsync(string email, string ssoId, string firstName, string lastName)
     {
         try
         {
@@ -36,20 +63,13 @@ public class UserService(IUserRepository userRepository, IPermissionRepository p
                     .AddErrorDetail("CreateUser", $"User with SSO ID {ssoId} already exists");
             }
 
-            var isRoleMatched = Enum.TryParse<GlobalRoleType>(globalRole, true, out var role);
-
-            if (!isRoleMatched)
-            {
-                return ((User?)null).BuildResponseDetail(ResultStatus.Error400, "Create User", SubCode)
-                    .AddErrorDetail("CreateUser", $"Requested role of {globalRole} is not a valid role");
-            }
-
             var user = new User
             {
                 Email = email,
                 SsoId = ssoId,
                 IsActive = true,
-                GlobalRole = role
+                FirstName = firstName,
+                LastName = lastName
             };
 
             user = await userRepository.CreateAsync(user);
@@ -147,8 +167,7 @@ public class UserService(IUserRepository userRepository, IPermissionRepository p
         }
     }
 
-    public async Task<ResponseDetail<User>> UpdateUserAsync(Guid userId, string email, string requestGlobalRole,
-        bool requestIsActive)
+    public async Task<ResponseDetail<User>> UpdateUserAsync(Guid userId, string email, bool requestIsActive, string firstName, string lastName)
     {
         try
         {
@@ -159,17 +178,10 @@ public class UserService(IUserRepository userRepository, IPermissionRepository p
                     .AddErrorDetail("UpdateUser", $"User with ID {userId} not found");
             }
 
-            var isRoleMatched = Enum.TryParse<GlobalRoleType>(requestGlobalRole, true, out var role);
-
-            if (!isRoleMatched)
-            {
-                return ((User?)null).BuildResponseDetail(ResultStatus.Error400, "Create User", SubCode)
-                    .AddErrorDetail("CreateUser", $"Requested role of {requestGlobalRole} is not a valid role");
-            }
-
             user.Email = email;
-            user.GlobalRole = role;
             user.IsActive = requestIsActive;
+            user.FirstName = firstName;
+            user.LastName = lastName;
 
             var updatedUser = await userRepository.UpdateAsync(user);
             return updatedUser.BuildResponseDetail(ResultStatus.Ok200, "Update User", SubCode);

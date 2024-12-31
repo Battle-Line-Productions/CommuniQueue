@@ -19,7 +19,6 @@
 
 #region Usings
 
-using BattlelineExtras.Contracts.Interfaces;
 using CommuniQueue.Contracts.Interfaces;
 
 #endregion

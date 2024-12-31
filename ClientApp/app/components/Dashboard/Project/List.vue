@@ -40,15 +40,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
+import type { UserInfoResponse } from '@logto/nuxt'
 import useProjects from '~/composables/use-projects-service'
 import type { IProject, IApiResponse } from '~/types'
 
 const { getProjectsByUserId } = useProjects()
+const user: UserInfoResponse = useLogtoUser()
 
 // TODO: Replace with actual user ID from auth system
-const userId = '7F58AFB9-CFEB-4117-998A-A6658C3BCC90'
+const userId = user.sub
 
 const { isLoading, isError, data, error } = useQuery<IApiResponse<IProject[]>>({
   queryKey: ['projects', userId],

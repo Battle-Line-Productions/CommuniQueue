@@ -1,10 +1,10 @@
 #region Copyright
 // ---------------------------------------------------------------------------
 // Copyright (c) 2024 Battleline Productions LLC. All rights reserved.
-// 
+//
 // Licensed under the Battleline Productions LLC license agreement.
 // See LICENSE file in the project root for full license information.
-// 
+//
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
 // Date: 10/14/2024
@@ -23,12 +23,36 @@ namespace CommuniQueue.DataAccess.Services;
 
 public class ProjectRepository(AppDbContext context) : BaseRepository<Project>(context), IProjectRepository
 {
-    public async Task<IEnumerable<Project?>> GetByUserIdAsync(Guid userId)
+    public async Task<IEnumerable<Project>> GetByUserIdAsync(Guid userId)
     {
-        return await context.Permissions
-            .Where(p => p.UserId == userId && p.EntityType == EntityType.Project)
-            .Include(p => p.Project)
-            .Select(p => p.Project)
-            .ToListAsync();
+        if (userId == Guid.Empty)
+        {
+            return [];
+        }
+
+        try
+        {
+            var test = await context.Permissions.ToListAsync();
+
+            var permissions1 = context.Permissions
+                .Include(permission => permission.Project)
+                .Where(permission => permission.UserId == userId && permission.EntityType == EntityType.Project);
+            var sql = permissions1.ToQueryString();
+            var permissions = await permissions1.ToListAsync();
+
+            if (permissions.Count == 0)
+            {
+                return [];
+            }
+
+            var projects = permissions.Select(permission => permission.Project).ToList();
+
+            return projects;
+        }
+        catch (Exception ex)
+        {
+            return [];
+        }
     }
+
 }

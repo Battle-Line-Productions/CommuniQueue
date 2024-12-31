@@ -2,7 +2,9 @@ import type { IPermission, IApiResponse, ICreatePermissionRequest, IUpdatePermis
 
 export default function usePermissions() {
   const config = useRuntimeConfig()
-  const baseUrl = `${config.public.apiBaseUrl}/api/v1/permissions`
+  const tenant = useTenant()
+
+  const baseUrl = `${config.public.apiBaseUrl}/api/v1/tenant/${tenant.currentTenantId.value}permissions`
   const { handleApiCall, createFetchOptions } = useApiUtils()
 
   const createPermission = (request: ICreatePermissionRequest) => {

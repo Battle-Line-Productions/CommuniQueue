@@ -2,10 +2,10 @@
 
 // ---------------------------------------------------------------------------
 // Copyright (c) 2024 Battleline Productions LLC. All rights reserved.
-// 
+//
 // Licensed under the Battleline Productions LLC license agreement.
 // See LICENSE file in the project root for full license information.
-// 
+//
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
 // Date: 11/03/2024
@@ -29,7 +29,7 @@ namespace CommuniQueue.Api.Handlers;
 
 public static class ProjectEndpoints
 {
-    private const string BaseRoute = "api/v{version:apiVersion}/projects";
+    private const string BaseRoute = "api/v{version:apiVersion}/tenant/{tenantId}/projects";
 
     public static void MapProjectEndpoints(this IEndpointRouteBuilder app)
     {
@@ -70,7 +70,7 @@ public static class ProjectEndpoints
                 Description = "Returns some basic details regarding project Kpi's"
             });
 
-        app.MapGet($"{BaseRoute}/user/{{userId:guid}}", GetProjectsByUserId)
+        app.MapGet($"{BaseRoute}/user/{{userId}}", GetProjectsByUserId)
             .Produces<ResponseDetail<List<Project>>>()
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
@@ -206,7 +206,7 @@ public static class ProjectEndpoints
 
     private static async Task<IResult> GetProjectsByUserId(
         [FromServices] IProjectService projectService,
-        Guid userId)
+        string userId)
     {
         var result = await projectService.GetProjectsByUserIdAsync(userId);
         return ApiResponse.GetListActionResult(result);
