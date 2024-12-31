@@ -47,12 +47,13 @@ import type { IProject, IApiResponse } from '~/types'
 
 const { getProjectsByUserId } = useProjects()
 const user: UserInfoResponse = useLogtoUser()
+const { currentTenantId } = useTenant()
 
 // TODO: Replace with actual user ID from auth system
 const userId = user.sub
 
 const { isLoading, isError, data, error } = useQuery<IApiResponse<IProject[]>>({
-  queryKey: ['projects', userId],
+  queryKey: ['projectsPerTenant', userId, currentTenantId],
   queryFn: () => getProjectsByUserId(userId),
   placeholderData: () => ({
     data: [] as IProject[],

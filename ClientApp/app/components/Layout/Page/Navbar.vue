@@ -173,6 +173,8 @@ function onTenantSelected(tenantId: string) {
   setTenant(tenantId)
   // If you want to close the mobile menu after selection:
   mobileMenuOpen.value = false
+
+  navigateTo(`/tenant/${tenantId}/dashboard/projects`)
 }
 
 // Optionally watch for errors (for debugging or UI)
@@ -416,6 +418,7 @@ watch(error, (err) => {
           <LayoutPageTenantDropdown
             :tenants="userTenants"
             :current-tenant-id="currentTenantId"
+            :mobile="true"
             @select-tenant="onTenantSelected"
           />
         </li>

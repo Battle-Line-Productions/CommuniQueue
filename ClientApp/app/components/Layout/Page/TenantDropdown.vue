@@ -14,6 +14,11 @@ const props = defineProps<{
      * The currently selected tenant ID
      */
   currentTenantId: string | null
+
+  /**
+     * If true, use "mobile" layout instead of absolute dropdown
+     */
+  mobile?: boolean
 }>()
 
 /**
@@ -73,10 +78,22 @@ function selectTenant(tenantId: string) {
 function loadMoreTenants() {
   maxToShow.value += 5
 }
+
+/**
+ * Helper to get the name for the currently selected tenant
+ */
+const currentTenantName = computed(() => {
+  return props.tenants.find(t => t.id === props.currentTenantId)?.name || 'Select Tenant'
+})
 </script>
 
 <template>
-  <div class="relative inline-block text-left">
+  <!-- Outer container: changes layout based on mobile or desktop -->
+  <div
+    :class="props.mobile
+      ? 'relative w-full text-left'
+      : 'relative inline-block text-left'"
+  >
     <!-- The trigger button -->
     <button
       type="button"
@@ -84,12 +101,7 @@ function loadMoreTenants() {
       @click="toggleDropdown"
     >
       <!-- Current tenant name OR fallback text -->
-      <span>
-        {{
-          props.tenants.find((t) => t.id === props.currentTenantId)?.name
-            || 'Select Tenant'
-        }}
-      </span>
+      <span>{{ currentTenantName }}</span>
       <!-- Down arrow icon -->
       <Icon
         name="mdi:chevron-down"
@@ -100,7 +112,9 @@ function loadMoreTenants() {
     <!-- The dropdown panel -->
     <div
       v-if="showDropdown"
-      class="origin-top-right absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+      :class="props.mobile
+        ? 'static mt-2 w-full bg-white border border-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5'
+        : 'origin-top-right absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5'"
     >
       <!-- Search box -->
       <div class="p-2">
@@ -133,9 +147,15 @@ function loadMoreTenants() {
         >
           <!-- Clicking the tenant name triggers selection -->
           <button
-            class="flex-grow text-left"
+            class="flex-grow text-left flex items-center gap-2"
             @click="selectTenant(tenant.id)"
           >
+            <!-- Show a check icon if this tenant is the active one -->
+            <Icon
+              v-if="tenant.id === props.currentTenantId"
+              name="mdi:check"
+              class="h-4 w-4 text-blue-600"
+            />
             {{ tenant.name }}
           </button>
 

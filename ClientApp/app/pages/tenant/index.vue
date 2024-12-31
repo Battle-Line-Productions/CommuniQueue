@@ -94,8 +94,7 @@ function selectTenant(tenantId: string) {
         </p>
         <nuxt-link
           to="/tenant/create"
-          class="bg-light-primary dark:bg-dark-primary
-                 text-white font-semibold px-4 py-2 rounded-md
+          class="bg-light-primary dark:bg-dark-primary text-white font-semibold px-4 py-2 rounded-md
                  hover:opacity-90 transition-opacity"
         >
           Create a Tenant
@@ -128,8 +127,7 @@ function selectTenant(tenantId: string) {
               </p>
             </div>
             <button
-              class="bg-light-secondary dark:bg-dark-secondary
-                     text-white px-3 py-2 rounded-md
+              class="bg-light-primary dark:bg-dark-primary text-white px-3 py-2 rounded-md
                      hover:opacity-80 transition-opacity"
               @click="selectTenant(tenant.id)"
             >
@@ -141,8 +139,7 @@ function selectTenant(tenantId: string) {
         <div class="flex justify-end">
           <nuxt-link
             to="/tenant/create"
-            class="bg-light-primary dark:bg-dark-primary
-                   text-white font-semibold px-4 py-2 rounded-md
+            class="bg-light-primary dark:bg-dark-primary text-white font-semibold px-4 py-2 rounded-md
                    hover:opacity-90 transition-opacity"
           >
             Create New Tenant

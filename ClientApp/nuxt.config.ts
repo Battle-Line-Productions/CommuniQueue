@@ -12,6 +12,7 @@ export default defineNuxtConfig({
     '@nuxt/scripts',
     '@nuxtjs/seo',
     '@vueuse/nuxt',
+    '@nuxtjs/tailwindcss',
   ],
 
   devtools: {
@@ -32,7 +33,9 @@ export default defineNuxtConfig({
     },
   },
 
-  css: ['~/assets/css/main.css'],
+  css: [
+    './app/assets/css/tailwind.css',
+  ],
 
   site: {
     url: process.env.NUXT_SITE_URL,
@@ -87,9 +90,15 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2024-11-01',
 
+  typescript: {
+    shim: false,
+    strict: true,
+  },
+
   postcss: {
     plugins: {
-      '@tailwindcss/postcss': {},
+      tailwindcss: {},
+      autoprefixer: {},
     },
   },
 
@@ -125,6 +134,12 @@ export default defineNuxtConfig({
       googleAnalytics: true,
       clarity: true,
     },
+  },
+
+  tailwindcss: {
+    configPath: './tailwind.config.ts',
+    exposeConfig: true,
+    viewer: true,
   },
 
   // for productioin only scripts
