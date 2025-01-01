@@ -34,7 +34,7 @@
       class="absolute left-[calc(50%-4rem)] top-10 -z-10 transform-gpu blur-3xl sm:left-[calc(50%-18rem)] lg:left-48 lg:top-[calc(50%-30rem)] xl:left-[calc(50%-24rem)]"
     >
       <div
-        class="aspect-[1108/632] w-[69.25rem] bg-gradient-to-r from-light-primary to-light-accent dark:from-dark-primary dark:to-dark-accent opacity-20"
+        class="aspect-1108/632 w-[69.25rem] bg-linear-to-r from-light-primary to-light-accent dark:from-dark-primary dark:to-dark-accent opacity-20"
         style="
           clip-path: polygon(
             73.6% 51.7%,
@@ -69,7 +69,7 @@
         <div class="mt-10 flex items-center gap-x-6">
           <NuxtLink
             to="/get-started"
-            class="rounded-md bg-light-primary dark:bg-dark-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-light-accent dark:hover:bg-dark-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-light-primary dark:focus-visible:outline-dark-primary transition duration-300"
+            class="rounded-md bg-light-primary dark:bg-dark-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-light-accent dark:hover:bg-dark-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-light-primary dark:focus-visible:outline-dark-primary transition duration-300"
           >
             Get Started
           </NuxtLink>
@@ -81,7 +81,7 @@
           </NuxtLink>
         </div>
       </div>
-      <div class="mt-16 sm:mt-24 lg:mt-0 lg:flex-shrink-0 lg:flex-grow">
+      <div class="mt-16 sm:mt-24 lg:mt-0 lg:shrink-0 lg:grow">
         <img
           alt="CommuniQueue App Screenshot"
           src="/assets/images/communiqueueLogo.png"

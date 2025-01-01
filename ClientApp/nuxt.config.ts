@@ -1,10 +1,11 @@
+import Tailwind from '@tailwindcss/vite'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
 
   modules: [
     '@logto/nuxt',
     '@nuxt/eslint',
-    '@nuxt/ui',
     '@nuxt/icon',
     '@nuxt/fonts',
     '@nuxtjs/color-mode',
@@ -12,7 +13,7 @@ export default defineNuxtConfig({
     '@nuxt/scripts',
     '@nuxtjs/seo',
     '@vueuse/nuxt',
-    '@nuxtjs/tailwindcss',
+    '@nuxt/ui-pro',
   ],
 
   devtools: {
@@ -90,16 +91,15 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2024-11-01',
 
+  vite: {
+    plugins: [
+      Tailwind(),
+    ],
+  },
+
   typescript: {
     shim: false,
     strict: true,
-  },
-
-  postcss: {
-    plugins: {
-      tailwindcss: {},
-      autoprefixer: {},
-    },
   },
 
   eslint: {
@@ -136,10 +136,8 @@ export default defineNuxtConfig({
     },
   },
 
-  tailwindcss: {
-    configPath: './tailwind.config.ts',
-    exposeConfig: true,
-    viewer: true,
+  uiPro: {
+    license: process.env.NUXT_UI_PRO_LICENSE,
   },
 
   // for productioin only scripts

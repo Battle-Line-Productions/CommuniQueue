@@ -135,14 +135,14 @@ public class ProjectService(
         }
     }
 
-    public async Task<ResponseDetail<List<Project?>>> GetProjectsByUserIdAsync(string ssoUserId)
+    public async Task<ResponseDetail<List<Project>>> GetProjectsByUserIdAsync(string ssoUserId)
     {
         try
         {
             var user = await userRepository.GetBySsoIdAsync(ssoUserId);
             if (user == null)
             {
-                return ((List<Project>?)null).BuildResponseDetail(ResultStatus.NotFound404, "Get Projects by User ID", SubCode)
+                return ((List<Project>)null).BuildResponseDetail(ResultStatus.NotFound404, "Get Projects by User ID", SubCode)
                     .AddErrorDetail("GetProjectsByUserId", $"User with SSOID {ssoUserId} not found");
             }
 
@@ -151,7 +151,7 @@ public class ProjectService(
         }
         catch (Exception ex)
         {
-            return new List<Project?>().BuildResponseDetail(ResultStatus.Fatal500, "Get Projects by User ID", SubCode)
+            return new List<Project>().BuildResponseDetail(ResultStatus.Fatal500, "Get Projects by User ID", SubCode)
                 .AddErrorDetail("GetProjectsByUserId", ex.Message);
         }
     }

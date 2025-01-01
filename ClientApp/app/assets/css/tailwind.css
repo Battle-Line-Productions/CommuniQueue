@@ -1,5 +1,119 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@import "@nuxt/ui";
+@import 'tailwindcss';
+
+/* @import "tailwindcss" source(none); */
+/* @source "./components";
+@source "./pages";
+@source "./layouts";
+@source "./app.vue"; */
+
+@import "@nuxt/ui-pro";
+
+@variant dark (&:is(.dark *));
+
+@theme {
+  --container-8xl: 90rem;
+
+  --color-primary-50: #b4e4cf;
+  --color-primary-100: #a5dfc5;
+  --color-primary-200: #87d4b2;
+  --color-primary-300: #69ca9e;
+  --color-primary-400: #4bbf8b;
+  --color-primary-500: #3ba676;
+  --color-primary-600: #2c7d59;
+  --color-primary-700: #1e533b;
+  --color-primary-800: #0f2a1e;
+  --color-primary-900: #000000;
+  --color-primary: #3ba676;
+
+  --color-green-50: #b4e4cf;
+  --color-green-100: #a5dfc5;
+  --color-green-200: #87d4b2;
+  --color-green-300: #69ca9e;
+  --color-green-400: #4bbf8b;
+  --color-green-500: #3ba676;
+  --color-green-600: #2c7d59;
+  --color-green-700: #1e533b;
+  --color-green-800: #0f2a1e;
+  --color-green-900: #000000;
+  --color-green: #3ba676;
+
+  --color-blue-50: #b8e2ff;
+  --color-blue-100: #a3d9ff;
+  --color-blue-200: #7ac8ff;
+  --color-blue-300: #52b8ff;
+  --color-blue-400: #29a7ff;
+  --color-blue-500: #0096ff;
+  --color-blue-600: #0075c7;
+  --color-blue-700: #00548f;
+  --color-blue-800: #003357;
+  --color-blue-900: #00121f;
+  --color-blue: #0096ff;
+
+  --color-red-50: #ffffff;
+  --color-red-100: #ffffff;
+  --color-red-200: #ffdede;
+  --color-red-300: #ffb6b6;
+  --color-red-400: #ff8d8d;
+  --color-red-500: #ff6464;
+  --color-red-600: #ff2c2c;
+  --color-red-700: #f30000;
+  --color-red-800: #bb0000;
+  --color-red-900: #830000;
+  --color-red: #ff6464;
+
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #020617;
+
+  --color-light-textbase: #333333;
+  --color-light-background: #f8fafc;
+  --color-light-surface: #ffffff;
+  --color-light-primary: #3b82f6;
+  --color-light-secondary: #64748b;
+  --color-light-accent: #06b6d4;
+  --color-light-error: #ef4444;
+  --color-light-info: #0ea5e9;
+  --color-light-success: #22c55e;
+  --color-light-warning: #f59e0b;
+
+  --color-dark-textbase: #e2e8f0;
+  --color-dark-background: #0f172a;
+  --color-dark-surface: #1e293b;
+  --color-dark-primary: #60a5fa;
+  --color-dark-secondary: #94a3b8;
+  --color-dark-accent: #22d3ee;
+  --color-dark-error: #f87171;
+  --color-dark-info: #38bdf8;
+  --color-dark-success: #4ade80;
+  --color-dark-warning: #fbbf24;
+
+  --font-sans: Nunito, ui-sans-serif, system-ui, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
 

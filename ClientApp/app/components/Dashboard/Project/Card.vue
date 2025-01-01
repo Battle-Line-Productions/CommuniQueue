@@ -25,7 +25,7 @@
     </p>
 
     <div class="grid grid-cols-3 gap-2 mb-4 text-center">
-      <div class="bg-light-background dark:bg-dark-background rounded p-2">
+      <div class="bg-light-background dark:bg-dark-background rounded-sm p-2">
         <p class="text-xs text-light-secondary dark:text-dark-secondary">
           Templates
         </p>
@@ -33,7 +33,7 @@
           {{ projectKpis.templateCount }}
         </p>
       </div>
-      <div class="bg-light-background dark:bg-dark-background rounded p-2">
+      <div class="bg-light-background dark:bg-dark-background rounded-sm p-2">
         <p class="text-xs text-light-secondary dark:text-dark-secondary">
           Containers
         </p>
@@ -41,7 +41,7 @@
           {{ projectKpis.containerCount }}
         </p>
       </div>
-      <div class="bg-light-background dark:bg-dark-background rounded p-2">
+      <div class="bg-light-background dark:bg-dark-background rounded-sm p-2">
         <p class="text-xs text-light-secondary dark:text-dark-secondary">
           Stages
         </p>

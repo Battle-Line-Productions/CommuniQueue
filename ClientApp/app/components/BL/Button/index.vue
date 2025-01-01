@@ -25,7 +25,7 @@ const props = defineProps({
 const defaultStyle = `
   cursor-pointer
   border transition-color duration-300
-  focus:outline-none focus:ring-1 focus:ring-offset-1 focus:dark:ring-offset-gray-50 focus:dark:ring-gray-400 focus:ring-gray-600/[0.6] focus:ring-offset-gray-800/[0.6]
+  focus:outline-hidden focus:ring-1 focus:ring-offset-1 dark:focus:ring-offset-gray-50 dark:focus:ring-gray-400 focus:ring-gray-600/[0.6] focus:ring-offset-gray-800/[0.6]
   flex items-center justify-center font-semibold
 `
 const styles = reactive<{
@@ -42,9 +42,9 @@ const sizes = reactive<{
   [key: string]: string
 }>({
   lg: 'h-14 px-8 text-lg rounded-lg',
-  md: 'h-10 px-6 text-base rounded',
-  sm: 'h-9 px-4 text-sm rounded',
-  xs: 'h-6 px-3 text-xs rounded',
+  md: 'h-10 px-6 text-base rounded-sm',
+  sm: 'h-9 px-4 text-sm rounded-sm',
+  xs: 'h-6 px-3 text-xs rounded-sm',
 })
 // state
 const selectedStyle = computed(() => (props.type in styles ? styles[props.type] : styles.primary))

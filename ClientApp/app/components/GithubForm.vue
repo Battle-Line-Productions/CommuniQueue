@@ -84,7 +84,7 @@ const handleSubmit = async () => {
             id="name"
             v-model="formData.name"
             type="text"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary bg-light-background dark:bg-dark-background text-light-textbase dark:text-dark-textbase p-2"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-xs focus:ring-primary focus:border-primary bg-light-background dark:bg-dark-background text-light-textbase dark:text-dark-textbase p-2"
             required
           >
         </div>
@@ -98,7 +98,7 @@ const handleSubmit = async () => {
             id="email"
             v-model="formData.email"
             type="email"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary bg-light-background dark:bg-dark-background text-light-textbase dark:text-dark-textbase p-2"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-xs focus:ring-primary focus:border-primary bg-light-background dark:bg-dark-background text-light-textbase dark:text-dark-textbase p-2"
             required
           >
         </div>
@@ -112,7 +112,7 @@ const handleSubmit = async () => {
           <select
             id="type"
             v-model="formData.type"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary bg-light-background dark:bg-dark-background text-light-textbase dark:text-dark-textbase p-2"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-xs focus:ring-primary focus:border-primary bg-light-background dark:bg-dark-background text-light-textbase dark:text-dark-textbase p-2"
             required
           >
             <option value="feature">
@@ -135,7 +135,7 @@ const handleSubmit = async () => {
           <textarea
             id="description"
             v-model="formData.description"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary bg-light-background dark:bg-dark-background text-light-textbase dark:text-dark-textbase p-2"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-xs focus:ring-primary focus:border-primary bg-light-background dark:bg-dark-background text-light-textbase dark:text-dark-textbase p-2"
             rows="4"
             required
           />

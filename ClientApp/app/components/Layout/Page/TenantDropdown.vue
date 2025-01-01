@@ -97,7 +97,7 @@ const currentTenantName = computed(() => {
     <!-- The trigger button -->
     <button
       type="button"
-      class="inline-flex items-center gap-1 px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
+      class="inline-flex items-center gap-1 px-4 py-2 bg-white border border-gray-300 rounded-md shadow-xs text-sm font-medium text-gray-700 hover:bg-gray-50"
       @click="toggleDropdown"
     >
       <!-- Current tenant name OR fallback text -->
@@ -121,7 +121,7 @@ const currentTenantName = computed(() => {
         <input
           v-model="searchTerm"
           type="text"
-          class="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+          class="w-full border border-gray-300 rounded-sm px-2 py-1 text-sm"
           placeholder="Search tenants..."
         >
       </div>
@@ -147,7 +147,7 @@ const currentTenantName = computed(() => {
         >
           <!-- Clicking the tenant name triggers selection -->
           <button
-            class="flex-grow text-left flex items-center gap-2"
+            class="grow text-left flex items-center gap-2"
             @click="selectTenant(tenant.id)"
           >
             <!-- Show a check icon if this tenant is the active one -->

@@ -1,7 +1,7 @@
 <template>
   <div class="p-4 sm:p-6 lg:p-8 space-y-6">
     <!-- Card Container -->
-    <div class="bg-light-surface dark:bg-dark-surface p-6 rounded-lg shadow-sm">
+    <div class="bg-light-surface dark:bg-dark-surface p-6 rounded-lg shadow-xs">
       <!-- Header Section -->
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold text-light-textbase dark:text-dark-textbase">

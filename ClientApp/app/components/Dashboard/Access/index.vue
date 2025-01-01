@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6">
-    <div class="bg-light-surface dark:bg-dark-surface p-6 rounded-lg shadow-sm">
+    <div class="bg-light-surface dark:bg-dark-surface p-6 rounded-lg shadow-xs">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold text-light-textbase dark:text-dark-textbase">
           Team Members

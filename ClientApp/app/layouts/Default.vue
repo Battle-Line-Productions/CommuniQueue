@@ -30,11 +30,11 @@ const navItems = [
     <LayoutPageNavbar
       :brand="'CommuniQueue'"
       :menu-items="navItems"
-      class="sticky top-0 z-30 flex-shrink-0 bg-light-surface dark:bg-dark-surface"
+      class="sticky top-0 z-30 shrink-0 bg-light-surface dark:bg-dark-surface"
     />
 
     <!-- Main Content - now takes up full width -->
-    <div class="flex-grow overflow-auto">
+    <div class="grow overflow-auto">
       <slot />
     </div>
 

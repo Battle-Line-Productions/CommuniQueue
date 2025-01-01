@@ -79,7 +79,7 @@
             id="addUserIsActive"
             v-model="isActive"
             type="checkbox"
-            class="h-4 w-4 rounded border-light-secondary/20 dark:border-dark-secondary/20"
+            class="h-4 w-4 rounded-sm border-light-secondary/20 dark:border-dark-secondary/20"
           >
           <label
             for="addUserIsActive"

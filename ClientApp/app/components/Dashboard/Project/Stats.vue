@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-light-surface dark:bg-dark-surface p-6 rounded-lg shadow-sm">
+  <div class="bg-light-surface dark:bg-dark-surface p-6 rounded-lg shadow-xs">
     <h2 class="text-xl font-semibold mb-4 text-light-textbase dark:text-dark-textbase">
       Project Statistics
     </h2>

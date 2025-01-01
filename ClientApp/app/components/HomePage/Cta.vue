@@ -39,7 +39,7 @@
           <div class="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
             <NuxtLink
               to="/get-started"
-              class="rounded-md bg-light-primary dark:bg-dark-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-light-accent dark:hover:bg-dark-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-light-primary dark:focus-visible:outline-dark-primary"
+              class="rounded-md bg-light-primary dark:bg-dark-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-light-accent dark:hover:bg-dark-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-light-primary dark:focus-visible:outline-dark-primary"
             >
               Get Started
             </NuxtLink>

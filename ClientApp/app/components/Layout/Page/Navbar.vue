@@ -188,7 +188,7 @@ watch(error, (err) => {
 <template>
   <!-- NAV WRAPPER -->
   <nav
-    class="w-full shadow bg-light-surface dark:bg-dark-surface text-light-textbase dark:text-dark-textbase transition-colors duration-300"
+    class="w-full shadow-sm bg-light-surface dark:bg-dark-surface text-light-textbase dark:text-dark-textbase transition-colors duration-300"
   >
     <!-- TOP INFOBAR (optional) -->
     <div
@@ -292,7 +292,7 @@ watch(error, (err) => {
 
             <!-- Sub-menu -->
             <ul
-              class="absolute left-0 top-full bg-white dark:bg-gray-700 shadow rounded mt-1 w-48 py-2 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity"
+              class="absolute left-0 top-full bg-white dark:bg-gray-700 shadow-sm rounded-sm mt-1 w-48 py-2 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity"
             >
               <li
                 v-for="(child, idx) in item.children"
@@ -351,7 +351,7 @@ watch(error, (err) => {
         <!-- LOGIN / LOGOUT link -->
         <li>
           <a
-            class="px-3 py-2 transition-colors duration-200 rounded hover:text-light-primary dark:hover:text-dark-primary"
+            class="px-3 py-2 transition-colors duration-200 rounded-sm hover:text-light-primary dark:hover:text-dark-primary"
             :href="`/sign-${user ? 'out' : 'in'}`"
           >
             Log {{ user ? 'out' : 'in' }}
@@ -368,7 +368,7 @@ watch(error, (err) => {
         <!-- THEME SWITCHER (Desktop) -->
         <li>
           <UButton
-            class="flex items-center gap-1 px-3 py-2 transition-colors duration-200 rounded hover:text-light-primary dark:hover:text-dark-primary"
+            class="flex items-center gap-1 px-3 py-2 transition-colors duration-200 rounded-sm hover:text-light-primary dark:hover:text-dark-primary"
             :title="'Rotate Theme (light/dark/system)'"
             @click="toggleTheme"
           >
@@ -394,7 +394,7 @@ watch(error, (err) => {
 
       <!-- MOBILE MENU UButton -->
       <UButton
-        class="md:hidden p-2 rounded transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+        class="md:hidden p-2 rounded-sm transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
         @click="toggleMobileMenu"
       >
         <Icon
@@ -408,7 +408,7 @@ watch(error, (err) => {
     <transition name="fade">
       <ul
         v-if="mobileMenuOpen"
-        class="md:hidden flex flex-col space-y-1 px-4 pb-4 bg-light-surface dark:bg-dark-surface shadow transition-colors duration-300"
+        class="md:hidden flex flex-col space-y-1 px-4 pb-4 bg-light-surface dark:bg-dark-surface shadow-sm transition-colors duration-300"
       >
         <!-- MOBILE TENANT SWITCHER -->
         <li
@@ -495,7 +495,7 @@ watch(error, (err) => {
         <!-- MOBILE LOGIN / LOGOUT -->
         <li class="flex items-center justify-start gap-2 py-2">
           <a
-            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+            class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
             :href="user ? '/sign-out' : '/sign-in'"
             @click="mobileMenuOpen = false"
           >
@@ -506,7 +506,7 @@ watch(error, (err) => {
         <!-- MOBILE THEME SWITCHER -->
         <li class="flex items-center justify-start gap-2 py-2">
           <UButton
-            class="flex items-center gap-1 p-2 rounded transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+            class="flex items-center gap-1 p-2 rounded-sm transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
             :title="'Rotate Theme (light/dark/system)'"
             @click="toggleTheme"
           >

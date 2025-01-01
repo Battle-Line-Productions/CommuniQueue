@@ -19,20 +19,20 @@
     "@nuxt/fonts": "0.10.3",
     "@nuxt/icon": "1.10.3",
     "@nuxt/scripts": "0.9.5",
-    "@nuxt/ui": "3.0.0-alpha.10",
+    "@nuxt/ui-pro": "3.0.0-alpha.10",
     "@nuxtjs/color-mode": "3.5.2",
     "@nuxtjs/seo": "2.0.2",
-    "@nuxtjs/tailwindcss": "6.12.2",
     "@tanstack/vue-query": "^5.62.9",
     "@vueuse/nuxt": "12.2.0",
-    "autoprefixer": "^10.4.20",
     "nuxt": "^3.15.0",
-    "tailwindcss": "^3.4.17",
     "vue": "latest"
   },
   "packageManager": "pnpm@9.15.1",
   "devDependencies": {
+    "@iconify-json/mdi": "^1.2.2",
     "@nuxt/eslint-config": "^0.7.4",
+    "@tailwindcss/postcss": "4.0.0-beta.8",
+    "@tailwindcss/vite": "4.0.0-beta.8",
     "eslint": "^9.17.0",
     "eslint-plugin-vue-composable": "^1.0.0",
     "sass": "^1.83.0",
@@ -42,6 +42,7 @@
     "serverless-domain-manager": "^8.0.0",
     "serverless-plugin-common-excludes": "^4.0.0",
     "serverless-s3-sync": "^3.4.0",
+    "tailwindcss": "4.0.0-beta.8",
     "typescript": "^5.7.2"
   }
 }
