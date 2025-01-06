@@ -15,6 +15,7 @@
 // ---------------------------------------------------------------------------
 #endregion
 
+using BattlelineExtras.Contracts.Extensions;
 using BattlelineExtras.Contracts.Models;
 using CommuniQueue.Contracts.Interfaces.Repositories;
 using CommuniQueue.Extensions;
@@ -149,8 +150,32 @@ public class TenantService(IUserRepository userRepo, ITenantRepository tenantRep
         };
     }
 
-    public async Task<ResponseDetail<AppTenantInfo>> UpdateTenantAsync(string tenantId, string tenantName, string tenantDescription)
+    public async Task<ResponseDetail<AppTenantInfo>> UpdateTenantAsync(string tenantId, string tenantName, string tenantDescription, string requesterSsoId)
     {
+
+        var user = await userRepo.GetBySsoIdAsync(requesterSsoId);
+
+        if (user == null)
+        {
+            var responseDetail = new ResponseDetail<AppTenantInfo>
+            {
+                SubCode = SubCode,
+                Title = "Remove Version from Stage",
+                Data = null,
+                Status = ResultStatus.NotFound404,
+                ErrorDetails =
+                [
+                    new()
+                    {
+                        Instance = "RemoveVersionFromStage",
+                        Detail = $"User with SSOID {requesterSsoId} not found"
+                    }
+                ]
+            };
+
+            return responseDetail;
+        }
+
         var tenant = await tenantRepo.GetTenantById(tenantId);
 
         if (tenant == null)

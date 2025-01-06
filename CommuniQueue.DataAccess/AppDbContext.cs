@@ -52,6 +52,14 @@ public class AppDbContext(IMultiTenantContextAccessor multiTenantContextAccessor
     public DbSet<TemplateStageAssignment> TemplateStageAssignments => Set<TemplateStageAssignment>();
     public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+
+        var debug = multiTenantContextAccessor;
+        Console.WriteLine("DEBUG");
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

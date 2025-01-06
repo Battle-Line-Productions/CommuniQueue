@@ -18,6 +18,7 @@
 using Asp.Versioning;
 using BattlelineExtras.Contracts.Models;
 using BattlelineExtras.Http.Utility;
+using CommuniQueue.Api.Extensions;
 using CommuniQueue.Contracts.Interfaces;
 using CommuniQueue.Contracts.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -61,18 +62,31 @@ public static class TenantUserManagementEndpoints
     private static async Task<IResult> AddUserToTenant(
         [FromServices] ITenantUserManagementService tenantUserManagementService,
         string tenantId,
-        Guid userId)
+        Guid userId, HttpContext context)
     {
-        var result = await tenantUserManagementService.AddUserToTenant(userId, tenantId);
+        var requesterUserId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(requesterUserId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await tenantUserManagementService.AddUserToTenant(userId, tenantId, requesterUserId);
         return ApiResponse.GetActionResult(result);
     }
 
     private static async Task<IResult> RemoveUserFromTenant(
         [FromServices] ITenantUserManagementService tenantUserManagementService,
         string tenantId,
-        Guid userId)
+        Guid userId,
+        HttpContext context)
     {
-        var result = await tenantUserManagementService.RemoveUserFromTenant(userId, tenantId);
+        var requsterUserId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(requsterUserId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await tenantUserManagementService.RemoveUserFromTenant(userId, tenantId, requsterUserId);
         return ApiResponse.GetActionResult(result);
     }
 }

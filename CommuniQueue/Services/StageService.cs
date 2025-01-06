@@ -1,10 +1,10 @@
 #region Copyright
 // ---------------------------------------------------------------------------
 // Copyright (c) 2024 Battleline Productions LLC. All rights reserved.
-// 
+//
 // Licensed under the Battleline Productions LLC license agreement.
 // See LICENSE file in the project root for full license information.
-// 
+//
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
 // Date: 11/03/2024
@@ -21,15 +21,23 @@ using CommuniQueue.Contracts.Interfaces.Repositories;
 
 namespace CommuniQueue.Services;
 
-public class StageService(IStageRepository stageRepository, IProjectRepository projectRepository)
+public class StageService(IStageRepository stageRepository, IProjectRepository projectRepository, IUserRepository userRepository)
     : IStageService
 {
     private const string SubCode = "StageService";
 
-    public async Task<ResponseDetail<Stage>> CreateStageAsync(Guid projectId, string name, int order)
+    public async Task<ResponseDetail<Stage>> CreateStageAsync(Guid projectId, string name, int order, string requesterSsoId)
     {
         try
         {
+            var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+            if (user == null)
+            {
+                return ((Stage?)null).BuildResponseDetail(ResultStatus.NotFound404, "Create Stage", SubCode)
+                    .AddErrorDetail("CreateStage", $"User with SSOID {requesterSsoId} not found");
+            }
+
             if (!await projectRepository.ExistsAsync(projectId))
             {
                 return ((Stage?)null).BuildResponseDetail(ResultStatus.NotFound404, "Create Stage", SubCode)
@@ -86,10 +94,18 @@ public class StageService(IStageRepository stageRepository, IProjectRepository p
         }
     }
 
-    public async Task<ResponseDetail<Stage>> UpdateStageAsync(Guid stageId, string name, int order)
+    public async Task<ResponseDetail<Stage>> UpdateStageAsync(Guid stageId, string name, int order, string requesterSsoId)
     {
         try
         {
+            var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+            if (user == null)
+            {
+                return ((Stage?)null).BuildResponseDetail(ResultStatus.NotFound404, "Update Stage", SubCode)
+                    .AddErrorDetail("UpdateStage", $"User with SSOID {requesterSsoId} not found");
+            }
+
             var stage = await stageRepository.GetByIdAsync(stageId);
             if (stage == null)
             {
@@ -109,10 +125,18 @@ public class StageService(IStageRepository stageRepository, IProjectRepository p
         }
     }
 
-    public async Task<ResponseDetail<bool>> DeleteStageAsync(Guid stageId)
+    public async Task<ResponseDetail<bool>> DeleteStageAsync(Guid stageId, string requesterSsoId)
     {
         try
         {
+            var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+            if (user == null)
+            {
+                return false.BuildResponseDetail(ResultStatus.NotFound404, "Delete Stage", SubCode)
+                    .AddErrorDetail("DeleteStage", $"User with SSOID {requesterSsoId} not found");
+            }
+
             if (!await stageRepository.ExistsAsync(stageId))
             {
                 return false.BuildResponseDetail(ResultStatus.NotFound404, "Delete Stage", SubCode)

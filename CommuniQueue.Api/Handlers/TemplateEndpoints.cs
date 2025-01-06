@@ -1,10 +1,10 @@
 #region Copyright
 // ---------------------------------------------------------------------------
 // Copyright (c) 2024 Battleline Productions LLC. All rights reserved.
-// 
+//
 // Licensed under the Battleline Productions LLC license agreement.
 // See LICENSE file in the project root for full license information.
-// 
+//
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
 // Date: 11/03/2024
@@ -18,6 +18,7 @@
 using Asp.Versioning;
 using BattlelineExtras.Contracts.Models;
 using BattlelineExtras.Http.Utility;
+using CommuniQueue.Api.Extensions;
 using CommuniQueue.Contracts.Interfaces;
 using CommuniQueue.Contracts.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -145,9 +146,15 @@ public static class TemplateEndpoints
 
     private static async Task<IResult> CreateTemplate(
         [FromServices] ITemplateService templateService,
-        [FromBody] CreateTemplateRequest request)
+        [FromBody] CreateTemplateRequest request, HttpContext context)
     {
-        var result = await templateService.CreateTemplateAsync(request.ProjectId, request.ContainerId, request.Name, request.Subject, request.Body);
+        var userId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await templateService.CreateTemplateAsync(request.ProjectId, request.ContainerId, request.Name, request.Subject, request.Body, userId);
         return ApiResponse.GetActionResult(result);
     }
 
@@ -194,27 +201,45 @@ public static class TemplateEndpoints
     private static async Task<IResult> CreateNewVersion(
         [FromServices] ITemplateService templateService,
         Guid templateId,
-        [FromBody] CreateVersionRequest request)
+        [FromBody] CreateVersionRequest request, HttpContext context)
     {
-        var result = await templateService.CreateNewVersionAsync(templateId, request.Subject, request.Body);
+        var userId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await templateService.CreateNewVersionAsync(templateId, request.Subject, request.Body, userId);
         return ApiResponse.GetActionResult(result);
     }
 
     private static async Task<IResult> AssignVersionToStage(
         [FromServices] ITemplateService templateService,
         Guid templateVersionId,
-        [FromBody] AssignVersionToStageRequest request)
+        [FromBody] AssignVersionToStageRequest request, HttpContext context)
     {
-        var result = await templateService.AssignVersionToStageAsync(templateVersionId, request.StageId);
+        var userId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await templateService.AssignVersionToStageAsync(templateVersionId, request.StageId, userId);
         return ApiResponse.GetActionResult(result);
     }
 
     private static async Task<IResult> RemoveVersionFromStage(
         [FromServices] ITemplateService templateService,
         Guid templateVersionId,
-        [FromBody] RemoveVersionFromStageRequest request)
+        [FromBody] RemoveVersionFromStageRequest request, HttpContext context)
     {
-        var result = await templateService.RemoveVersionFromStageAsync(templateVersionId, request.StageId);
+        var userId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await templateService.RemoveVersionFromStageAsync(templateVersionId, request.StageId, userId);
         return ApiResponse.GetActionResult(result);
     }
 

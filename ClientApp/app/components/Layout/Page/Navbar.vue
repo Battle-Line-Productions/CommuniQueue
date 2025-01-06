@@ -63,7 +63,7 @@ const {
   error,
 } = useQuery<IUserTenantsResult, Error>({
   // Use the same query key you've used elsewhere:
-  queryKey: ['userTenants', user?.sub],
+  queryKey: ['userTenants', user?.sub, currentTenantId.value],
   enabled: !!user?.sub, // only run if we have a user ID
   queryFn: async (): Promise<IUserTenantsResult> => {
     // 1) Create or get the user in the backend

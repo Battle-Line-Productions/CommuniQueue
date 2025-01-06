@@ -20,6 +20,7 @@
 using Asp.Versioning;
 using BattlelineExtras.Contracts.Models;
 using BattlelineExtras.Http.Utility;
+using CommuniQueue.Api.Extensions;
 using CommuniQueue.Contracts.Interfaces;
 using CommuniQueue.Contracts.Models;
 using CommuniQueue.Contracts.Models.Filters;
@@ -182,9 +183,16 @@ public static class ProjectEndpoints
 
     private static async Task<IResult> CreateProject(
         [FromServices] IProjectService projectService,
-        [FromBody] CreateProjectRequest request)
+        [FromBody] CreateProjectRequest request,
+        HttpContext context)
     {
-        var result = await projectService.CreateProjectAsync(request.Name, request.Description, request.OwnerId);
+        var userId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await projectService.CreateProjectAsync(request.Name, request.Description, userId);
         return ApiResponse.GetActionResult(result);
     }
 
@@ -215,35 +223,61 @@ public static class ProjectEndpoints
     private static async Task<IResult> UpdateProject(
         [FromServices] IProjectService projectService,
         Guid projectId,
-        [FromBody] UpdateProjectRequest request)
+        [FromBody] UpdateProjectRequest request,
+        HttpContext context)
     {
-        var result = await projectService.UpdateProjectAsync(projectId, request.Name, request.Description);
+        var userId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await projectService.UpdateProjectAsync(projectId, request.Name, request.Description, userId);
         return ApiResponse.GetActionResult(result);
     }
 
     private static async Task<IResult> DeleteProject(
         [FromServices] IProjectService projectService,
-        Guid projectId)
+        Guid projectId,
+        HttpContext context)
     {
-        var result = await projectService.DeleteProjectAsync(projectId);
+        var userId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await projectService.DeleteProjectAsync(projectId, userId);
         return ApiResponse.GetActionResult(result);
     }
 
     private static async Task<IResult> AddUserToProject(
         [FromServices] IProjectService projectService,
         Guid projectId,
-        [FromBody] AddUserToProjectRequest request)
+        [FromBody] AddUserToProjectRequest request, HttpContext context)
     {
-        var result = await projectService.AddUserToProjectAsync(projectId, request.UserId, request.PermissionLevel);
+        var userId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await projectService.AddUserToProjectAsync(projectId, request.UserId, request.PermissionLevel, userId);
         return ApiResponse.GetActionResult(result);
     }
 
     private static async Task<IResult> RemoveUserFromProject(
         [FromServices] IProjectService projectService,
         Guid projectId,
-        Guid userId)
+        Guid userId, HttpContext context)
     {
-        var result = await projectService.RemoveUserFromProjectAsync(projectId, userId);
+        var requesteruserId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(requesteruserId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await projectService.RemoveUserFromProjectAsync(projectId, userId, requesteruserId);
         return ApiResponse.GetActionResult(result);
     }
 
@@ -251,10 +285,16 @@ public static class ProjectEndpoints
         [FromServices] IProjectService projectService,
         Guid projectId,
         Guid userId,
-        [FromBody] UpdateUserPermissionRequest request)
+        [FromBody] UpdateUserPermissionRequest request, HttpContext context)
     {
+        var requesterUserId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(requesterUserId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
         var result =
-            await projectService.UpdateUserPermissionInProjectAsync(projectId, userId, request.NewPermissionLevel);
+            await projectService.UpdateUserPermissionInProjectAsync(projectId, userId, request.NewPermissionLevel, requesterUserId);
         return ApiResponse.GetActionResult(result);
     }
 
@@ -269,18 +309,30 @@ public static class ProjectEndpoints
     private static async Task<IResult> AddStageToProject(
         [FromServices] IProjectService projectService,
         Guid projectId,
-        [FromBody] AddStageToProjectRequest request)
+        [FromBody] AddStageToProjectRequest request, HttpContext context)
     {
-        var result = await projectService.AddStageToProjectAsync(projectId, request.Name, request.Order);
+        var userId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await projectService.AddStageToProjectAsync(projectId, request.Name, request.Order, userId);
         return ApiResponse.GetActionResult(result);
     }
 
     private static async Task<IResult> RemoveStageFromProject(
         [FromServices] IProjectService projectService,
         Guid projectId,
-        Guid stageId)
+        Guid stageId, HttpContext context)
     {
-        var result = await projectService.RemoveStageFromProjectAsync(projectId, stageId);
+        var userId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await projectService.RemoveStageFromProjectAsync(projectId, stageId, userId);
         return ApiResponse.GetActionResult(result);
     }
 
@@ -288,9 +340,15 @@ public static class ProjectEndpoints
         [FromServices] IProjectService projectService,
         Guid projectId,
         Guid stageId,
-        [FromBody] UpdateProjectStageRequest request)
+        [FromBody] UpdateProjectStageRequest request, HttpContext context)
     {
-        var result = await projectService.UpdateProjectStageAsync(projectId, stageId, request.Name, request.Order);
+        var userId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await projectService.UpdateProjectStageAsync(projectId, stageId, request.Name, request.Order, userId);
         return ApiResponse.GetActionResult(result);
     }
 }

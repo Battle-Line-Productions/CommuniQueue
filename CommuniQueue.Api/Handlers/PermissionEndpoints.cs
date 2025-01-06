@@ -1,10 +1,10 @@
 #region Copyright
 // ---------------------------------------------------------------------------
 // Copyright (c) 2024 Battleline Productions LLC. All rights reserved.
-// 
+//
 // Licensed under the Battleline Productions LLC license agreement.
 // See LICENSE file in the project root for full license information.
-// 
+//
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
 // Date: 11/23/2024
@@ -18,6 +18,7 @@
 using Asp.Versioning;
 using BattlelineExtras.Contracts.Models;
 using BattlelineExtras.Http.Utility;
+using CommuniQueue.Api.Extensions;
 using CommuniQueue.Contracts.Interfaces;
 using CommuniQueue.Contracts.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -92,11 +93,17 @@ public static class PermissionEndpoints
 
     public static async Task<IResult> CreatePermission(
         [FromServices] IPermissionService permissionService,
-        [FromBody] CreatePermissionRequest request)
+        [FromBody] CreatePermissionRequest request, HttpContext context)
     {
+        var userId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
         if (Enum.TryParse<EntityType>(request.EntityType, true, out var parsedEntityType))
         {
-            var result = await permissionService.CreatePermissionAsync(request.UserId, request.EntityId, parsedEntityType, request.PermissionLevel);
+            var result = await permissionService.CreatePermissionAsync(request.UserId, request.EntityId, parsedEntityType, request.PermissionLevel, userId);
             return ApiResponse.GetActionResult(result);
         }
 
@@ -134,11 +141,17 @@ public static class PermissionEndpoints
 
     public static async Task<IResult> UpdatePermission(
         [FromServices] IPermissionService permissionService,
-        [FromBody] UpdatePermissionRequest request)
+        [FromBody] UpdatePermissionRequest request, HttpContext context)
     {
+        var userId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
         if (Enum.TryParse<EntityType>(request.EntityType, true, out var parsedEntityType))
         {
-            var result = await permissionService.UpdatePermissionAsync(request.UserId, request.EntityId, parsedEntityType, request.NewPermissionLevel);
+            var result = await permissionService.UpdatePermissionAsync(request.UserId, request.EntityId, parsedEntityType, request.NewPermissionLevel, userId);
             return ApiResponse.GetActionResult(result);
         }
 
@@ -149,11 +162,17 @@ public static class PermissionEndpoints
         [FromServices] IPermissionService permissionService,
         Guid userId,
         Guid entityId,
-        string entityType)
+        string entityType, HttpContext context)
     {
+        var requesterUserId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(requesterUserId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
         if (Enum.TryParse<EntityType>(entityType, true, out var parsedEntityType))
         {
-            var result = await permissionService.DeletePermissionAsync(userId, entityId, parsedEntityType);
+            var result = await permissionService.DeletePermissionAsync(userId, entityId, parsedEntityType, requesterUserId);
             return ApiResponse.GetActionResult(result);
         }
 

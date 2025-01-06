@@ -2,10 +2,10 @@
 
 // ---------------------------------------------------------------------------
 // Copyright (c) 2024 Battleline Productions LLC. All rights reserved.
-// 
+//
 // Licensed under the Battleline Productions LLC license agreement.
 // See LICENSE file in the project root for full license information.
-// 
+//
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
 // Date: 11/03/2024
@@ -27,16 +27,24 @@ using CommuniQueue.Contracts.Interfaces.Repositories;
 
 namespace CommuniQueue.Services;
 
-public class ContainerService(IContainerRepository containerRepository, IProjectRepository projectRepository)
+public class ContainerService(IContainerRepository containerRepository, IProjectRepository projectRepository, IUserRepository userRepository)
     : IContainerService
 {
     private const string SubCode = "ContainerService";
 
     public async Task<ResponseDetail<Container>> CreateContainerAsync(string name, string description, Guid projectId,
-        Guid? parentContainerId)
+        Guid? parentContainerId, string requesterSsoId)
     {
         try
         {
+            var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+            if (user == null)
+            {
+                return ((Container?)null).BuildResponseDetail(ResultStatus.NotFound404, "Create Container", SubCode)
+                    .AddErrorDetail("CreateContainer", $"User with SSOID {requesterSsoId} not found");
+            }
+
             var project = await projectRepository.GetByIdAsync(projectId);
             if (project == null)
             {
@@ -109,10 +117,18 @@ public class ContainerService(IContainerRepository containerRepository, IProject
         }
     }
 
-    public async Task<ResponseDetail<Container>> UpdateContainerAsync(Guid containerId, string name, string description)
+    public async Task<ResponseDetail<Container>> UpdateContainerAsync(Guid containerId, string name, string description, string requesterSsoId)
     {
         try
         {
+            var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+            if (user == null)
+            {
+                return ((Container?)null).BuildResponseDetail(ResultStatus.NotFound404, "Update Container", SubCode)
+                    .AddErrorDetail("UpdateContainer", $"User with SSOID {requesterSsoId} not found");
+            }
+
             var container = await containerRepository.GetByIdAsync(containerId);
             if (container == null)
             {
@@ -132,10 +148,18 @@ public class ContainerService(IContainerRepository containerRepository, IProject
         }
     }
 
-    public async Task<ResponseDetail<bool>> DeleteContainerAsync(Guid containerId)
+    public async Task<ResponseDetail<bool>> DeleteContainerAsync(Guid containerId, string requesterSsoId)
     {
         try
         {
+            var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+            if (user == null)
+            {
+                return false.BuildResponseDetail(ResultStatus.NotFound404, "Delete Container", SubCode)
+                    .AddErrorDetail("DeleteContainer", $"User with SSOID {requesterSsoId} not found");
+            }
+
             var container = await containerRepository.GetByIdAsync(containerId);
             if (container == null)
             {
@@ -173,10 +197,18 @@ public class ContainerService(IContainerRepository containerRepository, IProject
         }
     }
 
-    public async Task<ResponseDetail<bool>> MoveContainerAsync(Guid containerId, Guid? newParentContainerId)
+    public async Task<ResponseDetail<bool>> MoveContainerAsync(Guid containerId, Guid? newParentContainerId, string requesterSsoId)
     {
         try
         {
+            var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+            if (user == null)
+            {
+                return false.BuildResponseDetail(ResultStatus.NotFound404, "Move Container", SubCode)
+                    .AddErrorDetail("MoveContainer", $"User with SSOID {requesterSsoId} not found");
+            }
+
             var container = await containerRepository.GetByIdAsync(containerId);
             if (container == null)
             {

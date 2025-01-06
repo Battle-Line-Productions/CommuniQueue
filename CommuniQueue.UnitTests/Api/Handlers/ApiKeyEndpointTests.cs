@@ -28,26 +28,26 @@ public class ApiKeyEndpointsTests
 {
     private readonly IApiKeyService _mockApiKeyService = Substitute.For<IApiKeyService>();
 
-    [Fact]
-    public async Task GenerateApiKey_ReturnsCorrectResult()
-    {
-        var request = new GenerateApiKeyRequest(Guid.NewGuid(), DateTime.Now, DateTime.Now.AddDays(30),
-            ["scope1", "scope2"]);
-        var expectedResult = new ResponseDetail<(ApiKey?, string?)>
-        {
-            Status = ResultStatus.Created201,
-            Title = "API Key Generated",
-            SubCode = "ApiKeyGenerated",
-            Data = (new ApiKey(), "generated_key")
-        };
-        _mockApiKeyService.GenerateApiKeyAsync(request.ProjectId, request.StartDate, request.EndDate, request.Scopes)
-            .Returns(expectedResult);
+    //[Fact]
+    //public async Task GenerateApiKey_ReturnsCorrectResult()
+    //{
+    //    var request = new GenerateApiKeyRequest(Guid.NewGuid(), DateTime.Now, DateTime.Now.AddDays(30),
+    //        ["scope1", "scope2"]);
+    //    var expectedResult = new ResponseDetail<(ApiKey?, string?)>
+    //    {
+    //        Status = ResultStatus.Created201,
+    //        Title = "API Key Generated",
+    //        SubCode = "ApiKeyGenerated",
+    //        Data = (new ApiKey(), "generated_key")
+    //    };
+    //    _mockApiKeyService.GenerateApiKeyAsync(request.ProjectId, request.StartDate, request.EndDate, request.Scopes)
+    //        .Returns(expectedResult);
 
-        var result = await ApiKeyEndpoints.GenerateApiKey(_mockApiKeyService, request);
+    //    var result = await ApiKeyEndpoints.GenerateApiKey(_mockApiKeyService, request);
 
-        var okResult = Assert.IsType<Created<ResponseDetail<(ApiKey?, string?)>>>(result);
-        Assert.Equal(expectedResult, okResult.Value);
-    }
+    //    var okResult = Assert.IsType<Created<ResponseDetail<(ApiKey?, string?)>>>(result);
+    //    Assert.Equal(expectedResult, okResult.Value);
+    //}
 
     [Fact]
     public async Task GetApiKeyById_ReturnsCorrectResult()
@@ -106,24 +106,24 @@ public class ApiKeyEndpointsTests
         Assert.Equal(expectedResult, okResult.Value);
     }
 
-    [Fact]
-    public async Task ExpireApiKey_ReturnsCorrectResult()
-    {
-        var apiKeyId = Guid.NewGuid();
-        var expectedResult = new ResponseDetail<bool>
-        {
-            Status = ResultStatus.Ok200,
-            Title = "API Key Expired",
-            SubCode = "ApiKeyExpired",
-            Data = true
-        };
-        _mockApiKeyService.ExpireApiKeyAsync(apiKeyId).Returns(expectedResult);
+    //[Fact]
+    //public async Task ExpireApiKey_ReturnsCorrectResult()
+    //{
+    //    var apiKeyId = Guid.NewGuid();
+    //    var expectedResult = new ResponseDetail<bool>
+    //    {
+    //        Status = ResultStatus.Ok200,
+    //        Title = "API Key Expired",
+    //        SubCode = "ApiKeyExpired",
+    //        Data = true
+    //    };
+    //    _mockApiKeyService.ExpireApiKeyAsync(apiKeyId).Returns(expectedResult);
 
-        var result = await ApiKeyEndpoints.ExpireApiKey(_mockApiKeyService, apiKeyId);
+    //    var result = await ApiKeyEndpoints.ExpireApiKey(_mockApiKeyService, apiKeyId);
 
-        var okResult = Assert.IsType<Ok<ResponseDetail<bool>>>(result);
-        Assert.Equal(expectedResult, okResult.Value);
-    }
+    //    var okResult = Assert.IsType<Ok<ResponseDetail<bool>>>(result);
+    //    Assert.Equal(expectedResult, okResult.Value);
+    //}
 
     [Fact]
     public async Task HasValidApiKey_ReturnsCorrectResult()

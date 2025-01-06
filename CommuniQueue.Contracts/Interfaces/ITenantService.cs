@@ -24,5 +24,5 @@ public interface ITenantService
 {
     Task<ResponseDetail<AppTenantInfo>> CreateTenantAsync(string tenantName, string tenantDescription, string ssoUserId);
     Task<ResponseDetail<List<AppTenantInfo>>> ListTenantsByUser(string ssoUserId);
-    Task<ResponseDetail<AppTenantInfo>> UpdateTenantAsync(string tenantId, string tenantName, string tenantDescription);
+    Task<ResponseDetail<AppTenantInfo>> UpdateTenantAsync(string tenantId, string tenantName, string tenantDescription, string requesterSsoId);
 }

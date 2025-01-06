@@ -24,6 +24,6 @@ namespace CommuniQueue.Contracts.Interfaces;
 
 public interface ITenantUserManagementService
 {
-    Task<ResponseDetail<AppTenantInfo>> AddUserToTenant(Guid userId, string tenantId);
-    Task<ResponseDetail<AppTenantInfo>> RemoveUserFromTenant(Guid userId, string tenantId);
+    Task<ResponseDetail<AppTenantInfo>> AddUserToTenant(Guid userId, string tenantId, string requesterSsoId);
+    Task<ResponseDetail<AppTenantInfo>> RemoveUserFromTenant(Guid userId, string tenantId, string requesterSsoId);
 }

@@ -1,10 +1,10 @@
 #region Copyright
 // ---------------------------------------------------------------------------
 // Copyright (c) 2024 Battleline Productions LLC. All rights reserved.
-// 
+//
 // Licensed under the Battleline Productions LLC license agreement.
 // See LICENSE file in the project root for full license information.
-// 
+//
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
 // Date: 11/03/2024
@@ -18,6 +18,7 @@
 using Asp.Versioning;
 using BattlelineExtras.Contracts.Models;
 using BattlelineExtras.Http.Utility;
+using CommuniQueue.Api.Extensions;
 using CommuniQueue.Contracts.Interfaces;
 using CommuniQueue.Contracts.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -113,9 +114,15 @@ public static class ContainerEndpoints
 
     public static async Task<IResult> CreateContainer(
         [FromServices] IContainerService containerService,
-        [FromBody] CreateContainerRequest request)
+        [FromBody] CreateContainerRequest request, HttpContext context)
     {
-        var result = await containerService.CreateContainerAsync(request.Name, request.Description, request.ProjectId, request.ParentContainerId);
+        var userId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await containerService.CreateContainerAsync(request.Name, request.Description, request.ProjectId, request.ParentContainerId, userId);
         return ApiResponse.GetActionResult(result);
     }
 
@@ -138,17 +145,29 @@ public static class ContainerEndpoints
     public static async Task<IResult> UpdateContainer(
         [FromServices] IContainerService containerService,
         Guid containerId,
-        [FromBody] UpdateContainerRequest request)
+        [FromBody] UpdateContainerRequest request, HttpContext context)
     {
-        var result = await containerService.UpdateContainerAsync(containerId, request.Name, request.Description);
+        var userId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await containerService.UpdateContainerAsync(containerId, request.Name, request.Description, userId);
         return ApiResponse.GetActionResult(result);
     }
 
     public static async Task<IResult> DeleteContainer(
         [FromServices] IContainerService containerService,
-        Guid containerId)
+        Guid containerId, HttpContext context)
     {
-        var result = await containerService.DeleteContainerAsync(containerId);
+        var userId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await containerService.DeleteContainerAsync(containerId, userId);
         return ApiResponse.GetActionResult(result);
     }
 
@@ -163,9 +182,15 @@ public static class ContainerEndpoints
     public static async Task<IResult> MoveContainer(
         [FromServices] IContainerService containerService,
         Guid containerId,
-        [FromBody] MoveContainerRequest request)
+        [FromBody] MoveContainerRequest request, HttpContext context)
     {
-        var result = await containerService.MoveContainerAsync(containerId, request.NewParentContainerId);
+        var userId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await containerService.MoveContainerAsync(containerId, request.NewParentContainerId, userId);
         return ApiResponse.GetActionResult(result);
     }
 }

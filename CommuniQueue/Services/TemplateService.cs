@@ -1,10 +1,10 @@
 #region Copyright
 // ---------------------------------------------------------------------------
 // Copyright (c) 2024 Battleline Productions LLC. All rights reserved.
-// 
+//
 // Licensed under the Battleline Productions LLC license agreement.
 // See LICENSE file in the project root for full license information.
-// 
+//
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
 // Date: 11/03/2024
@@ -26,15 +26,24 @@ public class TemplateService(
     ITemplateVersionRepository templateVersionRepository,
     ITemplateStageAssignmentRepository templateStageAssignmentRepository,
     IStageRepository stageRepository,
-    IContainerRepository containerRepository)
+    IContainerRepository containerRepository,
+    IUserRepository userRepository)
     : ITemplateService
 {
     private const string SubCode = "TemplateService";
 
-    public async Task<ResponseDetail<Template>> CreateTemplateAsync(Guid projectId, Guid containerId, string name, string subject, string body)
+    public async Task<ResponseDetail<Template>> CreateTemplateAsync(Guid projectId, Guid containerId, string name, string subject, string body, string requesterSsoId)
     {
         try
         {
+            var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+            if (user == null)
+            {
+                return ((Template?)null).BuildResponseDetail(ResultStatus.NotFound404, "Create Template", SubCode)
+                    .AddErrorDetail("CreateTemplate", $"User with SSOID {requesterSsoId} not found");
+            }
+
             var container = await containerRepository.GetByIdAsync(containerId);
             if (container == null || container.ProjectId != projectId)
             {
@@ -150,10 +159,18 @@ public class TemplateService(
         }
     }
 
-    public async Task<ResponseDetail<TemplateVersion>> CreateNewVersionAsync(Guid templateId, string subject, string body)
+    public async Task<ResponseDetail<TemplateVersion>> CreateNewVersionAsync(Guid templateId, string subject, string body, string requesterSsoId)
     {
         try
         {
+            var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+            if (user == null)
+            {
+                return ((TemplateVersion?)null).BuildResponseDetail(ResultStatus.NotFound404, "Create New Version", SubCode)
+                    .AddErrorDetail("CreateNewVersion", $"User with SSOID {requesterSsoId} not found");
+            }
+
             var template = await templateRepository.GetByIdAsync(templateId);
             if (template == null)
             {
@@ -182,10 +199,18 @@ public class TemplateService(
         }
     }
 
-    public async Task<ResponseDetail<bool>> AssignVersionToStageAsync(Guid templateVersionId, Guid stageId)
+    public async Task<ResponseDetail<bool>> AssignVersionToStageAsync(Guid templateVersionId, Guid stageId, string requesterSsoId)
     {
         try
         {
+            var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+            if (user == null)
+            {
+                return false.BuildResponseDetail(ResultStatus.NotFound404, "Assign Version to Stage", SubCode)
+                    .AddErrorDetail("AssignVersionToStage", $"User with SSOID {requesterSsoId} not found");
+            }
+
             var templateVersion = await templateVersionRepository.GetByIdAsync(templateVersionId);
             if (templateVersion == null)
             {
@@ -224,10 +249,18 @@ public class TemplateService(
         }
     }
 
-    public async Task<ResponseDetail<bool>> RemoveVersionFromStageAsync(Guid templateVersionId, Guid stageId)
+    public async Task<ResponseDetail<bool>> RemoveVersionFromStageAsync(Guid templateVersionId, Guid stageId, string requesterSsoId)
     {
         try
         {
+            var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+            if (user == null)
+            {
+                return false.BuildResponseDetail(ResultStatus.NotFound404, "Remove Version from Stage", SubCode)
+                    .AddErrorDetail("RemoveVersionFromStage", $"User with SSOID {requesterSsoId} not found");
+            }
+
             var assignment = await templateStageAssignmentRepository.GetByStageAndTemplateVersionIdAsync(stageId, templateVersionId);
             if (assignment == null)
             {

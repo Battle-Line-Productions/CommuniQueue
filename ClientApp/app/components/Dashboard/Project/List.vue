@@ -53,7 +53,7 @@ const { currentTenantId } = useTenant()
 const userId = user.sub
 
 const { isLoading, isError, data, error } = useQuery<IApiResponse<IProject[]>>({
-  queryKey: ['projectsPerTenant', userId, currentTenantId],
+  queryKey: ['projectsPerTenant', userId, currentTenantId.value],
   queryFn: () => getProjectsByUserId(userId),
   placeholderData: () => ({
     data: [] as IProject[],

@@ -18,6 +18,7 @@
 using Asp.Versioning;
 using BattlelineExtras.Contracts.Models;
 using BattlelineExtras.Http.Utility;
+using CommuniQueue.Api.Extensions;
 using CommuniQueue.Contracts.Interfaces;
 using CommuniQueue.Contracts.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -94,12 +95,19 @@ public static class TenantEndpoints
     private static async Task<IResult> UpdateTenant(
         [FromServices] ITenantService tenantService,
         string tenantId,
-        [FromBody] UpdateTenantRequest request)
+        [FromBody] UpdateTenantRequest request, HttpContext context)
     {
+        var userId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
         var result = await tenantService.UpdateTenantAsync(
             tenantId,
             request.TenantName,
-            request.TenantDescription
+            request.TenantDescription,
+            userId
         );
 
         return ApiResponse.GetActionResult(result);

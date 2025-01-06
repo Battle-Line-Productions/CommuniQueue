@@ -1,10 +1,10 @@
 #region Copyright
 // ---------------------------------------------------------------------------
 // Copyright (c) 2024 Battleline Productions LLC. All rights reserved.
-// 
+//
 // Licensed under the Battleline Productions LLC license agreement.
 // See LICENSE file in the project root for full license information.
-// 
+//
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
 // Date: 11/05/2024
@@ -26,13 +26,22 @@ namespace CommuniQueue.Services;
 public class ApiKeyService(
     IApiKeyRepository apiKeyRepository,
     IProjectRepository projectRepository,
-    IHashing hashingService)
+    IHashing hashingService,
+    IUserRepository userRepository)
     : IApiKeyService
 {
     private const string SubCode = "ApiKeyService";
 
-    public async Task<ResponseDetail<(ApiKey?, string?)>> GenerateApiKeyAsync(Guid projectId, DateTime startDate, DateTime endDate, List<string> scopes)
+    public async Task<ResponseDetail<(ApiKey?, string?)>> GenerateApiKeyAsync(Guid projectId, DateTime startDate, DateTime endDate, List<string> scopes, string requesterSsoId)
     {
+        var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+        if (user == null)
+        {
+            return ((ApiKey?)null, (string?)null).BuildResponseDetail(ResultStatus.NotFound404, "Generate API Key", SubCode)
+                .AddErrorDetail("GenerateApiKey", $"User with SSOID {requesterSsoId} not found");
+        }
+
         if (!await projectRepository.ExistsAsync(projectId))
         {
             return ((ApiKey?)null, (string?)null).BuildResponseDetail(ResultStatus.NotFound404, "Generate API Key", SubCode)
@@ -91,8 +100,16 @@ public class ApiKeyService(
         return true.BuildResponseDetail(ResultStatus.Ok200, "Validate API Key", SubCode);
     }
 
-    public async Task<ResponseDetail<bool>> ExpireApiKeyAsync(Guid apiKeyId)
+    public async Task<ResponseDetail<bool>> ExpireApiKeyAsync(Guid apiKeyId, string requesterSsoId)
     {
+        var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+        if (user == null)
+        {
+            return false.BuildResponseDetail(ResultStatus.NotFound404, "Expire API Key", SubCode)
+                .AddErrorDetail("ExpireApiKey", $"User with SSOID {requesterSsoId} not found");
+        }
+
         var apiKey = await apiKeyRepository.GetByIdAsync(apiKeyId);
         if (apiKey == null)
         {

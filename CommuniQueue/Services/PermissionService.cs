@@ -1,10 +1,10 @@
 #region Copyright
 // ---------------------------------------------------------------------------
 // Copyright (c) 2024 Battleline Productions LLC. All rights reserved.
-// 
+//
 // Licensed under the Battleline Productions LLC license agreement.
 // See LICENSE file in the project root for full license information.
-// 
+//
 // Author: Michael Cavanaugh
 // Company: Battleline Productions LLC
 // Date: 11/23/2024
@@ -26,8 +26,16 @@ public class PermissionService(IPermissionRepository permissionRepository, IUser
 {
     private const string SubCode = "PermissionService";
 
-    public async Task<ResponseDetail<Permission?>> CreatePermissionAsync(Guid userId, Guid entityId, EntityType entityType, PermissionLevel permissionLevel)
+    public async Task<ResponseDetail<Permission?>> CreatePermissionAsync(Guid userId, Guid entityId, EntityType entityType, PermissionLevel permissionLevel, string requesterSsoId)
     {
+        var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+        if (user == null)
+        {
+            return ((Permission)null).BuildResponseDetail(ResultStatus.NotFound404, "Create Permission", SubCode)
+                .AddErrorDetail("CreatePermission", $"User with SSOID {requesterSsoId} not found");
+        }
+
         if (!await userRepository.ExistsAsync(userId))
         {
             return ((Permission)null).BuildResponseDetail(ResultStatus.NotFound404, "Create Permission", SubCode)
@@ -70,8 +78,16 @@ public class PermissionService(IPermissionRepository permissionRepository, IUser
         return permissions.BuildResponseDetail(ResultStatus.Ok200, "Get Permissions by Entity", SubCode);
     }
 
-    public async Task<ResponseDetail<Permission>> UpdatePermissionAsync(Guid userId, Guid entityId, EntityType entityType, PermissionLevel newPermissionLevel)
+    public async Task<ResponseDetail<Permission>> UpdatePermissionAsync(Guid userId, Guid entityId, EntityType entityType, PermissionLevel newPermissionLevel, string requesterSsoId)
     {
+        var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+        if (user == null)
+        {
+            return ((Permission)null).BuildResponseDetail(ResultStatus.NotFound404, "Update Permission", SubCode)
+                .AddErrorDetail("UpdatePermission", $"User with SSOID {requesterSsoId} not found");
+        }
+
         var permission = await permissionRepository.GetAsync(userId, entityId, entityType);
         if (permission == null)
         {
@@ -84,8 +100,16 @@ public class PermissionService(IPermissionRepository permissionRepository, IUser
         return updatedPermission.BuildResponseDetail(ResultStatus.Ok200, "Update Permission", SubCode);
     }
 
-    public async Task<ResponseDetail<bool>> DeletePermissionAsync(Guid userId, Guid entityId, EntityType entityType)
+    public async Task<ResponseDetail<bool>> DeletePermissionAsync(Guid userId, Guid entityId, EntityType entityType, string requesterSsoId)
     {
+        var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+        if (user == null)
+        {
+            return false.BuildResponseDetail(ResultStatus.NotFound404, "Delete Permission", SubCode)
+                .AddErrorDetail("DeletePermission", $"User with SSOID {requesterSsoId} not found");
+        }
+
         if (!await permissionRepository.ExistsAsync(userId, entityId, entityType))
         {
             return false.BuildResponseDetail(ResultStatus.NotFound404, "Delete Permission", SubCode)

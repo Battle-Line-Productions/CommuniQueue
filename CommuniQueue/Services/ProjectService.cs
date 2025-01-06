@@ -69,12 +69,20 @@ public class ProjectService(
         return result.BuildResponseDetail(ResultStatus.Ok200, "Project Metrics", SubCode);
     }
 
-    public async Task<ResponseDetail<Project>> CreateProjectAsync(string name, string description, Guid ownerId)
+    public async Task<ResponseDetail<Project>> CreateProjectAsync(string name, string description, string requesterSsoId)
     {
         try
         {
             return await projectRepository.ExecuteInTransactionAsync(async () =>
             {
+                var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+                if (user == null)
+                {
+                    return ((Project?)null).BuildResponseDetail(ResultStatus.NotFound404, "Create Project", SubCode)
+                        .AddErrorDetail("CreateProject", $"User with SSOID {requesterSsoId} not found");
+                }
+
                 // First, create the Project without the RootContainerId
                 var project = new Project
                 {
@@ -97,7 +105,7 @@ public class ProjectService(
                 // Create the Permission
                 var permission = new Permission
                 {
-                    UserId = ownerId,
+                    UserId = user.Id,
                     EntityId = project.Id,
                     EntityType = EntityType.Project,
                     PermissionLevel = PermissionLevel.SuperAdmin
@@ -156,10 +164,18 @@ public class ProjectService(
         }
     }
 
-    public async Task<ResponseDetail<Project>> UpdateProjectAsync(Guid projectId, string name, string description)
+    public async Task<ResponseDetail<Project>> UpdateProjectAsync(Guid projectId, string name, string description, string requesterSsoId)
     {
         try
         {
+            var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+            if (user == null)
+            {
+                return ((Project?)null).BuildResponseDetail(ResultStatus.NotFound404, "Update Project", SubCode)
+                    .AddErrorDetail("UpdateProject", $"User with SSOID {requesterSsoId} not found");
+            }
+
             var project = await projectRepository.GetByIdAsync(projectId);
             if (project == null)
             {
@@ -179,10 +195,18 @@ public class ProjectService(
         }
     }
 
-    public async Task<ResponseDetail<bool>> DeleteProjectAsync(Guid projectId)
+    public async Task<ResponseDetail<bool>> DeleteProjectAsync(Guid projectId, string requesterSsoId)
     {
         try
         {
+            var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+            if (user == null)
+            {
+                return false.BuildResponseDetail(ResultStatus.NotFound404, "Delete Project", SubCode)
+                    .AddErrorDetail("DeleteProject", $"User with SSOID {requesterSsoId} not found");
+            }
+
             var project = await projectRepository.GetByIdAsync(projectId);
 
             if (project == null)
@@ -237,10 +261,18 @@ public class ProjectService(
     }
 
     public async Task<ResponseDetail<bool>> AddUserToProjectAsync(Guid projectId, Guid userId,
-        PermissionLevel permissionLevel)
+        PermissionLevel permissionLevel, string requesterSsoId)
     {
         try
         {
+            var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+            if (user == null)
+            {
+                return false.BuildResponseDetail(ResultStatus.NotFound404, "Add User To Project", SubCode)
+                    .AddErrorDetail("AddUserToProject", $"User with SSOID {requesterSsoId} not found");
+            }
+
             if (await permissionRepository.ExistsAsync(userId, projectId, EntityType.Project))
             {
                 return false.BuildResponseDetail(ResultStatus.Error400, "Add User to Project", SubCode)
@@ -265,10 +297,18 @@ public class ProjectService(
         }
     }
 
-    public async Task<ResponseDetail<bool>> RemoveUserFromProjectAsync(Guid projectId, Guid userId)
+    public async Task<ResponseDetail<bool>> RemoveUserFromProjectAsync(Guid projectId, Guid userId, string requesterSsoId)
     {
         try
         {
+            var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+            if (user == null)
+            {
+                return false.BuildResponseDetail(ResultStatus.NotFound404, "Remove User From Project", SubCode)
+                    .AddErrorDetail("RemoveUserFromProject", $"User with SSOID {requesterSsoId} not found");
+            }
+
             if (!await permissionRepository.ExistsAsync(userId, projectId, EntityType.Project))
             {
                 return false.BuildResponseDetail(ResultStatus.NotFound404, "Remove User from Project", SubCode)
@@ -286,10 +326,18 @@ public class ProjectService(
     }
 
     public async Task<ResponseDetail<bool>> UpdateUserPermissionInProjectAsync(Guid projectId, Guid userId,
-        PermissionLevel newPermissionLevel)
+        PermissionLevel newPermissionLevel, string requesterSsoId)
     {
         try
         {
+            var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+            if (user == null)
+            {
+                return false.BuildResponseDetail(ResultStatus.NotFound404, "Update User Permission In Project", SubCode)
+                    .AddErrorDetail("UpdateUserPermissionInProject", $"User with SSOID {requesterSsoId} not found");
+            }
+
             var permission = await permissionRepository.GetAsync(userId, projectId, EntityType.Project);
             if (permission == null)
             {
@@ -328,10 +376,18 @@ public class ProjectService(
         }
     }
 
-    public async Task<ResponseDetail<Stage>> AddStageToProjectAsync(Guid projectId, string stageName, int order)
+    public async Task<ResponseDetail<Stage>> AddStageToProjectAsync(Guid projectId, string stageName, int order, string requesterSsoId)
     {
         try
         {
+            var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+            if (user == null)
+            {
+                return ((Stage?)null).BuildResponseDetail(ResultStatus.NotFound404, "Add Stage to Project", SubCode)
+                    .AddErrorDetail("AddStageToProject", $"User with SSOID {requesterSsoId} not found");
+            }
+
             if (!await projectRepository.ExistsAsync(projectId))
             {
                 return ((Stage?)null).BuildResponseDetail(ResultStatus.NotFound404, "Add Stage to Project", SubCode)
@@ -355,10 +411,18 @@ public class ProjectService(
         }
     }
 
-    public async Task<ResponseDetail<bool>> RemoveStageFromProjectAsync(Guid projectId, Guid stageId)
+    public async Task<ResponseDetail<bool>> RemoveStageFromProjectAsync(Guid projectId, Guid stageId, string requesterSsoId)
     {
         try
         {
+            var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+            if (user == null)
+            {
+                return false.BuildResponseDetail(ResultStatus.NotFound404, "Remove Stage from Project", SubCode)
+                    .AddErrorDetail("RemoveStageFromProject", $"User with SSOID {requesterSsoId} not found");
+            }
+
             var stage = await stageRepository.GetByIdAsync(stageId);
             if (stage == null || stage.ProjectId != projectId)
             {
@@ -377,10 +441,18 @@ public class ProjectService(
     }
 
     public async Task<ResponseDetail<Stage>> UpdateProjectStageAsync(Guid projectId, Guid stageId, string name,
-        int order)
+        int order, string requesterSsoId)
     {
         try
         {
+            var user = await userRepository.GetBySsoIdAsync(requesterSsoId);
+
+            if (user == null)
+            {
+                return ((Stage?)null).BuildResponseDetail(ResultStatus.NotFound404, "Update Project Stage", SubCode)
+                    .AddErrorDetail("UpdateProjectStage", $"User with SSOID {requesterSsoId} not found");
+            }
+
             var stage = await stageRepository.GetByIdAsync(stageId);
             if (stage == null || stage.ProjectId != projectId)
             {

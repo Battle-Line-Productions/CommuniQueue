@@ -18,6 +18,7 @@
 using Asp.Versioning;
 using BattlelineExtras.Contracts.Models;
 using BattlelineExtras.Http.Utility;
+using CommuniQueue.Api.Extensions;
 using CommuniQueue.Contracts.Interfaces;
 using CommuniQueue.Contracts.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -103,9 +104,15 @@ public static class ApiKeyEndpoints
 
     public static async Task<IResult> GenerateApiKey(
         [FromServices] IApiKeyService apiKeyService,
-        [FromBody] GenerateApiKeyRequest request)
+        [FromBody] GenerateApiKeyRequest request, HttpContext context)
     {
-        var result = await apiKeyService.GenerateApiKeyAsync(request.ProjectId, request.StartDate, request.EndDate, request.Scopes);
+        var userId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await apiKeyService.GenerateApiKeyAsync(request.ProjectId, request.StartDate, request.EndDate, request.Scopes, userId);
         return ApiResponse.GetActionResult(result);
     }
 
@@ -135,9 +142,15 @@ public static class ApiKeyEndpoints
 
     public static async Task<IResult> ExpireApiKey(
         [FromServices] IApiKeyService apiKeyService,
-        Guid apiKeyId)
+        Guid apiKeyId, HttpContext context)
     {
-        var result = await apiKeyService.ExpireApiKeyAsync(apiKeyId);
+        var userId = context.User.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await apiKeyService.ExpireApiKeyAsync(apiKeyId, userId);
         return ApiResponse.GetActionResult(result);
     }
 

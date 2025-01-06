@@ -33,7 +33,7 @@
         <div class="flex justify-end">
           <UButton
             type="button"
-            class="mr-2 px-4 py-2 text-light-secondary dark:text-dark-secondary hover:underline"
+            class="mr-2 px-4 py-2 text-light-secondary dark:text-gray-200 hover:underline"
             @click="$emit('close')"
           >
             Cancel

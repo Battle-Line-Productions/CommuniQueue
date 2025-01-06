@@ -27,8 +27,31 @@ public class TenantUserManagementService(IUserRepository userRepo, ITenantReposi
 {
     private const string SubCode = "TenantUserManagementService";
 
-    public async Task<ResponseDetail<AppTenantInfo>> AddUserToTenant(Guid userId, string tenantId)
+    public async Task<ResponseDetail<AppTenantInfo>> AddUserToTenant(Guid userId, string tenantId, string requesterSsoId)
     {
+        var requester = await userRepo.GetByIdAsync(userId);
+
+        if (requester == null)
+        {
+            var responseDetail = new ResponseDetail<AppTenantInfo>
+            {
+                SubCode = SubCode,
+                Title = "AddUserToTenant",
+                Data = null,
+                Status = ResultStatus.NotFound404,
+                ErrorDetails =
+                [
+                    new()
+                    {
+                        Instance = "AddUserToTenant",
+                        Detail = $"User with SSOID {requesterSsoId} not found"
+                    }
+                ]
+            };
+
+            return responseDetail;
+        }
+
         var user = await userRepo.GetByIdAsync(userId);
 
         if (user == null)
@@ -101,8 +124,29 @@ public class TenantUserManagementService(IUserRepository userRepo, ITenantReposi
         };
     }
 
-    public async Task<ResponseDetail<AppTenantInfo>> RemoveUserFromTenant(Guid userId, string tenantId)
+    public async Task<ResponseDetail<AppTenantInfo>> RemoveUserFromTenant(Guid userId, string tenantId, string requesterSsoId)
     {
+        var requester = await userRepo.GetByIdAsync(userId);
+
+        if (requester == null)
+        {
+            return new ResponseDetail<AppTenantInfo>
+            {
+                SubCode = SubCode,
+                Title = "RemoveUserFromTenant",
+                Data = null,
+                Status = ResultStatus.NotFound404,
+                ErrorDetails =
+                [
+                    new()
+                    {
+                        Instance = "MissingUser",
+                        Detail = $"User by ID {userId} not found"
+                    }
+                ]
+            };
+        }
+
         var user = await userRepo.GetByIdAsync(userId);
 
         if (user == null)

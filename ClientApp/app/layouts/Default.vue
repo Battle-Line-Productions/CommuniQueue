@@ -20,7 +20,7 @@ watch(() => tenant.currentTenantId.value, (newTenantId) => {
 const navItems = [
   { label: 'Home', to: '/', requiresAuth: false },
   { label: 'Features', to: '/features', requiresAuth: false },
-  { label: 'Projects', to: projectRoute.value, requiresAuth: true, isTenantSpecific: true },
+  { label: 'Dashboard', to: projectRoute.value, requiresAuth: true, isTenantSpecific: true },
 ]
 </script>
 
