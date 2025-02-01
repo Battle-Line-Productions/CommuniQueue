@@ -23,7 +23,6 @@ using System.Linq.Expressions;
 using BattlelineExtras.Contracts.Extensions;
 using BattlelineExtras.Contracts.Models;
 using CommuniQueue.Contracts.Interfaces.Repositories;
-using CommuniQueue.Contracts.Models;
 using CommuniQueue.Contracts.Models.Filters;
 using CommuniQueue.Predicate;
 

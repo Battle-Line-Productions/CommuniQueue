@@ -41,6 +41,7 @@ public static class UserEndpoints
             .Produces<ResponseDetail<User>>(StatusCodes.Status409Conflict)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Requests a user, if one is not found, creates the user from the body",
@@ -52,6 +53,7 @@ public static class UserEndpoints
             .Produces<ResponseDetail<User>>(StatusCodes.Status409Conflict)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Create a new user",
@@ -63,6 +65,7 @@ public static class UserEndpoints
             .Produces<ResponseDetail<User>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get user by ID",
@@ -74,6 +77,7 @@ public static class UserEndpoints
             .Produces<ResponseDetail<User>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get user by SSO ID",
@@ -85,6 +89,7 @@ public static class UserEndpoints
             .Produces<ResponseDetail<User>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get user by email",
@@ -95,6 +100,7 @@ public static class UserEndpoints
             .Produces<ResponseDetail<List<User>>>()
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get all users",
@@ -106,6 +112,7 @@ public static class UserEndpoints
             .Produces<ResponseDetail<User>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Update user",
@@ -117,6 +124,7 @@ public static class UserEndpoints
             .Produces<ResponseDetail<bool>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Delete user",
@@ -128,6 +136,7 @@ public static class UserEndpoints
             .Produces<ResponseDetail<List<Permission>>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get user permissions",
@@ -138,6 +147,7 @@ public static class UserEndpoints
             .Produces<ResponseDetail<List<User>>>()
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Search users",
@@ -149,6 +159,7 @@ public static class UserEndpoints
             .Produces<ResponseDetail<List<User>>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get users with entity permissions",

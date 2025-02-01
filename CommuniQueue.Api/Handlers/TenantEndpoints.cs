@@ -42,6 +42,7 @@ public static class TenantEndpoints
             .Produces<ResponseDetail<AppTenantInfo>>(StatusCodes.Status500InternalServerError)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Create a new tenant",
@@ -53,6 +54,7 @@ public static class TenantEndpoints
             .Produces<ResponseDetail<List<AppTenantInfo>>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "List all tenants for a user",
@@ -64,6 +66,7 @@ public static class TenantEndpoints
             .Produces<ResponseDetail<AppTenantInfo>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Update an existing tenant",

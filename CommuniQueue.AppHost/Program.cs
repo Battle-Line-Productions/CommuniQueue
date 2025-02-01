@@ -25,7 +25,12 @@ using Projects;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var api = builder.AddProject<CommuniQueue_Api>("communiqueue-api").WithExternalHttpEndpoints();
+var postgres = builder.AddPostgres("postgres").WithDataVolume(isReadOnly: false).WithPgAdmin();
+
+var communiqueuedb = postgres.AddDatabase("communiqueuedb");
+
+var api = builder.AddProject<CommuniQueue_Api>("communiqueue-api").WithExternalHttpEndpoints()
+    .WithReference(communiqueuedb).WaitFor(postgres).WaitFor(communiqueuedb);
 
 builder.AddPnpmApp("CommuniQueue-UI", "../ClientApp", "dev")
     .WithReference(api)

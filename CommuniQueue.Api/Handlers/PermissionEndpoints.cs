@@ -41,6 +41,7 @@ public static class PermissionEndpoints
             .Produces<ResponseDetail<Permission>>(StatusCodes.Status400BadRequest)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Create a new permission",
@@ -52,6 +53,7 @@ public static class PermissionEndpoints
             .Produces<ResponseDetail<Permission>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get permission",
@@ -62,6 +64,7 @@ public static class PermissionEndpoints
             .Produces<ResponseDetail<List<Permission>>>()
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get permissions by entity",
@@ -73,6 +76,7 @@ public static class PermissionEndpoints
             .Produces<ResponseDetail<Permission>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Update permission",
@@ -84,6 +88,7 @@ public static class PermissionEndpoints
             .Produces<ResponseDetail<bool>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Delete permission",

@@ -41,6 +41,7 @@ public static class TemplateEndpoints
             .Produces<ResponseDetail<Template>>(StatusCodes.Status400BadRequest)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Create a new template",
@@ -52,6 +53,7 @@ public static class TemplateEndpoints
             .Produces<ResponseDetail<Template>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get a template by ID",
@@ -62,6 +64,7 @@ public static class TemplateEndpoints
             .Produces<ResponseDetail<List<Template>>>()
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get templates by project ID",
@@ -72,6 +75,7 @@ public static class TemplateEndpoints
             .Produces<ResponseDetail<List<Template>>>()
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get templates by container ID",
@@ -83,6 +87,7 @@ public static class TemplateEndpoints
             .Produces<ResponseDetail<TemplateVersion>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get latest version of a template",
@@ -93,6 +98,7 @@ public static class TemplateEndpoints
             .Produces<ResponseDetail<List<TemplateVersion>>>()
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get all versions of a template",
@@ -104,6 +110,7 @@ public static class TemplateEndpoints
             .Produces<ResponseDetail<TemplateVersion>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Create a new version of a template",
@@ -115,6 +122,7 @@ public static class TemplateEndpoints
             .Produces<ResponseDetail<bool>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Assign a template version to a stage",
@@ -126,6 +134,7 @@ public static class TemplateEndpoints
             .Produces<ResponseDetail<bool>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Remove a template version from a stage",
@@ -137,6 +146,7 @@ public static class TemplateEndpoints
             .Produces<ResponseDetail<TemplateVersion>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get version assigned to a stage",

@@ -17,7 +17,10 @@ export function useApiUtils() {
      * @returns A promise that resolves to the result of the `apiCall`.
      * @throws Rethrows any error caught during the API call.
      */
-    handleApiCall: async <T>(apiCall: Promise<T>, actionName: string): Promise<T> => {
+    handleApiCall: async <T>(
+      apiCall: Promise<T>,
+      actionName: string,
+    ): Promise<T> => {
       try {
         console.log(`Starting ${actionName}`)
 
@@ -27,6 +30,11 @@ export function useApiUtils() {
         }
 
         const result = await apiCall
+
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`Completed ${actionName} result:`, result)
+        }
+
         console.log(`Completed ${actionName}`)
         return result
       }
@@ -44,39 +52,57 @@ export function useApiUtils() {
 
     /**
      * Creates a base configuration object for a Nitro fetch call.
-     * This includes setting default headers and providing error logging
-     * for both request and response errors.
+     * This includes setting default headers, adding the Bearer token, and providing
+     * error logging for both request and response errors.
      *
      * @typeParam ResponseType - The expected response type for the fetch calls.
      * @returns A typed `NitroFetchOptions` object that includes default
      * headers and error handling callbacks.
      */
-    createFetchOptions: <ResponseType>(): NitroFetchOptions<
-      NitroFetchRequest,
-      'post' | 'get' | 'head' | 'patch' | 'put' | 'delete' | 'connect' | 'options' | 'trace'
+    createFetchOptions: async <ResponseType>(): Promise<
+      NitroFetchOptions<
+        NitroFetchRequest,
+        | 'post'
+        | 'get'
+        | 'head'
+        | 'patch'
+        | 'put'
+        | 'delete'
+        | 'connect'
+        | 'options'
+        | 'trace'
+      >
     > => {
-      return {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      }
 
-        // Called on response errors (e.g. non-2xx status codes).
+      try {
+        const { authToken } = useAuthToken()
+        if (authToken) {
+          headers.Authorization = `Bearer ${authToken.value}`
+        }
+      }
+      catch (error) {
+        console.error('Error getting session:', error)
+      }
+
+      return {
+        headers,
+        credentials: 'include',
         onResponseError(context: FetchContext<ResponseType>): void {
           const { request, response } = context
-          const url = request instanceof Request ? request.url : String(request)
+          const url
+            = request instanceof Request ? request.url : String(request)
           console.error(`API Error: ${response?.status}`, { url })
         },
-
-        // Called on request errors (e.g. network issues).
         onRequestError(context: FetchContext<ResponseType>): void {
           const { request, error } = context
-          const url = request instanceof Request ? request.url : String(request)
+          const url
+            = request instanceof Request ? request.url : String(request)
           console.error(`Request Error: ${error?.message}`, { url })
         },
-      } as NitroFetchOptions<
-        NitroFetchRequest,
-        'post' | 'get' | 'head' | 'patch' | 'put' | 'delete' | 'connect' | 'options' | 'trace'
-      >
+      }
     },
   }
 }

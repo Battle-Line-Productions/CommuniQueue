@@ -78,6 +78,10 @@ export default defineNuxtConfig({
       appId: '',
       appSecret: '',
       cookieEncryptionKey: '',
+      fetchUserInfo: true,
+      postLogoutRedirectUri: '/',
+      postCallbackRedirectUri: '/auth/logging-in',
+      scopes: ['openid', 'profile', 'email', 'organizations', 'custom_data', 'phone'],
     },
   },
 
@@ -112,8 +116,8 @@ export default defineNuxtConfig({
     postCallbackRedirectUri: '/auth/logging-in',
     postLogoutRedirectUri: '/',
     fetchUserInfo: true,
+    resources: ['https://dev-tenant.battlelineproductions.com'],
     scopes: ['openid', 'profile', 'email', 'organizations', 'custom_data', 'phone', 'write:resource'],
-    // resources: [process.env.NUXT_TENANT_LOGTO_RESOURCE as string]
   },
 
   ogImage: {

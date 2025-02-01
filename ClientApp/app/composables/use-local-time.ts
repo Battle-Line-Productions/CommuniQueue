@@ -1,4 +1,5 @@
 import type { Ref } from 'vue'
+import { ref } from 'vue'
 
 /**
  * A composable for converting UTC dates/times into local time strings.
@@ -22,6 +23,12 @@ export default function useLocalTime() {
 
     // Create a new Date object from the provided string or Date object.
     const date = new Date(isoUtcDatetime)
+
+    // Check for an invalid date
+    if (isNaN(date.getTime())) {
+      localTime.value = 'Invalid Date'
+      return localTime.value
+    }
 
     // Define how the date should be formatted.
     const options: Intl.DateTimeFormatOptions = {

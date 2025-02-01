@@ -30,6 +30,8 @@ public class ProjectRepository(AppDbContext context) : BaseRepository<Project>(c
         var query = _context.Permissions
             .Where(x => x.EntityType == EntityType.Project && x.UserId == userId);
 
+        var sql = query.ToQueryString();
+
         var matchingPermissions = await query.ToListAsync();
 
         var entityIdsFromPermissions = matchingPermissions.Select(x => x.EntityId).ToList();

@@ -85,7 +85,6 @@ const handleSubmit = () => {
   mutate({
     name: projectName.value,
     description: projectDescription.value,
-    ownerId: '7F58AFB9-CFEB-4117-998A-A6658C3BCC90', // TODO: Replace with actual user ID from auth system
   })
 }
 </script>

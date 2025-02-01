@@ -30,7 +30,9 @@ using CommuniQueue.Contracts.Models;
 using CommuniQueue.DataAccess;
 using CommuniQueue.ServiceDefaults;
 using Finbuckle.MultiTenant;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using ServiceExtensions = BattlelineExtras.Services.Extensions.ServiceExtensions;
 
 #endregion
@@ -42,6 +44,54 @@ builder.Services.AddCustomLogger(builder.Configuration);
 builder.AddServiceDefaults();
 
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.Authority =
+            "https://dev-vqwp0iq3eaderlnm.us.auth0.com/"; //TODO: Can move this to configuration item or env var later
+        options.Audience = "http://localhost:5000"; //TODO: Can move this to configuration item or env var later
+
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine("OnAuthenticationFailed: " + context.Exception.Message);
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = context =>
+            {
+                Console.WriteLine("OnTokenValidated: " + context.SecurityToken);
+                return Task.CompletedTask;
+            },
+            OnMessageReceived = context =>
+            {
+                Console.WriteLine("OnMessageReceived: " + context.Token);
+                return Task.CompletedTask;
+            },
+            OnChallenge = context =>
+            {
+                Console.WriteLine("OnChallenge: " + context.Error);
+                return Task.CompletedTask;
+            }
+        };
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            RequireExpirationTime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
@@ -78,7 +128,10 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policyBuilder =>
     {
-        policyBuilder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+        policyBuilder.WithOrigins("http://localhost:3000")  // Your frontend URL
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
     });
 });
 
@@ -95,6 +148,9 @@ app.UseMultiTenant();
 app.MapDefaultEndpoints();
 
 app.UseCors();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseHttpsRedirection();
 

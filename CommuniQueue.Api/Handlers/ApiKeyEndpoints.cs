@@ -41,6 +41,7 @@ public static class ApiKeyEndpoints
             .Produces<ResponseDetail<(ApiKey?, string?)>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Generate a new API key",
@@ -52,6 +53,7 @@ public static class ApiKeyEndpoints
             .Produces<ResponseDetail<ApiKey>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get API key by ID",
@@ -63,6 +65,7 @@ public static class ApiKeyEndpoints
             .Produces<ResponseDetail<List<ApiKey>>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get API keys by project ID",
@@ -74,6 +77,7 @@ public static class ApiKeyEndpoints
             .Produces<ResponseDetail<bool>>(StatusCodes.Status401Unauthorized)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Validate API key",
@@ -85,6 +89,7 @@ public static class ApiKeyEndpoints
             .Produces<ResponseDetail<bool>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Expire API key",
@@ -95,6 +100,7 @@ public static class ApiKeyEndpoints
             .Produces<ResponseDetail<bool>>()
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Check for valid API key",

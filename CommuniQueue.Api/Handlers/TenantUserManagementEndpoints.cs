@@ -41,6 +41,7 @@ public static class TenantUserManagementEndpoints
             .Produces<ResponseDetail<AppTenantInfo>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Add a user to a tenant",
@@ -52,6 +53,7 @@ public static class TenantUserManagementEndpoints
             .Produces<ResponseDetail<AppTenantInfo>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Remove a user from a tenant",

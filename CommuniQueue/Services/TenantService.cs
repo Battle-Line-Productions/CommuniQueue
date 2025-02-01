@@ -15,7 +15,6 @@
 // ---------------------------------------------------------------------------
 #endregion
 
-using BattlelineExtras.Contracts.Extensions;
 using BattlelineExtras.Contracts.Models;
 using CommuniQueue.Contracts.Interfaces.Repositories;
 using CommuniQueue.Extensions;

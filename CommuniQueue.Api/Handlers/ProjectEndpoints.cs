@@ -44,6 +44,7 @@ public static class ProjectEndpoints
             .Produces<ResponseDetail<Project>>(StatusCodes.Status400BadRequest)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Create a new project",
@@ -55,6 +56,7 @@ public static class ProjectEndpoints
             .Produces<ResponseDetail<Project>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get a project by ID",
@@ -65,6 +67,7 @@ public static class ProjectEndpoints
             .Produces<ResponseDetail<ProjectKpis>>()
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Gets basic project Kpi's",
@@ -75,6 +78,7 @@ public static class ProjectEndpoints
             .Produces<ResponseDetail<List<Project>>>()
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get projects by user ID",
@@ -86,6 +90,7 @@ public static class ProjectEndpoints
             .Produces<ResponseDetail<Project>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Update a project",
@@ -97,6 +102,7 @@ public static class ProjectEndpoints
             .Produces<ResponseDetail<bool>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Delete a project",
@@ -108,6 +114,7 @@ public static class ProjectEndpoints
             .Produces<ResponseDetail<bool>>(StatusCodes.Status400BadRequest)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Add a user to a project",
@@ -119,6 +126,7 @@ public static class ProjectEndpoints
             .Produces<ResponseDetail<bool>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Remove a user from a project",
@@ -130,6 +138,7 @@ public static class ProjectEndpoints
             .Produces<ResponseDetail<bool>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Update user permission in a project",
@@ -140,6 +149,7 @@ public static class ProjectEndpoints
             .Produces<ResponseDetail<List<Stage>>>()
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get project stages",
@@ -151,6 +161,7 @@ public static class ProjectEndpoints
             .Produces<ResponseDetail<Stage>>(StatusCodes.Status400BadRequest)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Add a stage to a project",
@@ -162,6 +173,7 @@ public static class ProjectEndpoints
             .Produces<ResponseDetail<bool>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Remove a stage from a project",
@@ -173,6 +185,7 @@ public static class ProjectEndpoints
             .Produces<ResponseDetail<Stage>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Update a project stage",
@@ -354,7 +367,7 @@ public static class ProjectEndpoints
 }
 
 // Request models
-public record CreateProjectRequest(string Name, string Description, Guid OwnerId);
+public record CreateProjectRequest(string Name, string Description);
 
 public record UpdateProjectRequest(string Name, string Description);
 

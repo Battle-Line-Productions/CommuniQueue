@@ -15,9 +15,7 @@
 // ---------------------------------------------------------------------------
 #endregion
 
-using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
-using CommuniQueue.Contracts.Models;
 
 namespace CommuniQueue.Api.Extensions;
 

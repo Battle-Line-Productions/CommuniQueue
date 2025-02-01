@@ -41,6 +41,7 @@ public static class ContainerEndpoints
             .Produces<ResponseDetail<Container>>(StatusCodes.Status400BadRequest)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Create a new container",
@@ -52,6 +53,7 @@ public static class ContainerEndpoints
             .Produces<ResponseDetail<Container>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get a container by ID",
@@ -62,6 +64,7 @@ public static class ContainerEndpoints
             .Produces<ResponseDetail<List<Container>>>()
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get containers by project ID",
@@ -73,6 +76,7 @@ public static class ContainerEndpoints
             .Produces<ResponseDetail<Container>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Update a container",
@@ -84,6 +88,7 @@ public static class ContainerEndpoints
             .Produces<ResponseDetail<bool>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Delete a container",
@@ -94,6 +99,7 @@ public static class ContainerEndpoints
             .Produces<ResponseDetail<List<Container>>>()
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Get child containers",
@@ -105,6 +111,7 @@ public static class ContainerEndpoints
             .Produces<ResponseDetail<bool>>(StatusCodes.Status404NotFound)
             .WithApiVersionSet(versionSet)
             .MapToApiVersion(1.0)
+            .RequireAuthorization()
             .WithOpenApi(operation => new(operation)
             {
                 Summary = "Move a container",
