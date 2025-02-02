@@ -75,9 +75,9 @@ export default defineNuxtConfig({
     },
     logto: {
       endpoint: 't7eamt.logto.app',
-      appId: '',
-      appSecret: '',
-      cookieEncryptionKey: '',
+      appId: '', // NUXT_LOGTO_APP_ID=<your-id>
+      appSecret: '', // NUXT_LOGTO_APP_SECRET=<your-secret
+      cookieEncryptionKey: '', // NUXT_LOGTO_COOKIE_ENCRYPTION_KEY
       fetchUserInfo: true,
       postLogoutRedirectUri: '/',
       postCallbackRedirectUri: '/auth/logging-in',
