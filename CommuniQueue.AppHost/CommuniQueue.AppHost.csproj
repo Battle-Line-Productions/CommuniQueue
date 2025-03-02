@@ -9,11 +9,11 @@
     <UserSecretsId>c8242e4d-dd9e-4c51-9f4d-57ec59097a39</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.0.0" />
-    <PackageReference Include="Aspire.Hosting.NodeJs" Version="9.0.0" />
-    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.0.0" />
-    <PackageReference Include="CommunityToolkit.Aspire.Hosting.NodeJS.Extensions" Version="9.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.1">
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.1.0" />
+    <PackageReference Include="Aspire.Hosting.NodeJs" Version="9.1.0" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.1.0" />
+    <PackageReference Include="CommunityToolkit.Aspire.Hosting.NodeJS.Extensions" Version="9.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
