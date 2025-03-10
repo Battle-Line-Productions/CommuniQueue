@@ -23,7 +23,7 @@
     "@nuxtjs/color-mode": "3.5.2",
     "@nuxtjs/seo": "2.0.2",
     "@tanstack/vue-query": "^5.62.9",
-    "@vueuse/nuxt": "12.2.0",
+    "@vueuse/nuxt": "13.0.0",
     "nuxt": "^3.15.0",
     "vue": "latest"
   },
