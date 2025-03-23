@@ -24,7 +24,7 @@ public class ProjectFilter
 
     public static bool TryParse(string? value, out ProjectFilter? result)
     {
-        result = new ProjectFilter();
+        result = new();
 
         if (string.IsNullOrEmpty(value))
         {

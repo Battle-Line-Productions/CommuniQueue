@@ -32,7 +32,7 @@ public static class TenantUserManagementEndpoints
     public static void MapTenantUserManagementEndpoints(this IEndpointRouteBuilder app)
     {
         var versionSet = app.NewApiVersionSet()
-            .HasApiVersion(new ApiVersion(1, 0))
+            .HasApiVersion(new(1, 0))
             .ReportApiVersions()
             .Build();
 

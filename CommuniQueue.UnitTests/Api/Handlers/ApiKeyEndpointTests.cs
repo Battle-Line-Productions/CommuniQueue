@@ -58,7 +58,7 @@ public class ApiKeyEndpointsTests
             Status = ResultStatus.Ok200,
             Title = "API Key Retrieved",
             SubCode = "ApiKeyRetrieved",
-            Data = new ApiKey()
+            Data = new()
         };
         _mockApiKeyService.GetApiKeyByIdAsync(apiKeyId).Returns(expectedResult);
 

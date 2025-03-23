@@ -34,7 +34,7 @@ public class UserService(IUserRepository userRepository, IPermissionRepository p
             if (user != null)
                 return user.BuildResponseDetail(ResultStatus.Ok200, "Get or Create User: Found User", SubCode);
 
-            user = new User
+            user = new()
             {
                 Email = email,
                 SsoId = ssoId,
@@ -250,7 +250,7 @@ public class UserService(IUserRepository userRepository, IPermissionRepository p
             {
                 user.Permissions = permissionsByUser.TryGetValue(user.Id, out var userPermissions)
                     ? userPermissions
-                    : new List<Permission>();
+                    : new();
             }
 
             return users.ToList().BuildResponseDetail(ResultStatus.Ok200, "Get Users With Entity Permissions", SubCode);

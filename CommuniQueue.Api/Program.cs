@@ -56,7 +56,7 @@ builder.Services.AddAuthentication(options =>
             "https://t7eamt.logto.app/oidc"; //TODO: Can move this to configuration item or env var later
         options.Audience = "http://localhost:5000"; //TODO: Can move this to configuration item or env var later
 
-        options.Events = new JwtBearerEvents
+        options.Events = new()
         {
             OnAuthenticationFailed = context =>
             {
@@ -80,7 +80,7 @@ builder.Services.AddAuthentication(options =>
             }
         };
 
-        options.TokenValidationParameters = new TokenValidationParameters
+        options.TokenValidationParameters = new()
         {
             ValidateIssuer = true,
             ValidateAudience = true,
@@ -113,7 +113,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddApiVersioning(options =>
     {
-        options.DefaultApiVersion = new ApiVersion(1, 0);
+        options.DefaultApiVersion = new(1, 0);
         options.AssumeDefaultVersionWhenUnspecified = true;
         options.ReportApiVersions = true;
         options.ApiVersionReader = new UrlSegmentApiVersionReader();

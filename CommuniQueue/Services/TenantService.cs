@@ -34,7 +34,7 @@ public class TenantService(IUserRepository userRepo, ITenantRepository tenantRep
 
             if (user == null)
             {
-                responseDetail = new ResponseDetail<AppTenantInfo>
+                responseDetail = new()
                 {
                     SubCode = SubCode,
                     Title = "CreateTenant",
@@ -81,7 +81,7 @@ public class TenantService(IUserRepository userRepo, ITenantRepository tenantRep
 
             await tenantRepo.CreateTenant(tenant);
 
-            responseDetail = new ResponseDetail<AppTenantInfo>
+            responseDetail = new()
             {
                 SubCode = SubCode,
                 Title = "CreateTenant",
@@ -93,7 +93,7 @@ public class TenantService(IUserRepository userRepo, ITenantRepository tenantRep
         }
         catch (Exception ex)
         {
-            responseDetail = new ResponseDetail<AppTenantInfo>
+            responseDetail = new()
             {
                 SubCode = SubCode,
                 Title = "CreateTenant",
@@ -140,7 +140,7 @@ public class TenantService(IUserRepository userRepo, ITenantRepository tenantRep
 
         var tenants = await tenantRepo.GetTenantsByUserId(user.Id);
 
-        return new ResponseDetail<List<AppTenantInfo>>
+        return new()
         {
             SubCode = SubCode,
             Title = "ListTenantsByUser",
@@ -205,7 +205,7 @@ public class TenantService(IUserRepository userRepo, ITenantRepository tenantRep
 
         await tenantRepo.UpdateTenant(tenant);
 
-        return new ResponseDetail<AppTenantInfo>
+        return new()
         {
             SubCode = SubCode,
             Title = "UpdateTenant",

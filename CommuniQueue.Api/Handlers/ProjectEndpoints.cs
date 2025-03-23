@@ -35,7 +35,7 @@ public static class ProjectEndpoints
     public static void MapProjectEndpoints(this IEndpointRouteBuilder app)
     {
         var versionSet = app.NewApiVersionSet()
-            .HasApiVersion(new ApiVersion(1, 0))
+            .HasApiVersion(new(1, 0))
             .ReportApiVersions()
             .Build();
 

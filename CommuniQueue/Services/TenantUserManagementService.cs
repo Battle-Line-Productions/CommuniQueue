@@ -115,7 +115,7 @@ public class TenantUserManagementService(IUserRepository userRepo, ITenantReposi
 
         await tenantRepo.UpdateTenant(tenant);
 
-        return new ResponseDetail<AppTenantInfo>
+        return new()
         {
             SubCode = SubCode,
             Title = "AddUserToTenant",
@@ -130,7 +130,7 @@ public class TenantUserManagementService(IUserRepository userRepo, ITenantReposi
 
         if (requester == null)
         {
-            return new ResponseDetail<AppTenantInfo>
+            return new()
             {
                 SubCode = SubCode,
                 Title = "RemoveUserFromTenant",
@@ -151,7 +151,7 @@ public class TenantUserManagementService(IUserRepository userRepo, ITenantReposi
 
         if (user == null)
         {
-            return new ResponseDetail<AppTenantInfo>
+            return new()
             {
                 SubCode = SubCode,
                 Title = "RemoveUserFromTenant",
@@ -172,7 +172,7 @@ public class TenantUserManagementService(IUserRepository userRepo, ITenantReposi
 
         if (tenant == null)
         {
-            return new ResponseDetail<AppTenantInfo>
+            return new()
             {
                 SubCode = SubCode,
                 Title = "RemoveUserFromTenant",
@@ -194,7 +194,7 @@ public class TenantUserManagementService(IUserRepository userRepo, ITenantReposi
 
         if (membership == null)
         {
-            return new ResponseDetail<AppTenantInfo>
+            return new()
             {
                 SubCode = SubCode,
                 Title = "RemoveUserFromTenant",
@@ -215,7 +215,7 @@ public class TenantUserManagementService(IUserRepository userRepo, ITenantReposi
 
         await tenantRepo.UpdateTenant(tenant);
 
-        return new ResponseDetail<AppTenantInfo>
+        return new()
         {
             SubCode = SubCode,
             Title = "RemoveUserFromTenant",

@@ -46,7 +46,7 @@ public class ProjectService(
     {
         var filterPredicate = ProjectDataPredicateBuilder.GetFilterPredicate(filter);
         Expression<Func<Project, object>> groupBy = entity => 1;
-        Expression<Func<IGrouping<object, Project>, ProjectKpis>> select = group => new ProjectKpis
+        Expression<Func<IGrouping<object, Project>, ProjectKpis>> select = group => new()
         {
             TemplateCount = group.Sum(project => project.Templates.Count),
             StageCount = group.Sum(project =>

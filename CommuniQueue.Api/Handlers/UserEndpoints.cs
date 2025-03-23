@@ -31,7 +31,7 @@ public static class UserEndpoints
     public static void MapUserEndpoints(this IEndpointRouteBuilder app)
     {
         var versionSet = app.NewApiVersionSet()
-            .HasApiVersion(new ApiVersion(1, 0))
+            .HasApiVersion(new(1, 0))
             .ReportApiVersions()
             .Build();
 
