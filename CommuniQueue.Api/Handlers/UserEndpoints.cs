@@ -15,7 +15,6 @@
 // ---------------------------------------------------------------------------
 #endregion
 
-using Asp.Versioning;
 using BattlelineExtras.Contracts.Models;
 using BattlelineExtras.Http.Utility;
 using CommuniQueue.Contracts.Interfaces;

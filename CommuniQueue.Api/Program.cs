@@ -32,7 +32,6 @@ using CommuniQueue.ServiceDefaults;
 using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using ServiceExtensions = BattlelineExtras.Services.Extensions.ServiceExtensions;
 
 #endregion
