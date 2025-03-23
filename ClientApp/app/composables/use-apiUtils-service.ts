@@ -59,7 +59,7 @@ export function useApiUtils() {
      * @returns A typed `NitroFetchOptions` object that includes default
      * headers and error handling callbacks.
      */
-    createFetchOptions: async <ResponseType>(): Promise<
+    createFetchOptions: <ResponseType>():
       NitroFetchOptions<
         NitroFetchRequest,
         | 'post'
@@ -71,16 +71,18 @@ export function useApiUtils() {
         | 'connect'
         | 'options'
         | 'trace'
-      >
-    > => {
+      > => {
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       }
 
       try {
-        const { authToken } = useAuthToken()
-        if (authToken) {
-          headers.Authorization = `Bearer ${authToken.value}`
+        const tokenObject = useAuthToken()
+        var token = tokenObject.getToken()
+        console.log('Token object:', tokenObject)
+        console.log('Token:', token)
+        if (token) {
+          headers.Authorization = `Bearer ${token}`
         }
       }
       catch (error) {

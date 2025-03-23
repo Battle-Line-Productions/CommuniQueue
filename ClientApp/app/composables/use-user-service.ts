@@ -6,8 +6,8 @@ export default function useUsers() {
 
   const baseUrl = `${config.public.apiBaseUrl}/api/v1/users`
 
-  const getOrCreateUser = (request: ICreateUserRequest) => {
-    return handleApiCall(
+  const getOrCreateUser = async (request: ICreateUserRequest) => {
+    return await handleApiCall(
       $fetch<IApiResponse<IUser>>(`${baseUrl}/initial`, {
         ...createFetchOptions<IApiResponse<IUser>>(),
         method: 'POST',

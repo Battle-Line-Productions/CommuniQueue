@@ -53,7 +53,7 @@ builder.Services.AddAuthentication(options =>
     .AddJwtBearer(options =>
     {
         options.Authority =
-            "https://dev-vqwp0iq3eaderlnm.us.auth0.com/"; //TODO: Can move this to configuration item or env var later
+            "https://t7eamt.logto.app/oidc"; //TODO: Can move this to configuration item or env var later
         options.Audience = "http://localhost:5000"; //TODO: Can move this to configuration item or env var later
 
         options.Events = new JwtBearerEvents

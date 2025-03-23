@@ -70,11 +70,11 @@ export default defineNuxtConfig({
           id: '',
         },
       },
-      // NUXT_PUBLIC_API_BASE_URL=<your-url>
-      apiBaseUrl: '',
     },
+    // NUXT_API_BASE_URL=<your-url>
+    apiBaseUrl: '',
     logto: {
-      endpoint: 't7eamt.logto.app',
+      endpoint: 'https://t7eamt.logto.app',
       appId: '', // NUXT_LOGTO_APP_ID=<your-id>
       appSecret: '', // NUXT_LOGTO_APP_SECRET=<your-secret
       cookieEncryptionKey: '', // NUXT_LOGTO_COOKIE_ENCRYPTION_KEY
@@ -116,7 +116,7 @@ export default defineNuxtConfig({
     postCallbackRedirectUri: '/auth/logging-in',
     postLogoutRedirectUri: '/',
     fetchUserInfo: true,
-    resources: ['https://dev-tenant.battlelineproductions.com'],
+    resources: ['https://dev-tenant.battlelineproductions.com', "http://localhost:5000"],
     scopes: ['openid', 'profile', 'email', 'organizations', 'custom_data', 'phone', 'write:resource'],
   },
 

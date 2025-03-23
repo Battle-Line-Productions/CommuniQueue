@@ -34,8 +34,13 @@ export function useAuthToken() {
     authToken.value = null
   }
 
+  function getToken() {
+    return authToken.value ?? tokenCookie.value
+  }
+
   return {
     authToken, // reactive
+    getToken,
     setToken,
     clearToken,
   }
