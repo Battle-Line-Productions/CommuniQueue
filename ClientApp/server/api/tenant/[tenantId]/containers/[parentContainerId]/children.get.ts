@@ -15,6 +15,7 @@ export default defineEventHandler(async (event) => {
             {
                 method: 'GET',
                 headers,
+                credentials: 'include',
             }
         )
         return res

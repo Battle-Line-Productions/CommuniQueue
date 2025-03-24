@@ -76,19 +76,6 @@ export function useApiUtils() {
         'Content-Type': 'application/json',
       }
 
-      try {
-        const tokenObject = useAuthToken()
-        var token = tokenObject.getToken()
-        console.log('Token object:', tokenObject)
-        console.log('Token:', token)
-        if (token) {
-          headers.Authorization = `Bearer ${token}`
-        }
-      }
-      catch (error) {
-        console.error('Error getting session:', error)
-      }
-
       return {
         headers,
         credentials: 'include',

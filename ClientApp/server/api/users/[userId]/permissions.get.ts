@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
         const res = await $fetch<IApiResponse<IPermission[]>>(`${config.apiBaseUrl}/api/v1/users/${userId}/permissions`, {
             method: 'GET',
             headers,
+            credentials: 'include',
         })
         return res
     })

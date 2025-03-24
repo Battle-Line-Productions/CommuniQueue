@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
         const res = await $fetch<IApiResponse<boolean>>(`${config.apiBaseUrl}/api/v1/users/${userId}`, {
             method: 'DELETE',
             headers,
+            credentials: 'include',
         })
         return res
     })

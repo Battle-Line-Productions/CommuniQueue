@@ -11,6 +11,7 @@ export default defineEventHandler(async (event) => {
             method: 'GET',
             headers,
             query: searchTerm ? { searchTerm } : {},
+            credentials: 'include',
         })
 
         return res

@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
             {
                 method: 'POST',
                 headers,
+                credentials: 'include',
             }
         )
 

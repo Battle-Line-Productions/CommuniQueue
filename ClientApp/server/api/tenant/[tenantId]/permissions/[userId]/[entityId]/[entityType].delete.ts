@@ -17,6 +17,7 @@ export default defineEventHandler(async (event) => {
             {
                 method: 'DELETE',
                 headers,
+                credentials: 'include',
             }
         )
         return res

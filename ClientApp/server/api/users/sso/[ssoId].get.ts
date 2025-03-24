@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
         const res = await $fetch<IApiResponse<IUser>>(`${config.apiBaseUrl}/api/v1/users/sso/${ssoId}`, {
             method: 'GET',
             headers,
+            credentials: 'include',
         })
         return res
     })

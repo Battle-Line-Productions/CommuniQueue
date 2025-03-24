@@ -21,6 +21,7 @@ export default defineEventHandler(async (event) => {
                 method: 'POST',
                 headers,
                 body,
+                credentials: 'include',
             }
         )
         return res
