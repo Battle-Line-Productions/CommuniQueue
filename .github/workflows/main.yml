@@ -31,7 +31,7 @@ jobs:
           dotnet test --no-restore --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=./coverage.opencover.xml
 
       - name: Unit Tests + SonarScanner
-        uses: highbyte/sonarscan-dotnet@v2.4.1
+        uses: highbyte/sonarscan-dotnet@v2.4.2
         with:
           sonarProjectKey: Battle-Line-Productions_CommuniQueue
           sonarProjectName:  CommuniQueue
